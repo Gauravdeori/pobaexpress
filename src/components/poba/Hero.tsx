@@ -114,7 +114,7 @@ export function Hero() {
           <motion.div
             animate={{ y: [0, -14, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="glass rounded-4xl p-8 shadow-lift transition-transform duration-500 hover:scale-[1.03]"
+            className="bg-white rounded-4xl p-8 shadow-lift transition-transform duration-500 hover:scale-[1.03]"
           >
             <img
               ref={logoRef}
@@ -130,7 +130,7 @@ export function Hero() {
               key={b.label}
               animate={{ y: [0, i % 2 === 0 ? -10 : 10, 0] }}
               transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut" }}
-              className={`glass-light absolute ${b.pos} flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-primary shadow-soft`}
+              className={`bg-white absolute ${b.pos} flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-primary shadow-soft`}
             >
               <b.icon className="size-4 text-accent" />
               {b.label}
