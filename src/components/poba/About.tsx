@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { MapPin, Users, Sparkles } from "lucide-react";
 import { Reveal } from "./Reveal";
-import { BANNER_SRC, onPhotoError, photoRef } from "@/lib/assets";
+
 
 const stats = [
   { icon: MapPin, value: "Jonai", label: "Assam" },
@@ -43,24 +43,14 @@ export function About() {
           <motion.div
             whileHover={{ y: -8 }}
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
-            className="relative overflow-hidden rounded-4xl bg-primary-deep shadow-lift"
+            className="relative overflow-hidden rounded-4xl shadow-lift"
           >
             <img
-              ref={photoRef}
-              src={BANNER_SRC}
-              onError={onPhotoError}
-              alt="Delivery rider on the forest highway near Jonai"
-              className="h-[420px] w-full object-cover"
+              src="/delivery-map.png"
+              alt="Poba Express Delivery Area Map"
+              className="w-full h-auto object-cover"
               loading="lazy"
             />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-hero p-6">
-              <p className="font-display text-lg font-semibold text-primary-foreground">
-                Delivering Happiness Across Jonai
-              </p>
-              <p className="mt-1 text-sm text-primary-foreground/80">
-                You stay, <span className="text-accent font-semibold">we deliver</span>.
-              </p>
-            </div>
           </motion.div>
         </Reveal>
       </div>
