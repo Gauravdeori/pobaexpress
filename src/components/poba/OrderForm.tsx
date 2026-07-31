@@ -1,21 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  UtensilsCrossed,
-  Pill,
-  Cake,
-  ShoppingCart,
-  Package,
-  Paperclip,
-  Send,
-  X,
-} from "lucide-react";
+import { UtensilsCrossed, Pill, Cake, Minus, Paperclip, Plus, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { whatsappLink } from "@/lib/contact";
+import { DELIVERY_FEE, getMenu, itemLabel, rupees } from "@/lib/menu";
 import { Reveal, SectionHeading } from "./Reveal";
 
 const categories = [
@@ -23,27 +15,15 @@ const categories = [
     id: "food",
     label: "Food",
     icon: UtensilsCrossed,
-    hint: "e.g. 2x Chicken Thali from Jonai Dhaba",
+    hint: "Anything else you need from the kitchen",
   },
-  { id: "medicine", label: "Medicine", icon: Pill, hint: "e.g. Paracetamol 650mg — 1 strip" },
   {
     id: "cake",
     label: "Cake",
     icon: Cake,
-    hint: "e.g. 1kg chocolate truffle, write 'Happy Birthday Ritu'",
+    hint: "e.g. write 'Happy Birthday Ritu' on top, eggless",
   },
-  {
-    id: "grocery",
-    label: "Grocery",
-    icon: ShoppingCart,
-    hint: "e.g. 5kg rice, 1L mustard oil, eggs",
-  },
-  {
-    id: "parcel",
-    label: "Parcel",
-    icon: Package,
-    hint: "e.g. Small documents parcel, pickup from Main Market",
-  },
+  { id: "medicine", label: "Medicine", icon: Pill, hint: "e.g. Paracetamol 650mg — 1 strip" },
 ] as const;
 
 type CategoryId = (typeof categories)[number]["id"];
@@ -56,9 +36,15 @@ export function OrderForm() {
   const [items, setItems] = useState("");
   const [notes, setNotes] = useState("");
   const [prescription, setPrescription] = useState<File | null>(null);
+  const [cart, setCart] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
 
   const active = categories.find((c) => c.id === category)!;
+  const menu = getMenu(category);
+
+  const picked = (menu ?? []).filter((item) => cart[item.id] > 0);
+  const subtotal = picked.reduce((sum, item) => sum + item.price * cart[item.id], 0);
+  const total = subtotal + DELIVERY_FEE;
 
   // Any edit clears a stale validation message so it can't linger after a fix.
   const bind = (set: (value: string) => void) => (value: string) => {
@@ -66,15 +52,41 @@ export function OrderForm() {
     setError(null);
   };
 
+  // Menus differ per category, so a half-built basket must not survive a switch.
+  const pickCategory = (id: CategoryId) => {
+    setCategory(id);
+    setCart({});
+    setError(null);
+  };
+
+  const setQuantity = (id: string, quantity: number) => {
+    setCart((current) => {
+      const next = { ...current };
+      if (quantity > 0) next[id] = quantity;
+      else delete next[id];
+      return next;
+    });
+    setError(null);
+  };
+
   const handleOrder = (event: FormEvent) => {
     event.preventDefault();
 
-    if (!name.trim() || !phone.trim() || !location.trim() || !items.trim()) {
-      setError("Please fill in your name, phone number, delivery location and what you need.");
+    if (!name.trim() || !phone.trim() || !location.trim()) {
+      setError("Please fill in your name, phone number and delivery location.");
       return;
     }
     if (phone.replace(/\D/g, "").length < 10) {
       setError("Please enter a valid phone number so we can confirm your order.");
+      return;
+    }
+    // With a menu on screen, either a tapped item or a written request will do.
+    if (!picked.length && !items.trim()) {
+      setError(
+        menu
+          ? "Please pick at least one item from the menu, or write what you need."
+          : "Please tell us what you need.",
+      );
       return;
     }
     setError(null);
@@ -86,11 +98,28 @@ export function OrderForm() {
       `*Name:* ${name.trim()}`,
       `*Phone:* ${phone.trim()}`,
       `*Delivery location:* ${location.trim()}`,
-      `*Order details:* ${items.trim()}`,
     ];
-    if (notes.trim()) lines.push(`*Extra notes:* ${notes.trim()}`);
+
+    if (picked.length) {
+      lines.push("", "*Items:*");
+      for (const item of picked) {
+        lines.push(
+          `• ${itemLabel(item)} x${cart[item.id]} — ${rupees(item.price * cart[item.id])}`,
+        );
+      }
+      lines.push(
+        "",
+        `*Subtotal:* ${rupees(subtotal)}`,
+        `*Delivery:* ${rupees(DELIVERY_FEE)}`,
+        `*Total:* ${rupees(total)}`,
+      );
+    }
+    if (items.trim()) lines.push("", `*Also needed:* ${items.trim()}`);
+    if (!picked.length) lines.push("", `*Delivery:* ${rupees(DELIVERY_FEE)} flat`);
+    if (notes.trim()) lines.push("", `*Extra notes:* ${notes.trim()}`);
     if (category === "medicine") {
       lines.push(
+        "",
         prescription
           ? `*Prescription:* attaching photo (${prescription.name}) in this chat.`
           : "*Prescription:* no photo attached.",
@@ -113,7 +142,9 @@ export function OrderForm() {
           subtitle="Pick a category, fill in a few details and send it straight to our WhatsApp. No app, no signup."
         />
 
-        <Reveal>
+        {/* The form is taller than the viewport once a menu is open, so it
+            reveals as soon as any of it is on screen. */}
+        <Reveal amount="some">
           <form
             onSubmit={handleOrder}
             noValidate
@@ -125,7 +156,7 @@ export function OrderForm() {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setCategory(c.id)}
+                  onClick={() => pickCategory(c.id)}
                   className={cn(
                     "flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-all duration-300",
                     category === c.id
@@ -138,6 +169,140 @@ export function OrderForm() {
                 </button>
               ))}
             </div>
+
+            {/* Menu — only the categories with a fixed price list get one */}
+            <AnimatePresence initial={false} mode="wait">
+              {menu && (
+                <motion.div
+                  key={category}
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="mt-8">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+                        {active.label} menu
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Prices exclude delivery · flat {rupees(DELIVERY_FEE)} per order
+                      </p>
+                    </div>
+
+                    <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                      {menu.map((item) => {
+                        const quantity = cart[item.id] ?? 0;
+                        return (
+                          <li key={item.id}>
+                            <div
+                              className={cn(
+                                "flex items-center gap-3 rounded-2xl border p-3 transition-colors duration-200",
+                                quantity
+                                  ? "border-accent bg-accent/5"
+                                  : "border-border bg-background",
+                              )}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => setQuantity(item.id, quantity + 1)}
+                                className="min-w-0 flex-1 text-left"
+                                aria-label={`Add ${itemLabel(item)}, ${rupees(item.price)}`}
+                              >
+                                <span className="block truncate text-sm font-medium text-primary">
+                                  {item.name}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {item.variant ? `${item.variant} · ` : ""}
+                                  {rupees(item.price)}
+                                </span>
+                              </button>
+
+                              {quantity > 0 ? (
+                                <div className="flex shrink-0 items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => setQuantity(item.id, quantity - 1)}
+                                    aria-label={`Remove one ${itemLabel(item)}`}
+                                    className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent"
+                                  >
+                                    <Minus className="size-3.5" />
+                                  </button>
+                                  <span
+                                    aria-live="polite"
+                                    className="w-6 text-center text-sm font-semibold text-primary"
+                                  >
+                                    {quantity}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setQuantity(item.id, quantity + 1)}
+                                    aria-label={`Add one more ${itemLabel(item)}`}
+                                    className="flex size-8 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground"
+                                  >
+                                    <Plus className="size-3.5" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setQuantity(item.id, 1)}
+                                  aria-label={`Add ${itemLabel(item)}`}
+                                  className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent hover:text-accent"
+                                >
+                                  <Plus className="size-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    {/* Running total */}
+                    <AnimatePresence initial={false}>
+                      {picked.length > 0 && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="mt-5 rounded-3xl border border-border bg-secondary/60 p-5">
+                            <ul className="space-y-1.5 text-sm">
+                              {picked.map((item) => (
+                                <li key={item.id} className="flex justify-between gap-3">
+                                  <span className="text-muted-foreground">
+                                    {itemLabel(item)} × {cart[item.id]}
+                                  </span>
+                                  <span className="shrink-0 font-medium text-primary">
+                                    {rupees(item.price * cart[item.id])}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                            <div className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
+                              <div className="flex justify-between gap-3 text-muted-foreground">
+                                <span>Subtotal</span>
+                                <span>{rupees(subtotal)}</span>
+                              </div>
+                              <div className="flex justify-between gap-3 text-muted-foreground">
+                                <span>Delivery</span>
+                                <span>{rupees(DELIVERY_FEE)}</span>
+                              </div>
+                              <div className="flex justify-between gap-3 text-base font-bold text-primary">
+                                <span>Total</span>
+                                <span>{rupees(total)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
@@ -175,7 +340,11 @@ export function OrderForm() {
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="order-items">What do you want? ({active.label})</Label>
+                <Label htmlFor="order-items">
+                  {menu
+                    ? "Anything not on the menu? (optional)"
+                    : `What do you want? (${active.label})`}
+                </Label>
                 <Textarea
                   id="order-items"
                   value={items}

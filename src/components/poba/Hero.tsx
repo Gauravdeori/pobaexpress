@@ -5,18 +5,16 @@ import {
   ShieldCheck,
   Handshake,
   UtensilsCrossed,
-  ShoppingCart,
+  Cake,
   Pill,
-  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BANNER_SRC, LOGO_SRC, logoRef, onLogoError, onPhotoError, photoRef } from "@/lib/assets";
 
 const chips = [
   { icon: UtensilsCrossed, label: "Food" },
-  { icon: ShoppingCart, label: "Grocery" },
+  { icon: Cake, label: "Cake" },
   { icon: Pill, label: "Medicine" },
-  { icon: Package, label: "Parcel" },
 ];
 
 const badges = [
@@ -70,7 +68,7 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="mt-5 max-w-xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg"
           >
-            Food, Grocery, Medicine & Parcel Delivery — Fast, Affordable and Reliable.
+            Food, Cake & Medicine Delivery — Fast, Affordable and Reliable.
           </motion.p>
 
           <motion.div

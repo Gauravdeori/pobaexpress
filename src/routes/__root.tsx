@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
 const siteDescription =
-  "Food, grocery, medicine and parcel delivery in Jonai, Assam. Fast, affordable and reliable local delivery by Poba Express.";
+  "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — flat ₹20 delivery, no app, no signup.";
 
 function NotFoundComponent() {
   return (

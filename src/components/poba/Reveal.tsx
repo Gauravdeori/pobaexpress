@@ -9,10 +9,17 @@ export function Reveal({
   children,
   delay = 0,
   className,
+  amount = 0.25,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  /**
+   * Fraction of the element that must be on screen before it fades in.
+   * Anything taller than about 4x the viewport can never reach the 0.25
+   * default and would stay invisible forever — pass "some" for those.
+   */
+  amount?: number | "some" | "all";
 }) {
   return (
     <motion.div
@@ -20,7 +27,7 @@ export function Reveal({
       variants={fadeUp}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.25 }}
+      viewport={{ once: true, amount }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}

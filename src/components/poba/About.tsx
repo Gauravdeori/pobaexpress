@@ -2,7 +2,6 @@ import { motion } from "motion/react";
 import { MapPin, Users, Sparkles } from "lucide-react";
 import { Reveal } from "./Reveal";
 
-
 const stats = [
   { icon: MapPin, value: "Jonai", label: "Assam" },
   { icon: Users, value: "50+", label: "Local partners" },

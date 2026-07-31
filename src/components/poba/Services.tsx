@@ -1,27 +1,22 @@
 import { motion } from "motion/react";
-import { UtensilsCrossed, ShoppingCart, Pill, Package } from "lucide-react";
+import { UtensilsCrossed, Cake, Pill } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 
 const services = [
   {
     icon: UtensilsCrossed,
     title: "Food Delivery",
-    text: "Fresh meals from your favorite local restaurants.",
+    text: "Biryani, chowmein, momos and more — from ₹29, hot to your door.",
   },
   {
-    icon: ShoppingCart,
-    title: "Grocery Delivery",
-    text: "Daily essentials delivered quickly.",
+    icon: Cake,
+    title: "Cake Delivery",
+    text: "Vanilla to black forest, plus bento cakes for last-minute surprises.",
   },
   {
     icon: Pill,
     title: "Medicine Delivery",
-    text: "Fast delivery from trusted pharmacies.",
-  },
-  {
-    icon: Package,
-    title: "Parcel Delivery",
-    text: "Secure local parcel pickup and drop.",
+    text: "Fast delivery from trusted pharmacies. Just send your prescription.",
   },
 ];
 
@@ -35,7 +30,7 @@ export function Services() {
           subtitle="One platform for everything Jonai needs — picked up locally and delivered with care."
         />
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s, i) => (
             <Reveal key={s.title} delay={i * 0.08}>
               <motion.article

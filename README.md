@@ -1,8 +1,8 @@
 # Poba Express — Landing Page
 
 Marketing site for **Poba Express**, a local delivery service in Jonai, Assam.
-Food, grocery, medicine and parcel delivery, ordered straight through WhatsApp —
-no app, no signup.
+Food, cake and medicine delivery, ordered straight through WhatsApp — no app,
+no signup.
 
 ## Stack
 
@@ -54,8 +54,13 @@ public/               favicon and robots.txt
   [`src/lib/contact.ts`](src/lib/contact.ts). The order form and the footer both
   read from it. The Facebook and Instagram icons only render once you fill in a
   URL for them.
+- **Prices** — the food and cake menus and the flat delivery fee live in
+  [`src/lib/menu.ts`](src/lib/menu.ts). Editing a price there updates the menu,
+  the running total and the WhatsApp message together.
 - **Order categories** and their placeholder hints are the `categories` array in
-  [`src/components/poba/OrderForm.tsx`](src/components/poba/OrderForm.tsx).
+  [`src/components/poba/OrderForm.tsx`](src/components/poba/OrderForm.tsx). A
+  category gets a tappable menu by having an entry in `menu.ts`; the rest are
+  free-text.
 - **Brand colors and fonts** are CSS variables at the top of
   [`src/styles.css`](src/styles.css) — primary `#0B3D1B` (forest green), accent
   `#FF6A00` (orange), fonts Poppins + Inter.

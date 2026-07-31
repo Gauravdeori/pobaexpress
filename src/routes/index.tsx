@@ -10,7 +10,7 @@ import { Footer } from "@/components/poba/Footer";
 
 const title = "Poba Express — Jonai's Own Delivery Service";
 const description =
-  "Food, grocery, medicine and parcel delivery in Jonai, Assam. Fast, affordable and reliable local delivery by Poba Express.";
+  "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — flat ₹20 delivery, no app, no signup.";
 
 export const Route = createFileRoute("/")({
   head: () => ({

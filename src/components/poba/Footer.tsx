@@ -17,7 +17,7 @@ const quickLinks = [
   { label: "Order Now", href: "#order" },
 ];
 
-const services = ["Food Delivery", "Grocery Delivery", "Medicine Delivery", "Parcel Delivery"];
+const services = ["Food Delivery", "Cake Delivery", "Medicine Delivery"];
 
 // Profiles without a URL in src/lib/contact.ts are dropped, so the row never
 // renders an icon that links nowhere.
