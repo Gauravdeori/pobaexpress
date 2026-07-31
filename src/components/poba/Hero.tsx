@@ -1,13 +1,16 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import {
   ChevronDown,
+  Zap,
+  ShieldCheck,
+  Handshake,
   UtensilsCrossed,
   ShoppingCart,
   Pill,
   Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BANNER_SRC, onPhotoError, photoRef } from "@/lib/assets";
+import { BANNER_SRC, LOGO_SRC, logoRef, onLogoError, onPhotoError, photoRef } from "@/lib/assets";
 
 const chips = [
   { icon: UtensilsCrossed, label: "Food" },
@@ -16,7 +19,11 @@ const chips = [
   { icon: Package, label: "Parcel" },
 ];
 
-
+const badges = [
+  { icon: Zap, label: "Fast Delivery", pos: "-left-5 top-8" },
+  { icon: ShieldCheck, label: "Safe", pos: "-right-4 top-1/2" },
+  { icon: Handshake, label: "Reliable", pos: "-left-2 -bottom-4" },
+];
 
 export function Hero() {
   const { scrollY } = useScroll();
@@ -107,14 +114,28 @@ export function Hero() {
           <motion.div
             animate={{ y: [0, -14, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="rounded-4xl shadow-lift transition-transform duration-500 hover:scale-[1.03] overflow-hidden"
+            className="bg-white rounded-4xl p-8 shadow-lift transition-transform duration-500 hover:scale-[1.03]"
           >
             <img
-              src="/hero-card.png"
-              alt="Delivering Happiness Across Jonai"
-              className="w-full h-auto object-cover"
+              ref={logoRef}
+              src={LOGO_SRC}
+              onError={onLogoError}
+              alt="Poba Express"
+              className="mx-auto w-full drop-shadow-2xl bg-white rounded-full p-4"
             />
           </motion.div>
+
+          {badges.map((b, i) => (
+            <motion.div
+              key={b.label}
+              animate={{ y: [0, i % 2 === 0 ? -10 : 10, 0] }}
+              transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut" }}
+              className={`bg-white absolute ${b.pos} flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-primary shadow-soft`}
+            >
+              <b.icon className="size-4 text-accent" />
+              {b.label}
+            </motion.div>
+          ))}
         </motion.div>
       </div>
 
