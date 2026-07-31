@@ -28,8 +28,10 @@ export function Hero() {
   const y = useTransform(scrollY, [0, 600], [0, 140]);
   const scale = useTransform(scrollY, [0, 600], [1.05, 1.18]);
 
+  // svh, not vh: on mobile 100vh is the height with the URL bar hidden, so a
+  // vh-sized hero is taller than the screen until you scroll.
   return (
-    <section id="home" className="relative min-h-screen overflow-hidden">
+    <section id="home" className="relative min-h-[100svh] overflow-hidden">
       {/* The deep-green base keeps the hero readable if the photo can't load. */}
       <motion.div style={{ y, scale }} className="absolute inset-0 z-0 bg-primary-deep">
         <img
@@ -42,7 +44,9 @@ export function Hero() {
       </motion.div>
       <div className="absolute inset-0 z-10 bg-gradient-hero" />
 
-      <div className="relative z-20 mx-auto grid max-w-7xl items-center gap-14 px-5 pt-32 pb-24 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:pt-40 lg:pb-32">
+      {/* Matching the section height lets items-center actually centre the copy;
+          without it the block sat high and left dead space under the chips. */}
+      <div className="relative z-20 mx-auto grid min-h-[100svh] max-w-7xl items-center gap-14 px-5 pt-28 pb-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:pt-40 lg:pb-32">
         <div>
           <motion.span
             initial={{ opacity: 0, y: 16 }}

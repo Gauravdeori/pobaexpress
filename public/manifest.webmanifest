@@ -1,0 +1,52 @@
+{
+  "name": "Poba Express — Jonai's Own Delivery Service",
+  "short_name": "Poba Express",
+  "description": "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — no app, no signup.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAF8",
+  "theme_color": "#0B3D1B",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["food", "shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Order food",
+      "short_name": "Food",
+      "url": "/?category=food#order"
+    },
+    {
+      "name": "Order a cake",
+      "short_name": "Cake",
+      "url": "/?category=cake#order"
+    },
+    {
+      "name": "Order medicine",
+      "short_name": "Medicine",
+      "url": "/?category=medicine#order"
+    }
+  ]
+}

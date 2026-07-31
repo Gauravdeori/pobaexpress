@@ -66,6 +66,25 @@ public/               favicon and robots.txt
   [`src/styles.css`](src/styles.css) — primary `#0B3D1B` (forest green), accent
   `#FF6A00` (orange), fonts Poppins + Inter.
 
+## Installable app (PWA)
+
+[`public/manifest.webmanifest`](public/manifest.webmanifest) plus
+[`public/sw.js`](public/sw.js) make the site installable to a phone home screen
+and usable offline. The service worker is registered from
+[`src/routes/__root.tsx`](src/routes/__root.tsx) **in production builds only** —
+in dev it would serve stale assets and fight the HMR client, so `npm run dev`
+never registers it. Test it with `npm run build && npx vite preview`.
+
+HTML is network-first with a cached fallback, so a deployed change is picked up
+on the next online visit; hashed assets under `/assets/` are served from cache
+and refreshed in the background. Bump `VERSION` in `sw.js` to retire old caches.
+
+The manifest's home-screen shortcuts pass `?category=food|cake|medicine`, which
+the order form reads on mount to preselect that menu.
+
+Icons are generated from `public/poba-logo.png` onto a **white** tile — the
+wordmark is dark green and disappears on the brand green.
+
 ## Brand images
 
 The logo and the hero photo are resolved by [`src/lib/assets.ts`](src/lib/assets.ts),

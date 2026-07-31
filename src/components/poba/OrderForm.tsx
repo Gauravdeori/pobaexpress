@@ -60,6 +60,14 @@ export function OrderForm() {
   const subtotal = picked.reduce((sum, item) => sum + item.price * cart[item.id], 0);
   const total = subtotal + fee;
 
+  // Honours ?category=cake, which is how the installed app's home-screen
+  // shortcuts jump straight to the right menu. Read on the client only, so the
+  // server-rendered markup stays identical for every visitor.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("category");
+    if (categories.some((c) => c.id === requested)) setCategory(requested as CategoryId);
+  }, []);
+
   // Object URLs leak until revoked, so tie each one to the file it previews.
   useEffect(() => {
     if (!prescription || !prescription.type.startsWith("image/")) {
@@ -215,7 +223,7 @@ export function OrderForm() {
                   type="button"
                   onClick={() => pickCategory(c.id)}
                   className={cn(
-                    "flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-all duration-300",
+                    "flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-all duration-300",
                     category === c.id
                       ? "border-transparent bg-gradient-accent text-accent-foreground shadow-soft"
                       : "border-border bg-background text-muted-foreground hover:border-accent hover:text-primary",
@@ -285,9 +293,9 @@ export function OrderForm() {
                                     type="button"
                                     onClick={() => setQuantity(item.id, quantity - 1)}
                                     aria-label={`Remove one ${itemLabel(item)}`}
-                                    className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent"
+                                    className="flex size-11 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent sm:size-9"
                                   >
-                                    <Minus className="size-3.5" />
+                                    <Minus className="size-4" />
                                   </button>
                                   <span
                                     aria-live="polite"
@@ -299,9 +307,9 @@ export function OrderForm() {
                                     type="button"
                                     onClick={() => setQuantity(item.id, quantity + 1)}
                                     aria-label={`Add one more ${itemLabel(item)}`}
-                                    className="flex size-8 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground"
+                                    className="flex size-11 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground sm:size-9"
                                   >
-                                    <Plus className="size-3.5" />
+                                    <Plus className="size-4" />
                                   </button>
                                 </div>
                               ) : (
@@ -309,9 +317,9 @@ export function OrderForm() {
                                   type="button"
                                   onClick={() => setQuantity(item.id, 1)}
                                   aria-label={`Add ${itemLabel(item)}`}
-                                  className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent hover:text-accent"
+                                  className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent hover:text-accent sm:size-9"
                                 >
-                                  <Plus className="size-3.5" />
+                                  <Plus className="size-4" />
                                 </button>
                               )}
                             </div>

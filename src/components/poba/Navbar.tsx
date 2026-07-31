@@ -93,7 +93,7 @@ export function Navbar() {
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
             className={cn(
-              "rounded-full p-2 transition-colors md:hidden",
+              "flex size-11 items-center justify-center rounded-full transition-colors md:hidden",
               scrolled ? "text-foreground" : "text-primary-foreground",
             )}
           >

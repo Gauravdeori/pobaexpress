@@ -7,6 +7,7 @@ import { WhyChooseUs } from "@/components/poba/WhyChooseUs";
 import { OrderForm } from "@/components/poba/OrderForm";
 import { CallToAction } from "@/components/poba/CallToAction";
 import { Footer } from "@/components/poba/Footer";
+import { MobileOrderBar } from "@/components/poba/MobileOrderBar";
 
 const title = "Poba Express — Jonai's Own Delivery Service";
 const description =
@@ -39,6 +40,7 @@ function Index() {
         <CallToAction />
       </main>
       <Footer />
+      <MobileOrderBar />
     </div>
   );
 }
