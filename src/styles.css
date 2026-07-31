@@ -1,0 +1,144 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-deep: var(--primary-deep);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --shadow-soft: 0 10px 40px -12px oklch(0.28 0.09 150 / 0.25);
+  --shadow-lift: 0 24px 60px -20px oklch(0.28 0.09 150 / 0.4);
+}
+
+:root {
+  --radius: 1rem;
+  /* #F8FAF8 */
+  --background: oklch(0.983 0.004 150);
+  --foreground: oklch(0.24 0.05 152);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.05 152);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.05 152);
+  /* #0B3D1B */
+  --primary: oklch(0.322 0.083 149.5);
+  --primary-foreground: oklch(1 0 0);
+  --primary-deep: oklch(0.235 0.062 149.5);
+  --secondary: oklch(0.955 0.012 150);
+  --secondary-foreground: oklch(0.322 0.083 149.5);
+  --muted: oklch(0.955 0.012 150);
+  --muted-foreground: oklch(0.52 0.02 150);
+  /* #FF6A00 */
+  --accent: oklch(0.687 0.208 44);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.012 150);
+  --input: oklch(0.9 0.012 150);
+  --ring: oklch(0.687 0.208 44);
+  --surface: oklch(1 0 0 / 0.08);
+  --gradient-hero: linear-gradient(
+    100deg,
+    oklch(0.18 0.05 150 / 0.95) 0%,
+    oklch(0.18 0.05 150 / 0.72) 45%,
+    oklch(0.18 0.05 150 / 0.35) 100%
+  );
+  --gradient-accent: linear-gradient(
+    135deg,
+    oklch(0.72 0.19 55),
+    oklch(0.65 0.215 36)
+  );
+  --gradient-green: linear-gradient(
+    135deg,
+    var(--primary-deep),
+    oklch(0.4 0.1 150)
+  );
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* The header is fixed, so anchor targets need clearance or their headings
+     land underneath it. */
+  :where(section, footer)[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@utility glass {
+  background: oklch(1 0 0 / 0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid oklch(1 0 0 / 0.18);
+}
+
+@utility glass-light {
+  background: oklch(1 0 0 / 0.72);
+  backdrop-filter: blur(14px);
+  border: 1px solid oklch(1 0 0 / 0.6);
+}
+
+@utility bg-gradient-hero {
+  background-image: var(--gradient-hero);
+}
+
+@utility bg-gradient-accent {
+  background-image: var(--gradient-accent);
+}
+
+@utility bg-gradient-green {
+  background-image: var(--gradient-green);
+}
