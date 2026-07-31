@@ -4,8 +4,8 @@ import { Reveal } from "./Reveal";
 
 const stats = [
   { icon: MapPin, value: "Jonai", label: "Assam" },
-  { icon: Users, value: "50+", label: "Local partners" },
-  { icon: Sparkles, value: "30 min", label: "Avg. delivery" },
+  { icon: Users, value: "4+", label: "Delivery partners" },
+  { icon: Sparkles, value: "15–20 min", label: "Avg. delivery" },
 ];
 
 export function About() {
