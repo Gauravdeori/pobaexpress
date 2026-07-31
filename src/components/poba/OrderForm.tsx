@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { UtensilsCrossed, Pill, Cake, Minus, Paperclip, Plus, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { whatsappLink } from "@/lib/contact";
-import { DELIVERY_FEE, getMenu, itemLabel, rupees } from "@/lib/menu";
+import { deliveryFee, getMenu, itemLabel, rupees } from "@/lib/menu";
 import { Reveal, SectionHeading } from "./Reveal";
+
+/** Anything bigger than this is likely a mistake and won't share cleanly. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+/** True when the browser can hand this file straight to WhatsApp. */
+function canShareFile(file: File): boolean {
+  return (
+    typeof navigator !== "undefined" &&
+    typeof navigator.canShare === "function" &&
+    navigator.canShare({ files: [file] })
+  );
+}
 
 const categories = [
   {
@@ -36,15 +48,37 @@ export function OrderForm() {
   const [items, setItems] = useState("");
   const [notes, setNotes] = useState("");
   const [prescription, setPrescription] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
 
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
+  const fee = deliveryFee(category);
 
   const picked = (menu ?? []).filter((item) => cart[item.id] > 0);
   const subtotal = picked.reduce((sum, item) => sum + item.price * cart[item.id], 0);
-  const total = subtotal + DELIVERY_FEE;
+  const total = subtotal + fee;
+
+  // Object URLs leak until revoked, so tie each one to the file it previews.
+  useEffect(() => {
+    if (!prescription || !prescription.type.startsWith("image/")) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(prescription);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [prescription]);
+
+  const attachPrescription = (file: File | null) => {
+    if (file && file.size > MAX_UPLOAD_BYTES) {
+      setError("That file is over 10 MB. Please pick a smaller photo.");
+      return;
+    }
+    setPrescription(file);
+    setError(null);
+  };
 
   // Any edit clears a stale validation message so it can't linger after a fix.
   const bind = (set: (value: string) => void) => (value: string) => {
@@ -69,7 +103,7 @@ export function OrderForm() {
     setError(null);
   };
 
-  const handleOrder = (event: FormEvent) => {
+  const handleOrder = async (event: FormEvent) => {
     event.preventDefault();
 
     if (!name.trim() || !phone.trim() || !location.trim()) {
@@ -110,23 +144,46 @@ export function OrderForm() {
       lines.push(
         "",
         `*Subtotal:* ${rupees(subtotal)}`,
-        `*Delivery:* ${rupees(DELIVERY_FEE)}`,
+        `*Delivery:* ${rupees(fee)}`,
         `*Total:* ${rupees(total)}`,
       );
     }
-    if (items.trim()) lines.push("", `*Also needed:* ${items.trim()}`);
-    if (!picked.length) lines.push("", `*Delivery:* ${rupees(DELIVERY_FEE)} flat`);
+    // Without a basket the free text is the whole order, not an addition to it.
+    if (items.trim()) {
+      lines.push("", `*${picked.length ? "Also needed" : "Order details"}:* ${items.trim()}`);
+    }
+    if (!picked.length) lines.push("", `*Delivery:* ${rupees(fee)} flat`);
     if (notes.trim()) lines.push("", `*Extra notes:* ${notes.trim()}`);
+
+    const shareable = prescription != null && canShareFile(prescription);
     if (category === "medicine") {
       lines.push(
         "",
-        prescription
-          ? `*Prescription:* attaching photo (${prescription.name}) in this chat.`
-          : "*Prescription:* no photo attached.",
+        !prescription
+          ? "*Prescription:* no photo attached."
+          : shareable
+            ? "*Prescription:* photo attached."
+            : `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`,
       );
     }
+    const message = lines.join("\n");
 
-    const url = whatsappLink(lines.join("\n"));
+    // The share sheet is the only way a page with no backend can hand the photo
+    // itself to WhatsApp. It must be reached before any other await or the
+    // browser stops treating this as a user gesture.
+    if (prescription && shareable) {
+      try {
+        await navigator.share({ files: [prescription], text: message });
+        return;
+      } catch (shareError) {
+        // Dismissing the sheet is a deliberate cancel, not a failure to retry.
+        if (shareError instanceof Error && shareError.name === "AbortError") return;
+        // Anything else (no target app, permission denied) falls through to the
+        // plain link, where the customer attaches the photo by hand.
+      }
+    }
+
+    const url = whatsappLink(message);
     // Popup blockers and in-app browsers can refuse window.open — fall back to
     // navigating this tab so the order is never silently dropped.
     const opened = window.open(url, "_blank", "noopener,noreferrer");
@@ -170,6 +227,12 @@ export function OrderForm() {
               ))}
             </div>
 
+            {/* The fee differs per category, so state it wherever you are. */}
+            <p className="mt-3 text-xs text-muted-foreground">
+              Delivery for {active.label.toLowerCase()}:{" "}
+              <span className="font-semibold text-accent">{rupees(fee)}</span> flat, per order.
+            </p>
+
             {/* Menu — only the categories with a fixed price list get one */}
             <AnimatePresence initial={false} mode="wait">
               {menu && (
@@ -185,9 +248,7 @@ export function OrderForm() {
                       <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
                         {active.label} menu
                       </h3>
-                      <p className="text-xs text-muted-foreground">
-                        Prices exclude delivery · flat {rupees(DELIVERY_FEE)} per order
-                      </p>
+                      <p className="text-xs text-muted-foreground">Prices exclude delivery</p>
                     </div>
 
                     <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
@@ -288,7 +349,7 @@ export function OrderForm() {
                               </div>
                               <div className="flex justify-between gap-3 text-muted-foreground">
                                 <span>Delivery</span>
-                                <span>{rupees(DELIVERY_FEE)}</span>
+                                <span>{rupees(fee)}</span>
                               </div>
                               <div className="flex justify-between gap-3 text-base font-bold text-primary">
                                 <span>Total</span>
@@ -380,8 +441,8 @@ export function OrderForm() {
                       Prescription photo
                     </Label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Choose your prescription here, then attach the same photo in the WhatsApp chat
-                      that opens — pharmacies need it before dispatch.
+                      Pharmacies need this before they dispatch. On a phone it goes straight to
+                      WhatsApp with your order; on a computer, attach it in the chat that opens.
                     </p>
                     <div className="mt-4 flex flex-wrap items-center gap-3">
                       <label
@@ -396,22 +457,41 @@ export function OrderForm() {
                         type="file"
                         accept="image/*,.pdf"
                         className="sr-only"
-                        onChange={(e) => setPrescription(e.target.files?.[0] ?? null)}
+                        onChange={(e) => attachPrescription(e.target.files?.[0] ?? null)}
                       />
-                      {prescription && (
-                        <span className="flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs text-muted-foreground">
-                          {prescription.name}
-                          <button
-                            type="button"
-                            aria-label="Remove prescription"
-                            onClick={() => setPrescription(null)}
-                            className="text-accent"
-                          >
-                            <X className="size-3.5" />
-                          </button>
-                        </span>
-                      )}
                     </div>
+
+                    {prescription && (
+                      <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-background p-3">
+                        {preview ? (
+                          <img
+                            src={preview}
+                            alt="Selected prescription"
+                            className="size-14 shrink-0 rounded-xl object-cover"
+                          />
+                        ) : (
+                          <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+                            <Paperclip className="size-5" />
+                          </span>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-primary">
+                            {prescription.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {Math.max(1, Math.round(prescription.size / 1024))} KB
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          aria-label="Remove prescription"
+                          onClick={() => attachPrescription(null)}
+                          className="flex size-8 shrink-0 items-center justify-center rounded-full text-accent transition-colors hover:bg-secondary"
+                        >
+                          <X className="size-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}

@@ -54,9 +54,10 @@ public/               favicon and robots.txt
   [`src/lib/contact.ts`](src/lib/contact.ts). The order form and the footer both
   read from it. The Facebook and Instagram icons only render once you fill in a
   URL for them.
-- **Prices** — the food and cake menus and the flat delivery fee live in
-  [`src/lib/menu.ts`](src/lib/menu.ts). Editing a price there updates the menu,
-  the running total and the WhatsApp message together.
+- **Prices** — the food and cake menus and the per-category delivery fees live
+  in [`src/lib/menu.ts`](src/lib/menu.ts). Editing a price there updates the
+  menu, the running total and the WhatsApp message together. Delivery is
+  charged once per order: ₹20 food, ₹10 cake, ₹30 medicine.
 - **Order categories** and their placeholder hints are the `categories` array in
   [`src/components/poba/OrderForm.tsx`](src/components/poba/OrderForm.tsx). A
   category gets a tappable menu by having an entry in `menu.ts`; the rest are
@@ -85,5 +86,12 @@ along with the two `*.asset.json` imports.
 
 The order form has no backend. It validates the fields, formats them into a
 message and opens a `wa.me` link with the text pre-filled, so the customer only
-has to press send in WhatsApp. Medicine orders prompt for a prescription photo,
-which the customer attaches in the chat that opens.
+has to press send in WhatsApp.
+
+Medicine orders prompt for a prescription photo. Since a `wa.me` link can only
+carry text, the form uses the Web Share API (`navigator.share` with `files`) to
+hand the image and the order to WhatsApp together — this works on phones, which
+is where the orders come from. Where that API is missing or refuses the file
+(most desktop browsers), it falls back to the plain link and tells the customer
+to attach the photo in the chat. Either path is a normal WhatsApp message; no
+file is ever uploaded to a server.

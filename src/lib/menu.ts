@@ -1,10 +1,20 @@
 /**
- * Poba Express price list. Prices are food-only in rupees; delivery is added
- * once per order, not per item.
+ * Poba Express price list. Item prices are in rupees and exclude delivery;
+ * delivery is charged once per order, not per item.
  */
 
-/** Flat delivery fee charged once per order. */
-export const DELIVERY_FEE = 20;
+/** Delivery fee per order, by category. */
+const DELIVERY_FEES: Record<string, number> = {
+  food: 20,
+  cake: 10,
+  medicine: 30,
+};
+
+const DEFAULT_DELIVERY_FEE = 20;
+
+export function deliveryFee(categoryId: string): number {
+  return DELIVERY_FEES[categoryId] ?? DEFAULT_DELIVERY_FEE;
+}
 
 export type MenuItem = {
   id: string;
