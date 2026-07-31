@@ -8,6 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { whatsappLink } from "@/lib/contact";
 import { deliveryFee, getMenu, itemLabel, rupees } from "@/lib/menu";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import { useAccount, saveProfile } from "@/lib/account";
+import { recordOrder, uploadPrescription, type OrderLine } from "@/lib/orders";
+import { AccountPanel } from "./AccountPanel";
 import { Reveal, SectionHeading } from "./Reveal";
 
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
@@ -51,6 +55,9 @@ export function OrderForm() {
   const [preview, setPreview] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  const { user, profile } = useAccount();
 
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
@@ -67,6 +74,15 @@ export function OrderForm() {
     const requested = new URLSearchParams(window.location.search).get("category");
     if (categories.some((c) => c.id === requested)) setCategory(requested as CategoryId);
   }, []);
+
+  // Prefill from the saved profile, but never overwrite something already
+  // typed — the profile can arrive after the customer has started filling in.
+  useEffect(() => {
+    if (!profile) return;
+    if (profile.full_name) setName((current) => current || profile.full_name!);
+    if (profile.phone) setPhone((current) => current || profile.phone!);
+    if (profile.address) setLocation((current) => current || profile.address!);
+  }, [profile]);
 
   // Object URLs leak until revoked, so tie each one to the file it previews.
   useEffect(() => {
@@ -133,63 +149,113 @@ export function OrderForm() {
     }
     setError(null);
 
-    const lines = [
-      "*New Order — Poba Express*",
-      "",
-      `*Category:* ${active.label}`,
-      `*Name:* ${name.trim()}`,
-      `*Phone:* ${phone.trim()}`,
-      `*Delivery location:* ${location.trim()}`,
-    ];
+    const userId = user?.id ?? null;
+    const orderLines: OrderLine[] = picked.map((item) => ({
+      id: item.id,
+      label: itemLabel(item),
+      quantity: cart[item.id],
+      price: item.price,
+    }));
 
-    if (picked.length) {
-      lines.push("", "*Items:*");
-      for (const item of picked) {
+    const buildMessage = (prescriptionLine: string | null) => {
+      const lines = [
+        "*New Order — Poba Express*",
+        "",
+        `*Category:* ${active.label}`,
+        `*Name:* ${name.trim()}`,
+        `*Phone:* ${phone.trim()}`,
+        `*Delivery location:* ${location.trim()}`,
+      ];
+
+      if (picked.length) {
+        lines.push("", "*Items:*");
+        for (const item of picked) {
+          lines.push(
+            `• ${itemLabel(item)} x${cart[item.id]} — ${rupees(item.price * cart[item.id])}`,
+          );
+        }
         lines.push(
-          `• ${itemLabel(item)} x${cart[item.id]} — ${rupees(item.price * cart[item.id])}`,
+          "",
+          `*Subtotal:* ${rupees(subtotal)}`,
+          `*Delivery:* ${rupees(fee)}`,
+          `*Total:* ${rupees(total)}`,
         );
       }
-      lines.push(
-        "",
-        `*Subtotal:* ${rupees(subtotal)}`,
-        `*Delivery:* ${rupees(fee)}`,
-        `*Total:* ${rupees(total)}`,
+      // Without a basket the free text is the whole order, not an addition to it.
+      if (items.trim()) {
+        lines.push("", `*${picked.length ? "Also needed" : "Order details"}:* ${items.trim()}`);
+      }
+      if (!picked.length) lines.push("", `*Delivery:* ${rupees(fee)} flat`);
+      if (notes.trim()) lines.push("", `*Extra notes:* ${notes.trim()}`);
+      if (prescriptionLine) lines.push("", prescriptionLine);
+      return lines.join("\n");
+    };
+
+    /** Best-effort record keeping. Never blocks or fails the order. */
+    const persist = async (prescriptionPath: string | null) => {
+      await recordOrder(
+        {
+          category,
+          customer_name: name.trim(),
+          phone: phone.trim(),
+          address: location.trim(),
+          lines: orderLines,
+          subtotal,
+          delivery_fee: fee,
+          total,
+          extra_request: items.trim() || null,
+          notes: notes.trim() || null,
+          prescription_path: prescriptionPath,
+        },
+        userId,
       );
-    }
-    // Without a basket the free text is the whole order, not an addition to it.
-    if (items.trim()) {
-      lines.push("", `*${picked.length ? "Also needed" : "Order details"}:* ${items.trim()}`);
-    }
-    if (!picked.length) lines.push("", `*Delivery:* ${rupees(fee)} flat`);
-    if (notes.trim()) lines.push("", `*Extra notes:* ${notes.trim()}`);
+      if (userId) {
+        await saveProfile(userId, {
+          full_name: name.trim(),
+          phone: phone.trim(),
+          address: location.trim(),
+        });
+      }
+    };
 
     const shareable = prescription != null && canShareFile(prescription);
-    if (category === "medicine") {
-      lines.push(
-        "",
-        !prescription
-          ? "*Prescription:* no photo attached."
-          : shareable
-            ? "*Prescription:* photo attached."
-            : `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`,
-      );
-    }
-    const message = lines.join("\n");
 
-    // The share sheet is the only way a page with no backend can hand the photo
-    // itself to WhatsApp. It must be reached before any other await or the
-    // browser stops treating this as a user gesture.
+    // The share sheet hands WhatsApp the photo itself, and must be reached
+    // before any await or the browser stops treating this as a user gesture —
+    // so nothing is uploaded until after it resolves.
     if (prescription && shareable) {
+      const message = buildMessage("*Prescription:* photo attached.");
       try {
         await navigator.share({ files: [prescription], text: message });
+        void uploadPrescription(prescription, userId).then((upload) =>
+          persist(upload?.path ?? null),
+        );
         return;
       } catch (shareError) {
         // Dismissing the sheet is a deliberate cancel, not a failure to retry.
         if (shareError instanceof Error && shareError.name === "AbortError") return;
         // Anything else (no target app, permission denied) falls through to the
-        // plain link, where the customer attaches the photo by hand.
+        // link below, where the photo travels as a stored reference instead.
       }
     }
+
+    // No share sheet: upload first so the message can carry a reference, which
+    // is what makes the photo reach you from a desktop browser.
+    setSending(true);
+    const upload = prescription ? await uploadPrescription(prescription, userId) : null;
+    setSending(false);
+
+    let prescriptionLine: string | null = null;
+    if (category === "medicine") {
+      if (!prescription) prescriptionLine = "*Prescription:* no photo attached.";
+      else if (upload?.signedUrl) prescriptionLine = `*Prescription:* ${upload.signedUrl}`;
+      else if (upload) prescriptionLine = `*Prescription:* uploaded — file \`${upload.path}\``;
+      else
+        prescriptionLine = `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`;
+    }
+
+    const message = buildMessage(prescriptionLine);
+    void persist(upload?.path ?? null);
 
     const url = whatsappLink(message);
     // Popup blockers and in-app browsers can refuse window.open — fall back to
@@ -215,6 +281,9 @@ export function OrderForm() {
             noValidate
             className="mt-12 rounded-4xl border border-border bg-card/80 p-6 shadow-soft backdrop-blur-xl sm:p-9"
           >
+            {/* Optional accounts: ordering never depends on being signed in. */}
+            {isSupabaseConfigured && <AccountPanel user={user} />}
+
             {/* Category picker */}
             <div className="flex flex-wrap gap-2.5">
               {categories.map((c) => (
@@ -512,9 +581,15 @@ export function OrderForm() {
             )}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
-              <Button variant="accent" size="xl" type="submit" className="w-full sm:w-auto">
+              <Button
+                variant="accent"
+                size="xl"
+                type="submit"
+                disabled={sending}
+                className="w-full sm:w-auto"
+              >
                 <Send className="size-4" />
-                Order Now on WhatsApp
+                {sending ? "Uploading photo…" : "Order Now on WhatsApp"}
               </Button>
               <p className="text-xs text-muted-foreground">
                 Your details open in WhatsApp ready to send — we confirm within minutes.
