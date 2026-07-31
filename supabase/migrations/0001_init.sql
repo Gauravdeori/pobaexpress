@@ -90,6 +90,14 @@ insert into storage.buckets (id, name, public)
 values ('prescriptions', 'prescriptions', false)
 on conflict (id) do nothing;
 
+-- Supabase's policy templates include an "Enable read access for all users"
+-- SELECT policy granted to `public`. Postgres OR's permissive policies
+-- together, so that one alone makes every prescription readable and listable
+-- by anyone holding the publishable key — which ships in the JS bundle. The
+-- restrictive policy below cannot cancel it out, so drop it explicitly.
+drop policy if exists "Enable read access for all users" on storage.objects;
+drop policy if exists "Enable read access for all users" on storage.buckets;
+
 -- Uploads are open; reads are not.
 drop policy if exists "anyone may upload a prescription" on storage.objects;
 create policy "anyone may upload a prescription"
