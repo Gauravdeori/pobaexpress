@@ -37,6 +37,25 @@ function fileExtension(name: string): string {
 }
 
 /**
+ * The order opens WhatsApp only once the upload settles, so a stalled request
+ * would hold the customer on a spinner. Give it a generous window — a photo on
+ * a rural mobile connection is legitimately slow — then carry on without it.
+ */
+const UPLOAD_TIMEOUT_MS = 20_000;
+
+function withTimeout<T>(work: Promise<T>, label: string): Promise<T | null> {
+  return Promise.race([
+    work,
+    new Promise<null>((resolve) =>
+      setTimeout(() => {
+        console.error(`${label} timed out after ${UPLOAD_TIMEOUT_MS}ms`);
+        resolve(null);
+      }, UPLOAD_TIMEOUT_MS),
+    ),
+  ]);
+}
+
+/**
  * Uploads a prescription to the private bucket. Returns null (rather than
  * throwing) if Supabase is not configured or the upload fails — a failed
  * upload must never block the WhatsApp order, which is the real delivery path.
@@ -52,12 +71,16 @@ export async function uploadPrescription(
   const folder = userId ?? `guest/${crypto.randomUUID()}`;
   const path = `${folder}/${Date.now()}.${fileExtension(file.name)}`;
 
-  const { error } = await supabase.storage
-    .from(PRESCRIPTION_BUCKET)
-    .upload(path, file, { contentType: file.type || undefined, upsert: false });
+  const result = await withTimeout(
+    supabase.storage
+      .from(PRESCRIPTION_BUCKET)
+      .upload(path, file, { contentType: file.type || undefined, upsert: false }),
+    "Prescription upload",
+  );
 
-  if (error) {
-    console.error("Prescription upload failed", error);
+  if (!result) return null;
+  if (result.error) {
+    console.error("Prescription upload failed", result.error);
     return null;
   }
 
