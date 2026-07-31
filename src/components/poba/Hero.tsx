@@ -121,7 +121,7 @@ export function Hero() {
               src={LOGO_SRC}
               onError={onLogoError}
               alt="Poba Express"
-              className="mx-auto w-full drop-shadow-2xl"
+              className="mx-auto w-full drop-shadow-2xl bg-white rounded-full p-4"
             />
           </motion.div>
 
