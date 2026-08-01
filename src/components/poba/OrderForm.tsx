@@ -8,6 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { whatsappLink } from "@/lib/contact";
 import { deliveryFee, getMenu, itemLabel, rupees } from "@/lib/menu";
+import { isFirebaseConfigured } from "@/lib/firebase";
+import { useAccount, saveProfile } from "@/lib/account";
+import { recordOrder, uploadPrescription, type OrderLine } from "@/lib/orders";
+import { AccountPanel } from "./AccountPanel";
 import { Reveal, SectionHeading } from "./Reveal";
 
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
@@ -51,6 +55,9 @@ export function OrderForm() {
   const [preview, setPreview] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  const { user, profile } = useAccount();
 
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
@@ -67,6 +74,15 @@ export function OrderForm() {
     const requested = new URLSearchParams(window.location.search).get("category");
     if (categories.some((c) => c.id === requested)) setCategory(requested as CategoryId);
   }, []);
+
+  // Prefill from the saved profile, but never overwrite something already
+  // typed — the profile can arrive after the customer has started filling in.
+  useEffect(() => {
+    if (!profile) return;
+    if (profile.fullName) setName((current) => current || profile.fullName!);
+    if (profile.phone) setPhone((current) => current || profile.phone!);
+    if (profile.address) setLocation((current) => current || profile.address!);
+  }, [profile]);
 
   // Object URLs leak until revoked, so tie each one to the file it previews.
   useEffect(() => {
@@ -167,31 +183,87 @@ export function OrderForm() {
       return lines.join("\n");
     };
 
+    const uid = user?.uid ?? null;
+    const orderLines: OrderLine[] = picked.map((item) => ({
+      id: item.id,
+      label: itemLabel(item),
+      quantity: cart[item.id],
+      price: item.price,
+    }));
+
+    /** Best-effort record keeping. Never blocks or fails the order. */
+    const persist = async (prescriptionPath: string | null) => {
+      await recordOrder(
+        {
+          category,
+          customerName: name.trim(),
+          phone: phone.trim(),
+          address: location.trim(),
+          lines: orderLines,
+          subtotal,
+          deliveryFee: fee,
+          total,
+          extraRequest: items.trim() || null,
+          notes: notes.trim() || null,
+          prescriptionPath,
+        },
+        uid,
+      );
+      if (uid) {
+        await saveProfile(uid, {
+          fullName: name.trim(),
+          phone: phone.trim(),
+          address: location.trim(),
+        });
+      }
+    };
+
     const shareable = prescription != null && canShareFile(prescription);
 
-    // The share sheet is the only way a page with no backend can hand the photo
-    // itself to WhatsApp. It must be reached before any other await or the
-    // browser stops treating this as a user gesture.
+    // The share sheet hands WhatsApp the photo itself, and must be reached
+    // before any await or the browser stops treating this as a user gesture —
+    // so nothing is uploaded until after it resolves.
     if (prescription && shareable) {
       try {
         await navigator.share({
           files: [prescription],
           text: buildMessage("*Prescription:* photo attached."),
         });
+        void uploadPrescription(prescription, uid).then((upload) => persist(upload?.path ?? null));
         return;
       } catch (shareError) {
         // Dismissing the sheet is a deliberate cancel, not a failure to retry.
         if (shareError instanceof Error && shareError.name === "AbortError") return;
         // Anything else (no target app, permission denied) falls through to the
-        // plain link, where the customer attaches the photo by hand.
+        // link below, where the photo travels as a stored reference instead.
       }
     }
 
+    // No share sheet, so the photo travels as a stored reference. The upload
+    // must not hold the order hostage though: the Firebase SDK retries with
+    // backoff, so an unreachable bucket would freeze the button for many
+    // seconds. Give it a brief head start — long enough that a small photo on
+    // a decent connection still puts a link in the message — then send the
+    // order regardless and let the upload finish in the background.
+    const uploading = prescription ? uploadPrescription(prescription, uid) : Promise.resolve(null);
+    // Record the order once the upload truly settles, however long that takes.
+    void uploading.then((finished) => persist(finished?.path ?? null));
+
+    setSending(true);
+    const raced = await Promise.race([
+      uploading,
+      new Promise<"pending">((resolve) => setTimeout(() => resolve("pending"), 3_500)),
+    ]);
+    setSending(false);
+    const upload = raced === "pending" ? null : raced;
+
     let prescriptionLine: string | null = null;
     if (category === "medicine") {
-      prescriptionLine = !prescription
-        ? "*Prescription:* no photo attached."
-        : `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`;
+      if (!prescription) prescriptionLine = "*Prescription:* no photo attached.";
+      else if (upload?.url) prescriptionLine = `*Prescription:* ${upload.url}`;
+      else if (upload) prescriptionLine = `*Prescription:* uploaded — file \`${upload.path}\``;
+      else
+        prescriptionLine = `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`;
     }
 
     const url = whatsappLink(buildMessage(prescriptionLine));
@@ -218,6 +290,9 @@ export function OrderForm() {
             noValidate
             className="mt-12 rounded-4xl border border-border bg-card/80 p-6 shadow-soft backdrop-blur-xl sm:p-9"
           >
+            {/* Optional accounts: ordering never depends on being signed in. */}
+            {isFirebaseConfigured && <AccountPanel user={user} />}
+
             {/* Category picker */}
             <div className="flex flex-wrap gap-2.5">
               {categories.map((c) => (
@@ -515,9 +590,15 @@ export function OrderForm() {
             )}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
-              <Button variant="accent" size="xl" type="submit" className="w-full sm:w-auto">
+              <Button
+                variant="accent"
+                size="xl"
+                type="submit"
+                disabled={sending}
+                className="w-full sm:w-auto"
+              >
                 <Send className="size-4" />
-                Order Now on WhatsApp
+                {sending ? "Uploading photo…" : "Order Now on WhatsApp"}
               </Button>
               <p className="text-xs text-muted-foreground">
                 Your details open in WhatsApp ready to send — we confirm within minutes.

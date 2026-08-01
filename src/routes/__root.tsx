@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { startAnalytics } from "../lib/firebase";
 
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
@@ -151,6 +152,10 @@ function RootComponent() {
       window.addEventListener("load", register, { once: true });
       return () => window.removeEventListener("load", register);
     }
+  }, []);
+
+  useEffect(() => {
+    void startAnalytics();
   }, []);
 
   return (

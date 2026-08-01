@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Prescriptions are medical data. The public may WRITE but never READ:
+// anyone can upload, nobody can read back except the signed-in owner of the
+// folder. Firebase evaluates matching rules with OR, so a single permissive
+// `allow read: if true` anywhere below would undo this — do not add one, and
+// never leave the console's "test mode" rules (`allow read, write: if true`)
+// in place.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /prescriptions/{allPaths=**} {
+      // Uploads are open, but bounded: 10 MB, images and PDFs only. Without
+      // these checks an open write path is a free file host for anyone.
+      allow write: if request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
+    // Only the owner may read their own uploads, which is what lets the app
+    // hand them a download link. Guest uploads sit under prescriptions/guest/…
+    // and match nothing here, so they stay unreadable from the client —
+    // retrieve those from the Firebase console.
+    match /prescriptions/{uid}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Everything outside /prescriptions is denied by default. Reads and writes
+    // are refused unless a rule above grants them.
+  }
+}

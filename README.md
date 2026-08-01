@@ -66,6 +66,55 @@ public/               favicon and robots.txt
   [`src/styles.css`](src/styles.css) — primary `#0B3D1B` (forest green), accent
   `#FF6A00` (orange), fonts Poppins + Inter.
 
+## Firebase (optional)
+
+Firebase adds three things: **optional accounts**, **prescription storage**, and
+an **order log**. It is entirely additive — with the environment variables unset
+the SDK is never initialised, the account panel is not rendered, and the site
+behaves exactly as it did without it: guest ordering over WhatsApp, no signup.
+
+**Setup**
+
+1. Copy `.env.example` to `.env` and fill in the seven values from Firebase
+   console → Project settings → General → Your apps. They are **not secret** —
+   Firebase web config is designed to ship in the browser bundle. Access is
+   controlled by the rules files, never by hiding these values.
+2. Enable the three services in the console: **Firestore Database**,
+   **Storage**, and **Authentication → Email/Password with the "Email link
+   (passwordless sign-in)" toggle on**.
+3. Deploy the rules — the console's default "test mode" rules are
+   `allow read, write: if true`, which would expose every prescription and
+   every customer's address:
+   ```sh
+   npx firebase deploy --only firestore:rules,storage
+   ```
+4. Authentication → Settings → **Authorized domains**: add your deployed
+   domain, or the email sign-in link will be rejected.
+5. Set the same variables in your host's environment (Vercel/Cloudflare).
+
+**How the pieces behave**
+
+| | Guest | Signed in |
+| --- | --- | --- |
+| Place an order | yes | yes, details prefilled and saved |
+| Order written to `orders` | yes, `userId` null | yes |
+| Read orders back | no | own orders only |
+| Prescription upload | yes | yes |
+| Link to the photo in WhatsApp | no — a storage path | yes, a download URL |
+
+Prescriptions are medical data, so storage is **write-only to the public**:
+anyone may upload, nobody may read back except the signed-in owner. That means
+a leaked config cannot enumerate prescriptions, and it is why guest orders
+carry a storage path for you to open in the console rather than a link.
+
+Note that a Firebase download URL carries a token and **does not expire** —
+anyone the link is forwarded to can open it.
+
+Every Firebase call is best-effort. The upload gets a 3.5s head start so a fast
+one can put a link in the message, then the order is sent regardless and the
+upload finishes in the background — the SDK retries with backoff, so waiting on
+it would freeze the button for many seconds whenever the network is poor.
+
 ## Installable app (PWA)
 
 [`public/manifest.webmanifest`](public/manifest.webmanifest) plus

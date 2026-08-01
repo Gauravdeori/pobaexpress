@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// Accounts are optional: guests order without signing in, so orders accept a
+// null userId. Guests may create an order but may never read one back — with
+// a single permissive read rule, the config in the JS bundle would expose
+// every customer's name, phone and address.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /profiles/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /orders/{orderId} {
+      // A row may only be attributed to the person placing it, so nobody can
+      // write orders into someone else's history.
+      allow create: if request.resource.data.userId == null
+                    || (request.auth != null
+                        && request.resource.data.userId == request.auth.uid);
+
+      allow read: if request.auth != null
+                  && resource.data.userId == request.auth.uid;
+
+      // Orders are a record. Change status from the console or the admin SDK,
+      // never from the browser.
+      allow update, delete: if false;
+    }
+
+    // Anything not matched above is denied.
+  }
+}
