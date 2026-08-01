@@ -17,15 +17,6 @@ import { Reveal, SectionHeading } from "./Reveal";
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
-/** True when the browser can hand this file straight to WhatsApp. */
-function canShareFile(file: File): boolean {
-  return (
-    typeof navigator !== "undefined" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files: [file] })
-  );
-}
-
 const categories = [
   {
     id: "food",
@@ -219,33 +210,17 @@ export function OrderForm() {
       }
     };
 
-    const shareable = prescription != null && canShareFile(prescription);
-
-    // The share sheet hands WhatsApp the photo itself, and must be reached
-    // before any await or the browser stops treating this as a user gesture —
-    // so nothing is uploaded until after it resolves.
-    if (prescription && shareable) {
-      try {
-        await navigator.share({
-          files: [prescription],
-          text: buildMessage("*Prescription:* photo attached."),
-        });
-        void uploadPrescription(prescription).then(persist);
-        return;
-      } catch (shareError) {
-        // Dismissing the sheet is a deliberate cancel, not a failure to retry.
-        if (shareError instanceof Error && shareError.name === "AbortError") return;
-        // Anything else (no target app, permission denied) falls through to the
-        // link below, where the photo travels as a stored reference instead.
-      }
-    }
-
-    // No share sheet, so the photo travels as a link. The upload must not hold
-    // the order hostage though — a slow or failing network would leave the
-    // customer staring at a dead button. Give it a brief head start, long
-    // enough that a small photo on a decent connection still puts a link in
-    // the message, then send the order regardless and let the upload finish in
-    // the background.
+    // Every order goes to the one number in src/lib/contact.ts. This used to
+    // hand the prescription to navigator.share() instead, which opens the OS
+    // share sheet with no recipient — the customer picked both the app and the
+    // contact, so an order could land anywhere. The photo travels as an
+    // uploaded link now, so the wa.me link is always the way out.
+    //
+    // The upload must not hold the order hostage: a slow or failing network
+    // would leave the customer staring at a dead button. Give it a brief head
+    // start, long enough that a small photo on a decent connection still puts
+    // a link in the message, then send the order regardless and let the upload
+    // finish in the background.
     const uploading = prescription ? uploadPrescription(prescription) : Promise.resolve(null);
     // Record the order once the upload truly settles, however long that takes.
     void uploading.then(persist);
@@ -263,7 +238,7 @@ export function OrderForm() {
       if (!prescription) prescriptionLine = "*Prescription:* no photo attached.";
       else if (upload) prescriptionLine = `*Prescription:* ${upload.url}`;
       else
-        prescriptionLine = `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`;
+        prescriptionLine = `*Prescription:* photo to follow in this chat (${prescription.name}).`;
     }
 
     const url = whatsappLink(buildMessage(prescriptionLine));
@@ -544,8 +519,8 @@ export function OrderForm() {
                       Prescription photo
                     </Label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Pharmacies need this before they dispatch. On a phone it goes straight to
-                      WhatsApp with your order; on a computer, attach it in the chat that opens.
+                      Pharmacies need this before they dispatch. It&apos;s uploaded with your order
+                      and a link goes into the WhatsApp message — no need to attach it yourself.
                     </p>
                     <div className="mt-4 flex flex-wrap items-center gap-3">
                       <label

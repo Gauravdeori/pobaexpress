@@ -115,8 +115,8 @@ from the browser — change status from the console or the Admin SDK.
 
 ⚠️ A Cloudinary delivery URL is **public to anyone holding it** and does not
 expire. The id is random so the URL is unguessable, but it is not access
-controlled. On phones the Web Share API still hands the photo straight to
-WhatsApp, so the link matters mainly for desktop orders.
+controlled, so treat the link as sensitive. It is sent only into the WhatsApp
+thread for the order it belongs to.
 
 Every call is best-effort. The upload gets a 3.5s head start so a fast one can
 put a link in the message, then the order is sent regardless and the upload
@@ -160,14 +160,18 @@ along with the two `*.asset.json` imports.
 
 ## How ordering works
 
-The order form has no backend. It validates the fields, formats them into a
-message and opens a `wa.me` link with the text pre-filled, so the customer only
-has to press send in WhatsApp.
+The form validates the fields, formats them into a message and opens a `wa.me`
+link with the text pre-filled, so the customer only has to press send. **Every
+order goes to the single number in [`src/lib/contact.ts`](src/lib/contact.ts)**
+— there is no path that lets the customer pick a different recipient.
 
-Medicine orders prompt for a prescription photo. Since a `wa.me` link can only
-carry text, the form uses the Web Share API (`navigator.share` with `files`) to
-hand the image and the order to WhatsApp together — this works on phones, which
-is where the orders come from. Where that API is missing or refuses the file
-(most desktop browsers), it falls back to the plain link and tells the customer
-to attach the photo in the chat. Either path is a normal WhatsApp message; no
-file is ever uploaded to a server.
+Medicine orders prompt for a prescription photo. A `wa.me` link carries text
+only, so the photo is uploaded (see the backend section) and its link goes into
+the message. If the upload fails or is slow, the order still sends and the
+message says the photo will follow in the chat.
+
+This deliberately does **not** use the Web Share API. `navigator.share()` can
+attach the file itself, but it opens the OS share sheet with no recipient — the
+customer chooses both the app and the contact, so an order could go to the
+wrong person or nowhere at all. Uploading the photo and sending a link keeps
+the destination fixed.
