@@ -7,6 +7,7 @@ import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount } from "@/lib/account";
 import { AccountMenu } from "./AccountMenu";
+import { InstallButton } from "./InstallButton";
 
 const links = [
   { label: "Home", href: "#home" },
@@ -87,6 +88,8 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-1 sm:gap-2">
+          {/* Renders only where the browser can actually install. */}
+          <InstallButton onDark={!scrolled} />
           {/* Optional: ordering never depends on being signed in. */}
           {isFirebaseConfigured && <AccountMenu user={user} onDark={!scrolled} />}
           <Button variant="accent" size="lg" className="hidden rounded-full sm:inline-flex" asChild>
