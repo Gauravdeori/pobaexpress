@@ -10,7 +10,8 @@ import { whatsappLink } from "@/lib/contact";
 import { deliveryFee, getMenu, itemLabel, rupees } from "@/lib/menu";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount, saveProfile } from "@/lib/account";
-import { recordOrder, uploadPrescription, type OrderLine } from "@/lib/orders";
+import { recordOrder, type OrderLine } from "@/lib/orders";
+import { uploadPrescription } from "@/lib/uploads";
 import { AccountPanel } from "./AccountPanel";
 import { Reveal, SectionHeading } from "./Reveal";
 
@@ -192,7 +193,7 @@ export function OrderForm() {
     }));
 
     /** Best-effort record keeping. Never blocks or fails the order. */
-    const persist = async (prescriptionPath: string | null) => {
+    const persist = async (upload: { publicId: string; url: string } | null) => {
       await recordOrder(
         {
           category,
@@ -205,7 +206,8 @@ export function OrderForm() {
           total,
           extraRequest: items.trim() || null,
           notes: notes.trim() || null,
-          prescriptionPath,
+          prescriptionId: upload?.publicId ?? null,
+          prescriptionUrl: upload?.url ?? null,
         },
         uid,
       );
@@ -229,7 +231,7 @@ export function OrderForm() {
           files: [prescription],
           text: buildMessage("*Prescription:* photo attached."),
         });
-        void uploadPrescription(prescription, uid).then((upload) => persist(upload?.path ?? null));
+        void uploadPrescription(prescription).then(persist);
         return;
       } catch (shareError) {
         // Dismissing the sheet is a deliberate cancel, not a failure to retry.
@@ -239,15 +241,15 @@ export function OrderForm() {
       }
     }
 
-    // No share sheet, so the photo travels as a stored reference. The upload
-    // must not hold the order hostage though: the Firebase SDK retries with
-    // backoff, so an unreachable bucket would freeze the button for many
-    // seconds. Give it a brief head start — long enough that a small photo on
-    // a decent connection still puts a link in the message — then send the
-    // order regardless and let the upload finish in the background.
-    const uploading = prescription ? uploadPrescription(prescription, uid) : Promise.resolve(null);
+    // No share sheet, so the photo travels as a link. The upload must not hold
+    // the order hostage though — a slow or failing network would leave the
+    // customer staring at a dead button. Give it a brief head start, long
+    // enough that a small photo on a decent connection still puts a link in
+    // the message, then send the order regardless and let the upload finish in
+    // the background.
+    const uploading = prescription ? uploadPrescription(prescription) : Promise.resolve(null);
     // Record the order once the upload truly settles, however long that takes.
-    void uploading.then((finished) => persist(finished?.path ?? null));
+    void uploading.then(persist);
 
     setSending(true);
     const raced = await Promise.race([
@@ -260,8 +262,7 @@ export function OrderForm() {
     let prescriptionLine: string | null = null;
     if (category === "medicine") {
       if (!prescription) prescriptionLine = "*Prescription:* no photo attached.";
-      else if (upload?.url) prescriptionLine = `*Prescription:* ${upload.url}`;
-      else if (upload) prescriptionLine = `*Prescription:* uploaded — file \`${upload.path}\``;
+      else if (upload) prescriptionLine = `*Prescription:* ${upload.url}`;
       else
         prescriptionLine = `*Prescription:* please see the photo (${prescription.name}) attached in this chat.`;
     }

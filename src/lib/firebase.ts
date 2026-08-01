@@ -1,7 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
-import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 /**
  * Firebase is optional. The site was built to work with no backend at all —
@@ -37,10 +36,9 @@ if (isFirebaseConfigured && isBrowser) {
 
 export const auth: Auth | null = app ? getAuth(app) : null;
 export const db: Firestore | null = app ? getFirestore(app) : null;
-export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
 
-/** Storage prefix holding prescription photos. Not publicly readable. */
-export const PRESCRIPTION_PREFIX = "prescriptions";
+// Cloud Storage is deliberately absent: it requires the Blaze plan, so
+// prescription photos go to Cloudinary instead. See src/lib/uploads.ts.
 
 /**
  * Analytics is loaded lazily and only where it is actually supported, so it

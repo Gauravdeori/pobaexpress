@@ -66,54 +66,62 @@ public/               favicon and robots.txt
   [`src/styles.css`](src/styles.css) — primary `#0B3D1B` (forest green), accent
   `#FF6A00` (orange), fonts Poppins + Inter.
 
-## Firebase (optional)
+## Backend (optional)
 
-Firebase adds three things: **optional accounts**, **prescription storage**, and
-an **order log**. It is entirely additive — with the environment variables unset
-the SDK is never initialised, the account panel is not rendered, and the site
-behaves exactly as it did without it: guest ordering over WhatsApp, no signup.
+Two optional services, both free-tier: **Firebase** for accounts and an order
+log, **Cloudinary** for prescription photos. Both are additive — with the
+environment variables unset neither is initialised, the account panel is not
+rendered, and the site behaves exactly as it did without them: guest ordering
+over WhatsApp, no signup.
 
-**Setup**
+Firebase Cloud Storage is deliberately unused. It requires the paid Blaze plan,
+so photos go to Cloudinary's free tier instead.
 
-1. Copy `.env.example` to `.env` and fill in the seven values from Firebase
-   console → Project settings → General → Your apps. They are **not secret** —
-   Firebase web config is designed to ship in the browser bundle. Access is
-   controlled by the rules files, never by hiding these values.
-2. Enable the three services in the console: **Firestore Database**,
-   **Storage**, and **Authentication → Email/Password with the "Email link
-   (passwordless sign-in)" toggle on**.
-3. Deploy the rules — the console's default "test mode" rules are
-   `allow read, write: if true`, which would expose every prescription and
-   every customer's address:
+**Firebase setup**
+
+1. Copy `.env.example` to `.env` and fill in the values from Firebase console →
+   Project settings → General → Your apps. They are **not secret** — Firebase
+   web config is designed to ship in the browser bundle. Access is controlled
+   by `firestore.rules`, never by hiding these values.
+2. Enable **Firestore Database** and **Authentication → Email/Password** with
+   the _"Email link (passwordless sign-in)"_ toggle on.
+3. Deploy the rules. The console's default test-mode rules are
+   `allow read, write: if true`, which would expose every customer's name,
+   phone and address:
    ```sh
-   npx firebase deploy --only firestore:rules,storage
+   npx firebase deploy --only firestore:rules
    ```
 4. Authentication → Settings → **Authorized domains**: add your deployed
-   domain, or the email sign-in link will be rejected.
-5. Set the same variables in your host's environment (Vercel/Cloudflare).
+   domain, or the email sign-in link is rejected.
+
+**Cloudinary setup**
+
+1. Settings → Upload → **Add upload preset**, signing mode **Unsigned**.
+   Restrict it to images/PDF and a sensible max size while you are there.
+2. Put the cloud name and preset name in `.env`. Neither is a secret; an
+   unsigned preset only grants uploading.
 
 **How the pieces behave**
 
-| | Guest | Signed in |
-| --- | --- | --- |
-| Place an order | yes | yes, details prefilled and saved |
-| Order written to `orders` | yes, `userId` null | yes |
-| Read orders back | no | own orders only |
-| Prescription upload | yes | yes |
-| Link to the photo in WhatsApp | no — a storage path | yes, a download URL |
+|                           | Guest                         | Signed in                        |
+| ------------------------- | ----------------------------- | -------------------------------- |
+| Place an order            | yes                           | yes, details prefilled and saved |
+| Order written to `orders` | yes, `userId` null            | yes                              |
+| Read orders back          | no                            | own orders only                  |
+| Prescription photo        | uploaded, link in the message | same                             |
 
-Prescriptions are medical data, so storage is **write-only to the public**:
-anyone may upload, nobody may read back except the signed-in owner. That means
-a leaked config cannot enumerate prescriptions, and it is why guest orders
-carry a storage path for you to open in the console rather than a link.
+Orders are readable only by the customer who placed them, and are immutable
+from the browser — change status from the console or the Admin SDK.
 
-Note that a Firebase download URL carries a token and **does not expire** —
-anyone the link is forwarded to can open it.
+⚠️ A Cloudinary delivery URL is **public to anyone holding it** and does not
+expire. The id is random so the URL is unguessable, but it is not access
+controlled. On phones the Web Share API still hands the photo straight to
+WhatsApp, so the link matters mainly for desktop orders.
 
-Every Firebase call is best-effort. The upload gets a 3.5s head start so a fast
-one can put a link in the message, then the order is sent regardless and the
-upload finishes in the background — the SDK retries with backoff, so waiting on
-it would freeze the button for many seconds whenever the network is poor.
+Every call is best-effort. The upload gets a 3.5s head start so a fast one can
+put a link in the message, then the order is sent regardless and the upload
+finishes in the background — waiting on it would freeze the button whenever the
+network is poor.
 
 ## Installable app (PWA)
 
