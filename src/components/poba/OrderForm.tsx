@@ -460,7 +460,6 @@ export function OrderForm() {
                   value={name}
                   onChange={(e) => bind(setName)(e.target.value)}
                   autoComplete="name"
-                  placeholder="Ritu Pegu"
                   className="h-12 rounded-2xl"
                 />
               </div>
@@ -473,7 +472,6 @@ export function OrderForm() {
                   autoComplete="tel"
                   value={phone}
                   onChange={(e) => bind(setPhone)(e.target.value)}
-                  placeholder="+91 98765 43210"
                   className="h-12 rounded-2xl"
                 />
               </div>
