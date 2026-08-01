@@ -12,6 +12,7 @@ import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount, saveProfile } from "@/lib/account";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { recordOrder, type OrderLine } from "@/lib/orders";
+import { formatOrderTime, makeOrderReference } from "@/lib/receipt";
 import { uploadPrescription } from "@/lib/uploads";
 import { Reveal, SectionHeading } from "./Reveal";
 
@@ -149,9 +150,16 @@ export function OrderForm() {
     }
     setError(null);
 
+    // One reference per submission, shared by the message and the saved order
+    // so a WhatsApp thread can be matched to its record.
+    const placedAt = new Date();
+    const reference = makeOrderReference(placedAt);
+
     const buildMessage = (prescriptionLine: string | null) => {
       const lines = [
-        "*New Order — Poba Express*",
+        "*POBA EXPRESS — ORDER RECEIPT*",
+        `Ref: ${reference}`,
+        formatOrderTime(placedAt),
         "",
         `*Category:* ${active.label}`,
         `*Name:* ${name.trim()}`,
@@ -180,6 +188,11 @@ export function OrderForm() {
       if (!picked.length) lines.push("", `*Delivery:* ${rupees(fee)} flat`);
       if (notes.trim()) lines.push("", `*Extra notes:* ${notes.trim()}`);
       if (prescriptionLine) lines.push("", prescriptionLine);
+      lines.push(
+        "",
+        "_Amounts are as listed on the site. We'll confirm this order and any_",
+        "_changes before delivery. Payment on delivery._",
+      );
       return lines.join("\n");
     };
 
@@ -195,6 +208,7 @@ export function OrderForm() {
     const persist = async (upload: { publicId: string; url: string } | null) => {
       await recordOrder(
         {
+          reference,
           category,
           customerName: name.trim(),
           phone: phone.trim(),
