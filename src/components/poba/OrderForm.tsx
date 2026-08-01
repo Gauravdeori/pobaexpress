@@ -345,16 +345,25 @@ export function OrderForm() {
                               <button
                                 type="button"
                                 onClick={() => setQuantity(item.id, quantity + 1)}
-                                className="min-w-0 flex-1 text-left"
+                                className="min-w-0 flex-1 text-left flex items-center gap-3"
                                 aria-label={`Add ${itemLabel(item)}, ${rupees(item.price)}`}
                               >
-                                <span className="block truncate text-sm font-medium text-primary">
-                                  {item.name}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {item.variant ? `${item.variant} · ` : ""}
-                                  {rupees(item.price)}
-                                </span>
+                                {item.image && (
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="size-12 shrink-0 rounded-lg object-cover shadow-sm"
+                                  />
+                                )}
+                                <div className="min-w-0">
+                                  <span className="block truncate text-sm font-medium text-primary">
+                                    {item.name}
+                                  </span>
+                                  <span className="block truncate text-xs text-muted-foreground">
+                                    {item.variant ? `${item.variant} · ` : ""}
+                                    {rupees(item.price)}
+                                  </span>
+                                </div>
                               </button>
 
                               {quantity > 0 ? (
