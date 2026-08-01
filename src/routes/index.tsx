@@ -4,6 +4,7 @@ import { Hero } from "@/components/poba/Hero";
 import { Services } from "@/components/poba/Services";
 import { About } from "@/components/poba/About";
 import { WhyChooseUs } from "@/components/poba/WhyChooseUs";
+import { PartnerForm } from "@/components/poba/PartnerForm";
 import { OrderForm } from "@/components/poba/OrderForm";
 import { CallToAction } from "@/components/poba/CallToAction";
 import { Footer } from "@/components/poba/Footer";
@@ -36,6 +37,7 @@ function Index() {
         <Services />
         <About />
         <WhyChooseUs />
+        <PartnerForm />
         <OrderForm />
         <CallToAction />
       </main>
