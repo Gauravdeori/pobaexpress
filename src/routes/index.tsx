@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/poba/Navbar";
 import { Hero } from "@/components/poba/Hero";
+import { LaunchCountdown } from "@/components/poba/LaunchCountdown";
 import { Services } from "@/components/poba/Services";
 import { About } from "@/components/poba/About";
 import { WhyChooseUs } from "@/components/poba/WhyChooseUs";
@@ -34,6 +35,7 @@ function Index() {
       <Navbar />
       <main>
         <Hero />
+        <LaunchCountdown />
         <Services />
         <About />
         <WhyChooseUs />

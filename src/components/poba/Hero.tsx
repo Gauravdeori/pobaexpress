@@ -7,9 +7,11 @@ import {
   UtensilsCrossed,
   Cake,
   Pill,
+  Rocket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BANNER_SRC, LOGO_SRC, logoRef, onLogoError, onPhotoError, photoRef } from "@/lib/assets";
+import { LAUNCH_DATE_LABEL } from "@/lib/launch";
 
 const chips = [
   { icon: UtensilsCrossed, label: "Food" },
@@ -55,9 +57,10 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-accent px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-foreground shadow-soft"
           >
-            Jonai's Own Delivery Service
+            <Rocket className="size-3.5" />
+            Launching {LAUNCH_DATE_LABEL}
           </motion.span>
 
           <motion.h1
