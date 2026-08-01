@@ -65,7 +65,7 @@ export function LaunchCountdown() {
         <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           {launched
             ? "Food, cake and medicine delivered across Jonai. Place your order on WhatsApp — no app, no signup."
-            : "We're getting our riders and partner kitchens ready. Send your order any time — we'll confirm it and deliver from day one."}
+            : "We're getting our riders and partner kitchens ready. Browse the menu and prices now — ordering switches on by itself that morning."}
         </p>
 
         {!launched && (
@@ -98,7 +98,7 @@ export function LaunchCountdown() {
           className="mt-9 flex flex-wrap justify-center gap-3"
         >
           <Button variant="accent" size="xl" asChild>
-            <a href="#order">{launched ? "Order Now" : "Pre-book your order"}</a>
+            <a href="#order">{launched ? "Order Now" : "See the menu & prices"}</a>
           </Button>
           <Button variant="onGreen" size="xl" asChild>
             <a href="#partners">Partner With Us</a>

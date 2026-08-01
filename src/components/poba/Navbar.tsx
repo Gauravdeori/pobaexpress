@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
+import { useLaunched } from "@/lib/launch";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount } from "@/lib/account";
 import { AccountMenu } from "./AccountMenu";
@@ -22,6 +23,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { user } = useAccount();
+  const launched = useLaunched();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -96,7 +98,7 @@ export function Navbar() {
           {/* Optional: ordering never depends on being signed in. */}
           {isFirebaseConfigured && <AccountMenu user={user} onDark={!scrolled} />}
           <Button variant="accent" size="lg" className="hidden rounded-full sm:inline-flex" asChild>
-            <a href="#order">Order Now</a>
+            <a href="#order">{launched ? "Order Now" : "See the Menu"}</a>
           </Button>
           <button
             type="button"
@@ -138,7 +140,7 @@ export function Navbar() {
               <li className="pt-2">
                 <Button variant="accent" className="w-full rounded-full" asChild>
                   <a href="#order" onClick={() => setOpen(false)}>
-                    Order Now
+                    {launched ? "Order Now" : "See the Menu"}
                   </a>
                 </Button>
               </li>

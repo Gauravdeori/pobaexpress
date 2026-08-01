@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { UtensilsCrossed, Pill, Cake, Minus, Paperclip, Plus, Send, X } from "lucide-react";
+import { UtensilsCrossed, Pill, Cake, Clock, Minus, Paperclip, Plus, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { whatsappLink } from "@/lib/contact";
 import { deliveryFee, getMenu, itemLabel, rupees } from "@/lib/menu";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount, saveProfile } from "@/lib/account";
+import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { recordOrder, type OrderLine } from "@/lib/orders";
 import { uploadPrescription } from "@/lib/uploads";
 import { Reveal, SectionHeading } from "./Reveal";
@@ -49,6 +50,7 @@ export function OrderForm() {
   const [sending, setSending] = useState(false);
 
   const { user, profile } = useAccount();
+  const launched = useLaunched();
 
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
@@ -120,6 +122,13 @@ export function OrderForm() {
 
   const handleOrder = async (event: FormEvent) => {
     event.preventDefault();
+
+    // The button is disabled before launch; this guards the Enter key and any
+    // other route to submit.
+    if (!launched) {
+      setError(`Ordering opens on ${LAUNCH_DATE_LABEL}. Browse the menu in the meantime.`);
+      return;
+    }
 
     if (!name.trim() || !phone.trim() || !location.trim()) {
       setError("Please fill in your name, phone number and delivery location.");
@@ -593,14 +602,25 @@ export function OrderForm() {
                 variant="accent"
                 size="xl"
                 type="submit"
-                disabled={sending}
+                disabled={sending || !launched}
                 className="w-full sm:w-auto"
               >
-                <Send className="size-4" />
-                {sending ? "Uploading photo…" : "Order Now on WhatsApp"}
+                {launched ? <Send className="size-4" /> : <Clock className="size-4" />}
+                {!launched
+                  ? `Ordering opens ${LAUNCH_DATE_LABEL}`
+                  : sending
+                    ? "Uploading photo…"
+                    : "Order Now on WhatsApp"}
               </Button>
               <p className="text-xs text-muted-foreground">
-                Your details open in WhatsApp ready to send — we confirm within minutes.
+                {launched ? (
+                  "Your details open in WhatsApp ready to send — we confirm within minutes."
+                ) : (
+                  <>
+                    We start delivering on {LAUNCH_DATE_LABEL}. Have a look at the menu and prices —
+                    ordering switches on by itself that morning.
+                  </>
+                )}
               </p>
             </div>
           </form>

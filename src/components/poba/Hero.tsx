@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BANNER_SRC, LOGO_SRC, logoRef, onLogoError, onPhotoError, photoRef } from "@/lib/assets";
-import { LAUNCH_DATE_LABEL } from "@/lib/launch";
+import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 
 const chips = [
   { icon: UtensilsCrossed, label: "Food" },
@@ -32,6 +32,7 @@ export function Hero() {
   // Looping motion is the kind that triggers motion sickness, so honour the
   // system setting rather than animating regardless.
   const reduceMotion = useReducedMotion();
+  const launched = useLaunched();
 
   // svh, not vh: on mobile 100vh is the height with the URL bar hidden, so a
   // vh-sized hero is taller than the screen until you scroll.
@@ -88,7 +89,7 @@ export function Hero() {
             className="mt-8 flex flex-wrap gap-3"
           >
             <Button variant="accent" size="xl" asChild>
-              <a href="#order">Order Now</a>
+              <a href="#order">{launched ? "Order Now" : "See the Menu"}</a>
             </Button>
             <Button variant="glass" size="xl" asChild>
               <a href="#partners">Become a Partner</a>

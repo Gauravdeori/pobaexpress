@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 /**
  * Launch date for Poba Express deliveries.
  *
@@ -18,6 +20,25 @@ export type Remaining = {
   /** True once the launch moment has passed. */
   done: boolean;
 };
+
+/**
+ * True once deliveries have started. Seeded from the same clock on the server
+ * and the client so the first paint matches, then re-checked on a timer so a
+ * tab left open across the launch moment updates itself.
+ */
+export function useLaunched(): boolean {
+  const [launched, setLaunched] = useState(() => timeUntilLaunch().done);
+
+  useEffect(() => {
+    if (launched) return;
+    const timer = setInterval(() => {
+      if (timeUntilLaunch().done) setLaunched(true);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [launched]);
+
+  return launched;
+}
 
 export function timeUntilLaunch(now: number = Date.now()): Remaining {
   const ms = LAUNCH_AT.getTime() - now;

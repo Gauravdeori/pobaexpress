@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag } from "lucide-react";
 
+import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+
 /**
  * Phone-only sticky call to action. The order form sits two thirds down a very
  * long page, so on a phone it stays one tap away instead of a long scroll.
@@ -10,6 +12,7 @@ import { ShoppingBag } from "lucide-react";
  */
 export function MobileOrderBar() {
   const [visible, setVisible] = useState(false);
+  const launched = useLaunched();
 
   useEffect(() => {
     const order = document.getElementById("order");
@@ -61,10 +64,12 @@ export function MobileOrderBar() {
             className="flex h-14 items-center justify-center gap-2.5 rounded-full bg-gradient-accent text-base font-semibold text-accent-foreground shadow-lift"
           >
             <ShoppingBag className="size-5" />
-            Order Now on WhatsApp
+            {launched ? "Order Now on WhatsApp" : "See the menu & prices"}
           </a>
           <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
-            Food from ₹29 · delivery from ₹10 · no app needed
+            {launched
+              ? "Food from ₹29 · delivery from ₹10 · no app needed"
+              : `Ordering opens ${LAUNCH_DATE_LABEL} · food from ₹29`}
           </p>
         </motion.div>
       )}
