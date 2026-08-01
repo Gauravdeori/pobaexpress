@@ -10,8 +10,6 @@ export type OrderLine = {
 };
 
 export type OrderDraft = {
-  /** Human-readable reference, also printed on the customer's receipt. */
-  reference: string;
   category: string;
   customerName: string;
   phone: string;
