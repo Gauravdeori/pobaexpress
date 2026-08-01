@@ -12,7 +12,6 @@ import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount, saveProfile } from "@/lib/account";
 import { recordOrder, type OrderLine } from "@/lib/orders";
 import { uploadPrescription } from "@/lib/uploads";
-import { AccountPanel } from "./AccountPanel";
 import { Reveal, SectionHeading } from "./Reveal";
 
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
@@ -291,8 +290,25 @@ export function OrderForm() {
             noValidate
             className="mt-12 rounded-4xl border border-border bg-card/80 p-6 shadow-soft backdrop-blur-xl sm:p-9"
           >
-            {/* Optional accounts: ordering never depends on being signed in. */}
-            {isFirebaseConfigured && <AccountPanel user={user} />}
+            {/* Status only — signing in lives in the header, so the form isn't
+                cluttered with a second copy of the same thing. Ordering never
+                depends on being signed in either way. */}
+            {isFirebaseConfigured && (
+              <p className="mb-6 rounded-2xl border border-border bg-secondary/50 px-4 py-3 text-sm text-muted-foreground">
+                {user ? (
+                  <>
+                    Signed in as <span className="font-medium text-primary">{user.email}</span> —
+                    your details are filled in below and saved when you order.
+                  </>
+                ) : (
+                  <>
+                    Ordering as a guest — no account needed. Use{" "}
+                    <span className="font-medium text-primary">Sign in</span> at the top if
+                    you&apos;d like your details saved for next time.
+                  </>
+                )}
+              </p>
+            )}
 
             {/* Category picker */}
             <div className="flex flex-wrap gap-2.5">

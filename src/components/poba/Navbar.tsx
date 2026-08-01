@@ -4,6 +4,9 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
+import { isFirebaseConfigured } from "@/lib/firebase";
+import { useAccount } from "@/lib/account";
+import { AccountMenu } from "./AccountMenu";
 
 const links = [
   { label: "Home", href: "#home" },
@@ -17,6 +20,7 @@ const links = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user } = useAccount();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -82,7 +86,9 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Optional: ordering never depends on being signed in. */}
+          {isFirebaseConfigured && <AccountMenu user={user} onDark={!scrolled} />}
           <Button variant="accent" size="lg" className="hidden rounded-full sm:inline-flex" asChild>
             <a href="#order">Order Now</a>
           </Button>
