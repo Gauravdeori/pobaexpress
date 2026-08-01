@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 
 import {
   ADDRESS_FULL,
@@ -9,6 +9,7 @@ import {
   PHONE_DISPLAY,
   PHONE_HREF,
   POLICY_EFFECTIVE_DATE,
+  WHATSAPP_DISPLAY,
   whatsappLink,
 } from "@/lib/contact";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
@@ -50,19 +51,22 @@ export function ContactDetails() {
       </p>
       <p className="flex gap-2">
         <Phone className="mt-0.5 size-4 shrink-0 text-accent" />
+        <a href={PHONE_HREF} className="transition-colors hover:text-accent">
+          {PHONE_DISPLAY}
+        </a>
+      </p>
+      <p className="flex gap-2">
+        <MessageCircle className="mt-0.5 size-4 shrink-0 text-accent" />
         <span>
-          <a href={PHONE_HREF} className="transition-colors hover:text-accent">
-            {PHONE_DISPLAY}
-          </a>
-          {" · "}
           <a
             href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-accent"
           >
-            WhatsApp
-          </a>
+            {WHATSAPP_DISPLAY}
+          </a>{" "}
+          <span className="text-muted-foreground/70">(WhatsApp, messages only)</span>
         </span>
       </p>
       <p className="flex gap-2">

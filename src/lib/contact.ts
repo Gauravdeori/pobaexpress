@@ -3,14 +3,22 @@
  * Update the values here and every section of the page follows.
  */
 
-/** WhatsApp number in international format, digits only. */
+/**
+ * Two separate numbers, deliberately. Orders and messages go to WhatsApp;
+ * calls go to the contact line. Don't collapse them back into one.
+ */
+
+/** WhatsApp — messages only, no calls. International format, digits only. */
 export const WHATSAPP_NUMBER = "918822015747";
 
-/** The same number, formatted for display. */
-export const PHONE_DISPLAY = "+91 88220 15747";
+/** The WhatsApp number, formatted for display. */
+export const WHATSAPP_DISPLAY = "+91 88220 15747";
 
-/** The same number as a dialable href. */
-export const PHONE_HREF = "tel:+918822015747";
+/** The number to call. */
+export const PHONE_DISPLAY = "+91 70997 28406";
+
+/** The same calling number as a dialable href. */
+export const PHONE_HREF = "tel:+917099728406";
 
 export const EMAIL = "pobaparadise@gmail.com";
 export const EMAIL_HREF = `mailto:${EMAIL}`;

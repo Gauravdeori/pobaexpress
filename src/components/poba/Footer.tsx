@@ -9,6 +9,7 @@ import {
   PHONE_DISPLAY,
   PHONE_HREF,
   SOCIAL,
+  WHATSAPP_DISPLAY,
   whatsappLink,
 } from "@/lib/contact";
 
@@ -111,6 +112,22 @@ export function Footer() {
                 className="flex items-center gap-2 transition-colors hover:text-accent"
               >
                 <Phone className="size-4 shrink-0 text-accent" /> {PHONE_DISPLAY}
+              </a>
+            </li>
+            <li>
+              <a
+                href={whatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-2 transition-colors hover:text-accent"
+              >
+                <MessageCircle className="mt-0.5 size-4 shrink-0 text-accent" />
+                <span>
+                  {WHATSAPP_DISPLAY}
+                  <span className="block text-xs text-primary-foreground/55">
+                    WhatsApp — messages only
+                  </span>
+                </span>
               </a>
             </li>
             <li>
