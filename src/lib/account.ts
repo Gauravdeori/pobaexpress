@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  isSignInWithEmailLink,
   onAuthStateChanged,
-  sendSignInLinkToEmail,
-  signInWithEmailLink,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut as firebaseSignOut,
   type User,
 } from "firebase/auth";
@@ -20,10 +21,6 @@ export type Profile = {
 
 const EMPTY_PROFILE: Profile = { fullName: null, phone: null, address: null };
 
-// Firebase's email-link flow returns to the page without telling us who it is
-// for, so the address is stashed before the link is sent and read back here.
-const PENDING_EMAIL_KEY = "poba:pending-email";
-
 /**
  * Session plus saved profile. Accounts are optional: signed out, everything
  * below is null and the order form behaves exactly as it did without Firebase.
@@ -32,22 +29,6 @@ export function useAccount() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(isFirebaseConfigured);
-
-  // Complete a sign-in if we arrived back from an email link.
-  useEffect(() => {
-    if (!auth || !isSignInWithEmailLink(auth, window.location.href)) return;
-    const email = window.localStorage.getItem(PENDING_EMAIL_KEY);
-    if (!email) return; // Opened on a different device; nothing to complete with.
-
-    signInWithEmailLink(auth, email, window.location.href)
-      .then(() => {
-        window.localStorage.removeItem(PENDING_EMAIL_KEY);
-        // Strip the credential out of the address bar so it is not shared or
-        // replayed from history.
-        window.history.replaceState({}, "", window.location.pathname + "#order");
-      })
-      .catch((error) => console.error("Could not complete sign-in", error));
-  }, []);
 
   useEffect(() => {
     if (!auth) return;
@@ -76,21 +57,46 @@ export function useAccount() {
   return { user, profile, loading };
 }
 
-/** Emails a one-time sign-in link. Returns an error message, or null on success. */
-export async function sendMagicLink(email: string): Promise<string | null> {
+export async function signInWithPassword(email: string, password: string):Promise<string | null> {
   if (!auth) return "Accounts aren't set up yet.";
-  const address = email.trim();
   try {
-    await sendSignInLinkToEmail(auth, address, {
-      // Must be on the Authorized domains list in the Firebase console.
-      url: `${window.location.origin}/#order`,
-      handleCodeInApp: true,
-    });
-    window.localStorage.setItem(PENDING_EMAIL_KEY, address);
+    await signInWithEmailAndPassword(auth, email, password);
     return null;
-  } catch (error) {
-    console.error("Could not send sign-in link", error);
-    return error instanceof Error ? error.message : "Could not send the link.";
+  } catch (error: any) {
+    console.error("Sign-in failed", error);
+    if (error.code === "auth/invalid-credential") {
+      return "Incorrect email or password.";
+    }
+    return error instanceof Error ? error.message : "Could not sign in.";
+  }
+}
+
+export async function signUpWithPassword(email: string, password: string):Promise<string | null> {
+  if (!auth) return "Accounts aren't set up yet.";
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    return null;
+  } catch (error: any) {
+    console.error("Sign-up failed", error);
+    if (error.code === "auth/email-already-in-use") {
+      return "An account with this email already exists.";
+    }
+    if (error.code === "auth/weak-password") {
+      return "Password should be at least 6 characters.";
+    }
+    return error instanceof Error ? error.message : "Could not create account.";
+  }
+}
+
+export async function signInWithGoogle():Promise<string | null> {
+  if (!auth) return "Accounts aren't set up yet.";
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+    return null;
+  } catch (error: any) {
+    console.error("Google sign-in failed", error);
+    return error instanceof Error ? error.message : "Could not sign in with Google.";
   }
 }
 
