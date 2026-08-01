@@ -118,12 +118,15 @@ export function Hero() {
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             className="bg-white rounded-4xl p-8 shadow-lift transition-transform duration-500 hover:scale-[1.03]"
           >
+            {/* No rounded-full here: the lockup is 375x403, so a circular mask
+                crops the wordmark and tagline off the bottom corners. The card
+                behind it already supplies the white backing and the radius. */}
             <img
               ref={logoRef}
               src={LOGO_SRC}
               onError={onLogoError}
               alt="Poba Express"
-              className="mx-auto w-full drop-shadow-2xl bg-white rounded-full p-4"
+              className="mx-auto w-full"
             />
           </motion.div>
 
