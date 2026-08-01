@@ -39,7 +39,7 @@ export function Footer() {
     <footer id="contact" className="bg-primary-deep text-primary-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
-          <div className="inline-block rounded-2xl bg-white/95 p-3">
+          <div className="inline-block">
             <img
               ref={logoRef}
               src={LOGO_SRC}

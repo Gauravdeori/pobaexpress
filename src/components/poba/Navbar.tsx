@@ -59,7 +59,7 @@ export function Navbar() {
         {/* The logo's wordmark is dark green, so it needs a light backing to stay
             readable over the hero photo. On the scrolled (near-white) bar the
             chip blends into the background and reads as no chip at all. */}
-        <a href="#home" className="flex items-center gap-2 rounded-xl bg-white/92 p-1.5">
+        <a href="#home" className="flex items-center gap-2">
           <img
             ref={logoRef}
             src={LOGO_SRC}

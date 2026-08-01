@@ -116,7 +116,9 @@ export function Hero() {
           <motion.div
             animate={{ y: [0, -14, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="bg-white rounded-4xl p-8 shadow-lift transition-transform duration-500 hover:scale-[1.03]"
+            /* Padding without a background: keeps the mark clear of the floating
+               badges, which are pinned to this container's edges. */
+            className="p-6 transition-transform duration-500 hover:scale-[1.03]"
           >
             {/* No rounded-full here: the lockup is 375x403, so a circular mask
                 crops the wordmark and tagline off the bottom corners. The card

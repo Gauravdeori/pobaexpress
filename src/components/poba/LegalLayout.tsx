@@ -93,7 +93,7 @@ export function LegalLayout({
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex h-20 max-w-3xl items-center justify-between gap-4 px-5 lg:px-8">
-          <Link to="/" className="flex items-center gap-2 rounded-xl bg-white/92 p-1.5">
+          <Link to="/" className="flex items-center gap-2">
             <img
               ref={logoRef}
               src={LOGO_SRC}
