@@ -23,12 +23,12 @@ npm run dev      # http://localhost:3000
 
 Other scripts:
 
-| Command | What it does |
-| --- | --- |
-| `npm run build` | Production build |
+| Command           | What it does                       |
+| ----------------- | ---------------------------------- |
+| `npm run build`   | Production build                   |
 | `npm run preview` | Serve the production build locally |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier, in place |
+| `npm run lint`    | ESLint                             |
+| `npm run format`  | Prettier, in place                 |
 
 ## Project layout
 
@@ -66,47 +66,6 @@ public/               favicon and robots.txt
   [`src/styles.css`](src/styles.css) — primary `#0B3D1B` (forest green), accent
   `#FF6A00` (orange), fonts Poppins + Inter.
 
-## Supabase (optional)
-
-Supabase adds three things: **optional accounts**, **prescription storage**, and
-an **order log**. It is entirely additive — with the environment variables unset
-the client is `null`, the account panel is not rendered, and the site behaves
-exactly as it did before: guest ordering over WhatsApp, no signup.
-
-**Setup**
-
-1. Copy `.env.example` to `.env` and fill in both values from Supabase →
-   Settings → API. Use the **publishable** key (`sb_publishable_…`), which is
-   meant to sit in browser code. Never put a secret / `service_role` key in a
-   `VITE_` variable — those are readable by anyone who loads the site.
-2. Run [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql)
-   in the SQL editor. It creates `profiles`, `orders`, the private
-   `prescriptions` bucket, and the RLS policies that make all of it safe.
-3. In Authentication → URL Configuration, add your deployed origin to the
-   redirect allow-list so magic links work in production.
-4. Set the same two variables in your host's environment (Vercel/Cloudflare).
-
-**How the pieces behave**
-
-| | Guest | Signed in |
-| --- | --- | --- |
-| Place an order | yes | yes, details prefilled and saved |
-| Order written to `orders` | yes, `user_id` null | yes |
-| Read orders back | no | own orders only |
-| Prescription upload | yes | yes |
-| Link to the photo in WhatsApp | no — a storage path | yes, a 7-day signed URL |
-
-Prescriptions are medical data, so the bucket is **write-only to the public**:
-anyone may upload, nobody may read back except the signed-in owner. That is a
-deliberate trade — it means a leaked publishable key cannot enumerate
-prescriptions, and it is why guest orders carry a storage path for you to open
-in the dashboard rather than a link. On phones the Web Share API still hands
-the photo straight to WhatsApp, so the path is a backup, not the only copy.
-
-Every Supabase call is best-effort: a failed upload or insert is logged and the
-WhatsApp order still goes through, because that is the delivery path that
-actually matters.
-
 ## Installable app (PWA)
 
 [`public/manifest.webmanifest`](public/manifest.webmanifest) plus
@@ -131,10 +90,10 @@ wordmark is dark green and disappears on the brand green.
 The logo and the hero photo are resolved by [`src/lib/assets.ts`](src/lib/assets.ts),
 which tries a list of sources in order and uses the first that loads:
 
-| Image | Tried first | Then | Last resort |
-| --- | --- | --- | --- |
-| Logo | `public/poba-logo.png` | the uploaded copy on the editor's asset host | `public/logo.svg` (bundled vector mark) |
-| Hero / About photo | `public/forest-road.jpg` | the uploaded copy on the editor's asset host | hidden, leaving a deep-green panel |
+| Image              | Tried first              | Then                                         | Last resort                             |
+| ------------------ | ------------------------ | -------------------------------------------- | --------------------------------------- |
+| Logo               | `public/poba-logo.png`   | the uploaded copy on the editor's asset host | `public/logo.svg` (bundled vector mark) |
+| Hero / About photo | `public/forest-road.jpg` | the uploaded copy on the editor's asset host | hidden, leaving a deep-green panel      |
 
 The uploaded copies live behind a `/__l5e/` path that only resolves inside the
 editor preview — they 404 on any other host. **Drop the two originals into
