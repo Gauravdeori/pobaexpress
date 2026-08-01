@@ -59,13 +59,16 @@ export function Navbar() {
         {/* The logo's wordmark is dark green, so it needs a light backing to stay
             readable over the hero photo. On the scrolled (near-white) bar the
             chip blends into the background and reads as no chip at all. */}
-        <a href="#home" className="flex items-center gap-2">
-          <img
+        <a href="#home" className="group flex items-center gap-2">
+          <motion.img
             ref={logoRef}
             src={LOGO_SRC}
             onError={onLogoError}
             alt="Poba Express"
-            className="h-12 w-auto"
+            whileHover={{ scale: 1.06, rotate: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            className="h-12 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]"
           />
         </a>
 

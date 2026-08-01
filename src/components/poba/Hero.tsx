@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import {
   ChevronDown,
   Zap,
@@ -27,6 +27,9 @@ export function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, 140]);
   const scale = useTransform(scrollY, [0, 600], [1.05, 1.18]);
+  // Looping motion is the kind that triggers motion sickness, so honour the
+  // system setting rather than animating regardless.
+  const reduceMotion = useReducedMotion();
 
   // svh, not vh: on mobile 100vh is the height with the URL bar hidden, so a
   // vh-sized hero is taller than the screen until you scroll.
@@ -107,28 +110,43 @@ export function Hero() {
           </motion.ul>
         </div>
 
+        {/* The mark rides in from the left rather than fading: it is a scooter
+            with speed lines, so arriving reads better than appearing. */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -70, scale: 0.9 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          transition={
+            reduceMotion
+              ? { duration: 0.4 }
+              : { type: "spring", stiffness: 90, damping: 14, delay: 0.25 }
+          }
           className="relative mx-auto hidden w-full max-w-md lg:block"
         >
+          {/* Warm glow so the mark lifts off the dark photo now that there is
+              no panel behind it. Sits first in the DOM, so it paints behind. */}
           <motion.div
-            animate={{ y: [0, -14, 0] }}
+            aria-hidden
+            animate={
+              reduceMotion ? undefined : { opacity: [0.2, 0.4, 0.2], scale: [0.92, 1.04, 0.92] }
+            }
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-10 rounded-full bg-accent/40 blur-3xl"
+          />
+
+          <motion.div
+            animate={reduceMotion ? undefined : { y: [0, -14, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.04, rotate: -1.5 }}
             /* Padding without a background: keeps the mark clear of the floating
                badges, which are pinned to this container's edges. */
-            className="p-6 transition-transform duration-500 hover:scale-[1.03]"
+            className="relative p-6"
           >
-            {/* No rounded-full here: the lockup is 375x403, so a circular mask
-                crops the wordmark and tagline off the bottom corners. The card
-                behind it already supplies the white backing and the radius. */}
             <img
               ref={logoRef}
               src={LOGO_SRC}
               onError={onLogoError}
               alt="Poba Express"
-              className="mx-auto w-full"
+              className="mx-auto w-full drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
             />
           </motion.div>
 

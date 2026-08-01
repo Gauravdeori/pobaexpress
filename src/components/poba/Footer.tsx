@@ -1,4 +1,5 @@
 import { Facebook, Instagram, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
+import { motion } from "motion/react";
 import { Link } from "@tanstack/react-router";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
 import {
@@ -40,11 +41,17 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <div className="inline-block">
-            <img
+            <motion.img
               ref={logoRef}
               src={LOGO_SRC}
               onError={onLogoError}
               alt="Poba Express"
+              // Arrives when the footer does, rather than sitting there already.
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: "some" }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ scale: 1.04 }}
               className="h-20 w-auto"
               loading="lazy"
             />
