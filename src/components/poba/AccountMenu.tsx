@@ -33,10 +33,10 @@ export function AccountMenu({ user, onDark = false }: { user: User | null; onDar
     if (e) e.preventDefault();
     if (!email.trim() || !password.trim()) return;
     setStatus("loading");
-    const error = isSignUp 
+    const error = isSignUp
       ? await signUpWithPassword(email, password)
       : await signInWithPassword(email, password);
-    
+
     if (error) {
       setStatus("error");
       setMessage(error);

@@ -12,10 +12,17 @@ export const PHONE_DISPLAY = "+91 88220 15747";
 /** The same number as a dialable href. */
 export const PHONE_HREF = "tel:+918822015747";
 
-export const EMAIL = "hello@pobaexpress.in";
+export const EMAIL = "pobaparadise@gmail.com";
 export const EMAIL_HREF = `mailto:${EMAIL}`;
 
+/** Short form for the footer, where the column is narrow. */
 export const ADDRESS = "Jonai, Assam";
+
+/** Registered address, used in the legal policies. */
+export const ADDRESS_FULL = "Opposite Jonai Police Station, Jonai, Dhemaji, Assam – 787060";
+
+/** Date the current policies take effect, shown on each legal page. */
+export const POLICY_EFFECTIVE_DATE = "28 July 2026";
 
 /** Public profiles. Leave a value empty and the footer hides that icon. */
 export const SOCIAL = {

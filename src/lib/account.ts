@@ -57,45 +57,55 @@ export function useAccount() {
   return { user, profile, loading };
 }
 
-export async function signInWithPassword(email: string, password: string):Promise<string | null> {
+/** Firebase throws FirebaseError, whose `code` is what we branch on. */
+function authErrorCode(error: unknown): string {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : "";
+}
+
+export async function signInWithPassword(email: string, password: string): Promise<string | null> {
   if (!auth) return "Accounts aren't set up yet.";
   try {
     await signInWithEmailAndPassword(auth, email, password);
     return null;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Sign-in failed", error);
-    if (error.code === "auth/invalid-credential") {
+    if (authErrorCode(error) === "auth/invalid-credential") {
       return "Incorrect email or password.";
     }
     return error instanceof Error ? error.message : "Could not sign in.";
   }
 }
 
-export async function signUpWithPassword(email: string, password: string):Promise<string | null> {
+export async function signUpWithPassword(email: string, password: string): Promise<string | null> {
   if (!auth) return "Accounts aren't set up yet.";
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     return null;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Sign-up failed", error);
-    if (error.code === "auth/email-already-in-use") {
+    const code = authErrorCode(error);
+    if (code === "auth/email-already-in-use") {
       return "An account with this email already exists.";
     }
-    if (error.code === "auth/weak-password") {
+    if (code === "auth/weak-password") {
       return "Password should be at least 6 characters.";
     }
     return error instanceof Error ? error.message : "Could not create account.";
   }
 }
 
-export async function signInWithGoogle():Promise<string | null> {
+export async function signInWithGoogle(): Promise<string | null> {
   if (!auth) return "Accounts aren't set up yet.";
   try {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
     return null;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Google sign-in failed", error);
+    // Closing the popup is a deliberate cancel, not something to report.
+    if (authErrorCode(error) === "auth/popup-closed-by-user") return null;
     return error instanceof Error ? error.message : "Could not sign in with Google.";
   }
 }

@@ -53,7 +53,8 @@ export function PartnerForm() {
                   </div>
                   <h3 className="mt-6 text-2xl font-bold text-primary">Application Received!</h3>
                   <p className="mt-2 text-muted-foreground max-w-sm">
-                    Thank you for your interest. Our team will contact you shortly to discuss the next steps.
+                    Thank you for your interest. Our team will contact you shortly to discuss the
+                    next steps.
                   </p>
                   <Button
                     variant="outline"
@@ -66,11 +67,19 @@ export function PartnerForm() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Web3Forms Access Key */}
-                  <input type="hidden" name="access_key" value="1da10f27-6791-403f-a336-559ac471cd68" />
-                  
+                  <input
+                    type="hidden"
+                    name="access_key"
+                    value="1da10f27-6791-403f-a336-559ac471cd68"
+                  />
+
                   {/* Optional: Add a subject to the email */}
-                  <input type="hidden" name="subject" value="New Partner Application - Poba Express" />
-                  
+                  <input
+                    type="hidden"
+                    name="subject"
+                    value="New Partner Application - Poba Express"
+                  />
+
                   {/* Optional: Add a redirect or disable it so we handle state via fetch */}
                   <input type="hidden" name="redirect" value="false" />
 
@@ -92,7 +101,10 @@ export function PartnerForm() {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="partner-phone" className="text-sm font-medium text-foreground">
+                      <label
+                        htmlFor="partner-phone"
+                        className="text-sm font-medium text-foreground"
+                      >
                         Phone Number
                       </label>
                       <div className="relative">
@@ -111,7 +123,10 @@ export function PartnerForm() {
 
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label htmlFor="partner-business" className="text-sm font-medium text-foreground">
+                      <label
+                        htmlFor="partner-business"
+                        className="text-sm font-medium text-foreground"
+                      >
                         Business Name
                       </label>
                       <div className="relative">

@@ -1,4 +1,5 @@
 import { Facebook, Instagram, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
 import {
   ADDRESS,
@@ -18,6 +19,12 @@ const quickLinks = [
 ];
 
 const services = ["Food Delivery", "Cake Delivery", "Medicine Delivery"];
+
+const legalLinks = [
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms & Conditions", to: "/terms" },
+  { label: "Refund & Cancellation", to: "/refunds" },
+] as const;
 
 // Profiles without a URL in src/lib/contact.ts are dropped, so the row never
 // renders an icon that links nowhere.
@@ -112,6 +119,13 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10 py-5 text-center text-xs text-primary-foreground/60">
+        <nav aria-label="Legal" className="mb-3 flex flex-wrap justify-center gap-x-5 gap-y-2">
+          {legalLinks.map((l) => (
+            <Link key={l.to} to={l.to} className="min-h-8 transition-colors hover:text-accent">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
         © {new Date().getFullYear()} Poba Express. All Rights Reserved.
       </div>
     </footer>
