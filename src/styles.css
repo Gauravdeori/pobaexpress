@@ -121,6 +121,19 @@
   border: 1px solid oklch(1 0 0 / 0.6);
 }
 
+/* Lifts a cut-out illustration off a photographic background. A frosted plate
+   works over a muted backdrop but reads as a milky smudge once the photo behind
+   it runs at full strength, so this fades to nothing instead of ending on an
+   edge. */
+@utility spotlight {
+  background: radial-gradient(
+    circle at 50% 50%,
+    oklch(1 0 0 / 0.72) 0%,
+    oklch(1 0 0 / 0.45) 42%,
+    oklch(1 0 0 / 0) 70%
+  );
+}
+
 @utility bg-gradient-hero {
   background-image: var(--gradient-hero);
 }

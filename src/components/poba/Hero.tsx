@@ -20,22 +20,15 @@ export function Hero() {
     <section id="home" className="relative overflow-hidden bg-background">
       {/* Photograph of Jonai behind the whole section. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        {/* Held well back: at full strength the photo is a high-contrast,
-            highly saturated drone shot that out-shouts both the headline and
-            the rider, and its greens fight the brand green. */}
-        <img
-          src="/hero-bg.jpg"
-          alt=""
-          className="h-full w-full object-cover object-center opacity-55 saturate-[0.8]"
-        />
-        {/* Two layers, because one flat wash is not enough. Body copy in
-            muted-foreground clears 4.5:1 on the cream background, but the photo
-            carries dark forest and tarmac and a 50% wash only gets it to around
-            2:1 over those. So the wash lifts the whole frame and the gradient
-            then clears the side the copy actually sits on — down the page on
-            phones, across from the rider on desktop. */}
-        <div className="absolute inset-0 bg-background/50" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background/20 lg:bg-gradient-to-r lg:from-background lg:via-background/50 lg:to-transparent" />
+        <img src="/hero-bg.jpg" alt="" className="h-full w-full object-cover object-center" />
+        {/* Legibility comes from one scrim shaped around the copy, not from a
+            flat wash over the whole frame — a wash dulls the parts of the photo
+            nothing is sitting on, which is most of it. Body copy in
+            muted-foreground needs the cream at close to full strength to clear
+            4.5:1, so the scrim holds solid across the copy column and only then
+            falls away: down the page on phones, across from the rider on
+            desktop. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background from-30% via-background/70 via-62% to-transparent to-88% lg:bg-gradient-to-r lg:from-28% lg:via-background/55 lg:via-52% lg:to-78%" />
       </div>
 
       <div className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
@@ -132,13 +125,13 @@ export function Hero() {
             {/* The rider is drawn side-on at street level and the photo behind
                 it was shot from the air, so the two never share a horizon and
                 the cut-out reads as a sticker floating over the valley. The
-                frosted plate gives it a surface of its own, and the ellipse
-                sits under the wheels so the scooter has something to stand on.
-                Both are drawn before the artwork so it paints over them. */}
+                halo separates it from the busy photo, and the ellipse sits
+                under the wheels so the scooter has something to stand on. Both
+                are drawn before the artwork so it paints over them. */}
             <div className="relative w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[460px] xl:max-w-[560px]">
               <div
                 aria-hidden
-                className="glass-light absolute left-1/2 top-1/2 aspect-square w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                className="spotlight absolute left-1/2 top-1/2 aspect-square w-[118%] -translate-x-1/2 -translate-y-1/2"
               />
               {/* Traced from the artwork: the wheels bottom out at 94% of its
                   height and the scooter spans 26%–90% across. */}
@@ -163,7 +156,7 @@ export function Hero() {
         aria-label="Scroll down"
         animate={reduceMotion ? undefined : { y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="relative mx-auto mb-8 hidden w-max flex-col items-center gap-1 text-muted-foreground sm:flex z-10"
+        className="relative z-10 mx-auto mb-8 hidden w-max flex-col items-center gap-1 text-primary sm:flex"
       >
         <span className="text-[11px] font-semibold uppercase tracking-[0.25em]">Scroll</span>
         <ChevronDown className="size-5" />
