@@ -37,7 +37,7 @@ const features = [
 
 export function WhyChooseUs() {
   return (
-    <section className="py-24 lg:py-32">
+    <section id="why-us" className="py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <SectionHeading
           eyebrow="Why Choose Us"

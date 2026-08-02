@@ -5,11 +5,11 @@ import { LaunchCountdown } from "@/components/poba/LaunchCountdown";
 import { Services } from "@/components/poba/Services";
 import { About } from "@/components/poba/About";
 import { WhyChooseUs } from "@/components/poba/WhyChooseUs";
-import { PartnerForm } from "@/components/poba/PartnerForm";
 import { OrderForm } from "@/components/poba/OrderForm";
 import { CallToAction } from "@/components/poba/CallToAction";
 import { Footer } from "@/components/poba/Footer";
 import { MobileOrderBar } from "@/components/poba/MobileOrderBar";
+import { PartnerSheet } from "@/components/poba/PartnerSheet";
 
 const title = "Poba Express — Jonai's Own Delivery Service";
 const description =
@@ -39,12 +39,12 @@ function Index() {
         <Services />
         <About />
         <WhyChooseUs />
-        <PartnerForm />
         <OrderForm />
         <CallToAction />
       </main>
       <Footer />
       <MobileOrderBar />
+      <PartnerSheet />
     </div>
   );
 }
