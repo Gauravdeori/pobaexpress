@@ -97,13 +97,12 @@ export function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.2, type: "spring", stiffness: 50 }}
-            className="relative w-full h-[300px] sm:h-[400px] lg:h-[600px] xl:h-[700px] z-0 flex justify-center lg:justify-end items-center lg:-mr-12 xl:-mr-20"
+            className="relative w-full flex justify-center lg:justify-end items-center mt-12 lg:mt-0"
           >
             <img
-              src="/hero-custom.png"
+              src="/hero-final.png"
               alt="Poba Express Delivery Rider"
-              className="object-contain w-full h-full max-w-[120%] lg:scale-110 drop-shadow-2xl origin-right"
-              style={{ objectPosition: 'center right' }}
+              className="object-contain w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[450px] xl:max-w-[550px] drop-shadow-2xl"
             />
           </motion.div>
         </div>
