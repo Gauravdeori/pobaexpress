@@ -32,7 +32,10 @@ export function Hero() {
       </div>
 
       <div className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        {/* The map is wider than it is tall and carries small labels, so it
+            takes the larger share of the row — at an even split its boundary
+            names stop being readable. */}
+        <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10">
           {/* Left Column: Text and Actions */}
           <div className="max-w-xl z-10">
             <motion.div
@@ -115,39 +118,30 @@ export function Hero() {
             </motion.ul>
           </div>
 
-          {/* Right Column: Illustration */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
+          {/* Right column: the coverage map.
+
+              Framed as a card rather than floated as a cut-out. The artwork is
+              a self-contained graphic with its own background, so it has no
+              silhouette to blend and nothing to stand on — a mount and a shadow
+              make it read as an object deliberately placed on the page, which
+              is also why the aerial photo behind it no longer fights it. */}
+          <motion.figure
+            initial={{ opacity: 0, y: 32, rotate: -1.6 }}
+            animate={{ opacity: 1, y: 0, rotate: -1.6 }}
             transition={{ duration: 0.9, delay: 0.2, type: "spring", stiffness: 50 }}
-            className="relative w-full flex justify-center lg:justify-end items-center mt-12 lg:mt-0"
+            className="relative mx-auto mt-12 w-full max-w-[560px] lg:ml-auto lg:mr-0 lg:mt-0 lg:max-w-none"
           >
-            {/* The rider is drawn side-on at street level and the photo behind
-                it was shot from the air, so the two never share a horizon and
-                the cut-out reads as a sticker floating over the valley. The
-                halo separates it from the busy photo, and the ellipse sits
-                under the wheels so the scooter has something to stand on. Both
-                are drawn before the artwork so it paints over them. */}
-            <div className="relative w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[460px] xl:max-w-[560px]">
-              <div
-                aria-hidden
-                className="spotlight absolute left-1/2 top-1/2 aspect-square w-[118%] -translate-x-1/2 -translate-y-1/2"
-              />
-              {/* Traced from the artwork: the wheels bottom out at 94% of its
-                  height and the scooter spans 26%–90% across. */}
-              <div
-                aria-hidden
-                className="absolute bottom-[3%] left-[26%] right-[10%] h-[4%] rounded-[50%] bg-primary/30 blur-[6px]"
-              />
-              {/* Decorative: the heading already carries the message. */}
+            <div className="rounded-[2rem] border border-border/70 bg-card p-2 shadow-lift sm:p-3">
+              {/* Not decorative: this is the only place the delivery boundary is
+                  stated, and the landmarks are baked into the image where a
+                  screen reader cannot reach them. */}
               <img
-                aria-hidden
-                src="/hero-final.png"
-                alt=""
-                className="relative w-full object-contain drop-shadow-xl"
+                src="/coverage-map.jpg"
+                alt="Poba Express delivery area for Jonai town — north to Ruskin Gate, south to Jonai P.H.C, east to the Torajan side and west to Rotkey playground."
+                className="w-full rounded-[1.4rem]"
               />
             </div>
-          </motion.div>
+          </motion.figure>
         </div>
       </div>
 
