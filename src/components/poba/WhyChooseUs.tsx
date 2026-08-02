@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Zap, MapPin, Wallet, ShieldCheck, Handshake, Heart } from "lucide-react";
-import { Reveal, SectionHeading } from "./Reveal";
+import { Reveal } from "./Reveal";
 
 const features = [
   {
@@ -37,14 +37,12 @@ const features = [
 
 export function WhyChooseUs() {
   return (
-    <section id="why-us" className="py-24 lg:py-32 bg-background">
+    <section id="why-us" className="py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-primary sm:text-4xl">
-            Why Choose Poba Express?
-          </h2>
-          <div className="w-12 h-1 bg-accent mx-auto mt-6 rounded-full" />
-        </div>
+        <Reveal className="mx-auto mb-16 max-w-2xl text-center">
+          <h2 className="text-3xl font-bold text-primary sm:text-4xl">Why Choose Poba Express?</h2>
+          <div className="mx-auto mt-6 h-1 w-12 rounded-full bg-accent" />
+        </Reveal>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (

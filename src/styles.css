@@ -67,11 +67,7 @@
   --input: oklch(0.92 0.01 140);
   --ring: oklch(0.38 0.1 152);
   --surface: oklch(1 0 0 / 0.4);
-  --gradient-hero: linear-gradient(
-    180deg,
-    var(--background) 0%,
-    oklch(0.96 0.01 120) 100%
-  );
+  --gradient-hero: linear-gradient(180deg, var(--background) 0%, oklch(0.96 0.01 120) 100%);
   --gradient-accent: linear-gradient(135deg, var(--accent), oklch(0.34 0.1 155));
   --gradient-green: linear-gradient(135deg, var(--primary-deep), var(--primary));
 }
@@ -100,9 +96,10 @@
   }
 
   /* The header is fixed, so anchor targets need clearance or their headings
-     land underneath it. */
+     land underneath it. The bar itself is h-24 (6rem), so this has to stay
+     above that or a jumped-to heading sits flush against its underside. */
   :where(section, footer)[id] {
-    scroll-margin-top: 6rem;
+    scroll-margin-top: 7.5rem;
   }
 
   @media (prefers-reduced-motion: reduce) {

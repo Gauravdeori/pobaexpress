@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
-import { ChevronDown, Zap, ShieldCheck, Handshake, Utensils, ArrowRight } from "lucide-react";
+import { ChevronDown, Zap, ShieldCheck, Handshake, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import { useLaunched } from "@/lib/launch";
 
 /** Three promises, each with a supporting line, as a row under the buttons. */
 const promises = [
@@ -11,20 +11,31 @@ const promises = [
 ];
 
 export function Hero() {
+  // Looping motion is the kind that triggers motion sickness, so honour the
+  // system setting rather than animating regardless.
   const reduceMotion = useReducedMotion();
   const launched = useLaunched();
 
   return (
     <section id="home" className="relative overflow-hidden bg-background">
-      {/* Custom Background Image */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      {/* Photograph of Jonai behind the whole section. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        {/* Held well back: at full strength the photo is a high-contrast,
+            highly saturated drone shot that out-shouts both the headline and
+            the rider, and its greens fight the brand green. */}
         <img
-          src="/hero-bg.png"
+          src="/hero-bg.jpg"
           alt=""
-          className="h-full w-full object-cover object-center opacity-60"
+          className="h-full w-full object-cover object-center opacity-55 saturate-[0.8]"
         />
-        {/* Soft overlay to ensure text remains readable */}
+        {/* Two layers, because one flat wash is not enough. Body copy in
+            muted-foreground clears 4.5:1 on the cream background, but the photo
+            carries dark forest and tarmac and a 50% wash only gets it to around
+            2:1 over those. So the wash lifts the whole frame and the gradient
+            then clears the side the copy actually sits on — down the page on
+            phones, across from the rider on desktop. */}
         <div className="absolute inset-0 bg-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background/20 lg:bg-gradient-to-r lg:from-background lg:via-background/50 lg:to-transparent" />
       </div>
 
       <div className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
@@ -57,7 +68,8 @@ export function Hero() {
               transition={{ duration: 0.7, delay: 0.24 }}
               className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground sm:text-xl"
             >
-              Fast, affordable and reliable delivery from your favourite restaurants right to your doorstep.
+              Fast, affordable and reliable delivery of food, cake and medicine — from your
+              favourite local shops right to your doorstep.
             </motion.p>
 
             <motion.div
@@ -66,16 +78,24 @@ export function Hero() {
               transition={{ duration: 0.7, delay: 0.32 }}
               className="mt-10 flex flex-wrap items-center gap-4"
             >
-              <Button className="rounded-full bg-primary hover:bg-primary-deep text-primary-foreground font-semibold px-8 shadow-lg" size="xl" asChild>
+              {/* Ordering does not open until launch day, so the label has to
+                  agree with the header, the sticky bar and the form itself —
+                  all of which offer the menu until then. */}
+              <Button variant="hero" size="xl" className="font-semibold" asChild>
                 <a href="#order">
-                  {launched ? "Order Now" : "Order Now"}
-                  <ArrowRight className="ml-2 size-4" />
+                  {launched ? "Order Now" : "See the Menu"}
+                  <ArrowRight className="size-4" />
                 </a>
               </Button>
-              <Button variant="outline" size="xl" className="rounded-full bg-card hover:bg-card/90 font-semibold px-8 border-border text-foreground shadow-sm" asChild>
-                <a href="#order">
-                  Explore Restaurants
-                  <Utensils className="ml-2 size-4 text-muted-foreground" />
+              <Button
+                variant="outline"
+                size="xl"
+                className="border-border bg-card font-semibold text-foreground shadow-sm hover:bg-card/90 hover:text-foreground"
+                asChild
+              >
+                <a href="#partners">
+                  Become a Partner
+                  <Handshake className="size-4 text-muted-foreground" />
                 </a>
               </Button>
             </motion.div>
@@ -93,7 +113,9 @@ export function Hero() {
                   </span>
                   <span>
                     <span className="block text-sm font-bold text-primary">{p.title}</span>
-                    <span className="block text-xs font-medium text-muted-foreground">{p.detail}</span>
+                    <span className="block text-xs font-medium text-muted-foreground">
+                      {p.detail}
+                    </span>
                   </span>
                 </li>
               ))}
@@ -107,17 +129,37 @@ export function Hero() {
             transition={{ duration: 0.9, delay: 0.2, type: "spring", stiffness: 50 }}
             className="relative w-full flex justify-center lg:justify-end items-center mt-12 lg:mt-0"
           >
-            <img
-              src="/hero-final.png"
-              alt="Poba Express Delivery Rider"
-              className="object-contain w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[450px] xl:max-w-[550px] drop-shadow-2xl"
-            />
+            {/* The rider is drawn side-on at street level and the photo behind
+                it was shot from the air, so the two never share a horizon and
+                the cut-out reads as a sticker floating over the valley. The
+                frosted plate gives it a surface of its own, and the ellipse
+                sits under the wheels so the scooter has something to stand on.
+                Both are drawn before the artwork so it paints over them. */}
+            <div className="relative w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[460px] xl:max-w-[560px]">
+              <div
+                aria-hidden
+                className="glass-light absolute left-1/2 top-1/2 aspect-square w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              />
+              {/* Traced from the artwork: the wheels bottom out at 94% of its
+                  height and the scooter spans 26%–90% across. */}
+              <div
+                aria-hidden
+                className="absolute bottom-[3%] left-[26%] right-[10%] h-[4%] rounded-[50%] bg-primary/30 blur-[6px]"
+              />
+              {/* Decorative: the heading already carries the message. */}
+              <img
+                aria-hidden
+                src="/hero-final.png"
+                alt=""
+                className="relative w-full object-contain drop-shadow-xl"
+              />
+            </div>
           </motion.div>
         </div>
       </div>
 
       <motion.a
-        href="#why-us"
+        href="#services"
         aria-label="Scroll down"
         animate={reduceMotion ? undefined : { y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}

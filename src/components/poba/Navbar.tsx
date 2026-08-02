@@ -56,8 +56,11 @@ export function Navbar() {
           : "bg-transparent",
       )}
     >
-      <nav className="flex h-24 items-center justify-between mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
-        <div className="flex w-1/4 justify-start">
+      {/* The nav sits centred by giving both flanks equal flex space rather
+          than a fixed share of the width: at md the six links need every pixel
+          they can get, and a hard w-1/4 on each side starves them. */}
+      <nav className="mx-auto flex h-24 max-w-[120rem] items-center justify-between px-6 lg:px-12 2xl:px-20">
+        <div className="flex flex-1 justify-start">
           <a href="#home" className="group flex items-center gap-2">
             <motion.img
               ref={logoRef}
@@ -72,30 +75,30 @@ export function Navbar() {
           </a>
         </div>
 
-        <div className="hidden flex-1 justify-center md:flex">
-          <ul className="flex items-center gap-8">
+        <div className="hidden shrink-0 justify-center md:flex">
+          <ul className="flex items-center gap-6 lg:gap-8">
             {links.map((l) => (
               <li key={l.label}>
                 <a
                   href={l.href}
-                  className="relative text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                  className="relative text-sm font-semibold text-foreground transition-colors hover:text-accent"
                 >
                   {l.label}
-                  {/* Active indicator underline logic could go here */}
                 </a>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="flex w-1/4 items-center justify-end gap-1 sm:gap-2">
+        <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
           {/* Renders only where the browser can actually install. */}
           <InstallButton />
           {/* Optional: ordering never depends on being signed in. */}
           {isFirebaseConfigured && <AccountMenu user={user} />}
           <Button
-            className="hidden rounded-full bg-primary hover:bg-primary-deep text-primary-foreground sm:inline-flex px-8 font-semibold shadow-md"
+            variant="hero"
             size="lg"
+            className="hidden rounded-full px-8 font-semibold sm:inline-flex"
             asChild
           >
             <a href="#order">{launched ? "Order Now" : "See the Menu"}</a>
@@ -135,7 +138,7 @@ export function Navbar() {
                 </li>
               ))}
               <li className="pt-2">
-                <Button className="w-full rounded-full bg-primary hover:bg-primary-deep text-primary-foreground font-semibold" asChild>
+                <Button variant="hero" className="w-full rounded-full font-semibold" asChild>
                   <a href="#order" onClick={() => setOpen(false)}>
                     {launched ? "Order Now" : "See the Menu"}
                   </a>

@@ -1,48 +1,53 @@
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { useLaunched } from "@/lib/launch";
 
 export function CallToAction() {
+  const launched = useLaunched();
+
   return (
-    <section id="get-started" className="relative pb-24 lg:pb-32 px-5 lg:px-8 bg-background">
+    <section id="get-started" className="relative px-5 pb-24 lg:px-8 lg:pb-32">
       <div className="mx-auto max-w-[80rem]">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: "some" }}
           transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
-          className="bg-primary rounded-[3rem] overflow-hidden flex flex-col md:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative shadow-xl"
+          className="relative flex flex-col items-center justify-between overflow-hidden rounded-[3rem] bg-primary p-8 shadow-xl md:flex-row md:p-12 lg:px-20"
         >
           {/* Subtle background decoration */}
           <div className="absolute inset-0 bg-gradient-green opacity-50" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-accent-light/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-8 md:gap-12 w-full">
-            {/* Left Image */}
-            <div className="w-48 h-48 md:w-56 md:h-56 flex-shrink-0 flex items-center justify-center -mt-16 md:-my-16">
-              <img 
-                src="/cta-bag.png" 
-                alt="Groceries" 
-                className="w-full h-full object-contain object-bottom drop-shadow-2xl" 
+          <div className="absolute right-0 top-0 size-64 -translate-y-1/2 translate-x-1/4 rounded-full bg-accent-light/10 blur-3xl" />
+
+          <div className="relative z-10 flex w-full flex-col items-center gap-8 text-center md:flex-row md:gap-12 md:text-left">
+            {/* The card clips to its rounded corners so the blur above stays
+                inside it, which means the artwork has to stay inside too. */}
+            <div className="flex size-40 shrink-0 items-center justify-center md:size-48">
+              <img
+                aria-hidden
+                src="/cta-bag.png"
+                alt=""
+                loading="lazy"
+                className="size-full object-contain drop-shadow-2xl"
               />
             </div>
-            
-            {/* Center Text */}
-            <div className="flex-1 max-w-xl self-center">
+
+            <div className="flex-1">
               <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl">
                 Craving something delicious?
               </h2>
               <p className="mt-3 text-lg text-primary-foreground/90">
-                Order from your favorite restaurants in Jonai.
+                Food, cake and medicine from your favourite Jonai shops.
               </p>
             </div>
-            
-            {/* Right Button */}
-            <div className="flex-shrink-0 self-center mt-6 md:mt-0">
-              <Button className="rounded-full bg-card hover:bg-card/90 text-primary font-semibold px-8 h-14 shadow-lg text-lg" asChild>
+
+            <div className="shrink-0">
+              <Button variant="onGreen" size="xl" className="font-semibold" asChild>
                 <a href="#order">
-                  Order Now
-                  <ArrowRight className="ml-2 size-5" />
+                  {launched ? "Order Now" : "See the Menu"}
+                  <ArrowRight className="size-4" />
                 </a>
               </Button>
             </div>
