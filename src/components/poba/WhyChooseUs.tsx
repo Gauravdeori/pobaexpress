@@ -37,28 +37,28 @@ const features = [
 
 export function WhyChooseUs() {
   return (
-    <section id="why-us" className="py-24 lg:py-32">
+    <section id="why-us" className="py-24 lg:py-32 bg-background">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <SectionHeading
-          eyebrow="Why Choose Us"
-          title="Built For Jonai, By Jonai"
-          subtitle="A delivery service that puts the community first — from our riders to our partner shops."
-        />
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold text-primary sm:text-4xl">
+            Why Choose Poba Express?
+          </h2>
+          <div className="w-12 h-1 bg-accent mx-auto mt-6 rounded-full" />
+        </div>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <Reveal key={f.title} delay={i * 0.07}>
               <motion.article
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="group relative h-full overflow-hidden rounded-3xl border border-border bg-card p-7 shadow-soft"
+                className="group relative h-full overflow-hidden rounded-[2rem] border border-border/60 bg-card p-8 shadow-sm hover:shadow-md transition-shadow text-center flex flex-col items-center"
               >
-                <div className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gradient-accent transition-transform duration-500 group-hover:scale-x-100" />
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-accent/10 text-accent transition-transform duration-300 group-hover:scale-110">
-                  <f.icon className="size-5" />
+                <div className="flex size-16 items-center justify-center rounded-[1.25rem] bg-accent/10 text-accent mb-6">
+                  <f.icon className="size-8" strokeWidth={1.5} />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-primary">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
+                <h3 className="text-xl font-bold text-primary">{f.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
               </motion.article>
             </Reveal>
           ))}

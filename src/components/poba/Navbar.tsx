@@ -52,44 +52,52 @@ export function Navbar() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-background/85 backdrop-blur-xl shadow-soft border-b border-border"
+          ? "bg-background/95 backdrop-blur-xl shadow-sm border-b border-border/40"
           : "bg-transparent",
       )}
     >
-      {/* Tall enough to give the near-square logo lockup room to stay legible. */}
-      <nav className="flex h-20 items-center justify-between py-2 mx-auto max-w-[120rem] px-5 lg:px-12 2xl:px-20">
-        <a href="#home" className="group flex items-center gap-2">
-          <motion.img
-            ref={logoRef}
-            src={LOGO_SRC}
-            onError={onLogoError}
-            alt="Poba Express"
-            whileHover={{ scale: 1.06, rotate: -2 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className="h-12 w-auto"
-          />
-        </a>
+      <nav className="flex h-24 items-center justify-between mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
+        <div className="flex w-1/4 justify-start">
+          <a href="#home" className="group flex items-center gap-2">
+            <motion.img
+              ref={logoRef}
+              src={LOGO_SRC}
+              onError={onLogoError}
+              alt="Poba Express"
+              whileHover={{ scale: 1.06, rotate: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="h-10 w-auto lg:h-12"
+            />
+          </a>
+        </div>
 
-        <ul className="hidden items-center gap-8 md:flex">
-          {links.map((l) => (
-            <li key={l.label}>
-              <a
-                href={l.href}
-                className="relative text-sm font-medium text-foreground transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:text-accent hover:after:origin-bottom-left hover:after:scale-x-100"
-              >
-                {l.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <div className="hidden flex-1 justify-center md:flex">
+          <ul className="flex items-center gap-8">
+            {links.map((l) => (
+              <li key={l.label}>
+                <a
+                  href={l.href}
+                  className="relative text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                >
+                  {l.label}
+                  {/* Active indicator underline logic could go here */}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex w-1/4 items-center justify-end gap-1 sm:gap-2">
           {/* Renders only where the browser can actually install. */}
           <InstallButton />
           {/* Optional: ordering never depends on being signed in. */}
           {isFirebaseConfigured && <AccountMenu user={user} />}
-          <Button variant="accent" size="lg" className="hidden rounded-full sm:inline-flex" asChild>
+          <Button
+            className="hidden rounded-full bg-primary hover:bg-primary-deep text-primary-foreground sm:inline-flex px-8 font-semibold shadow-md"
+            size="lg"
+            asChild
+          >
             <a href="#order">{launched ? "Order Now" : "See the Menu"}</a>
           </Button>
           <button
@@ -127,7 +135,7 @@ export function Navbar() {
                 </li>
               ))}
               <li className="pt-2">
-                <Button variant="accent" className="w-full rounded-full" asChild>
+                <Button className="w-full rounded-full bg-primary hover:bg-primary-deep text-primary-foreground font-semibold" asChild>
                   <a href="#order" onClick={() => setOpen(false)}>
                     {launched ? "Order Now" : "See the Menu"}
                   </a>

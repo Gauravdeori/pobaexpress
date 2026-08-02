@@ -1,45 +1,52 @@
 import { motion } from "motion/react";
-
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Reveal } from "./Reveal";
 
 export function CallToAction() {
   return (
-    <section id="get-started" className="relative overflow-hidden bg-gradient-green py-20 lg:py-28">
-      <div className="absolute -left-24 -top-24 size-80 rounded-full bg-accent/20 blur-3xl" />
-      <div className="absolute -bottom-32 -right-16 size-96 rounded-full bg-accent/10 blur-3xl" />
-
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-        <Reveal className="text-center lg:text-left">
-          <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl lg:text-5xl">
-            Ready to Get Anything Delivered?
-          </h2>
-          <p className="mt-4 text-base text-primary-foreground/80 sm:text-lg">
-            Experience Jonai&apos;s fastest and most reliable delivery service today.
-          </p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3 lg:justify-start">
-            <Button variant="onGreen" size="xl" asChild>
-              <a href="#order">Order Now</a>
-            </Button>
-            <Button variant="ghostOnGreen" size="xl" asChild>
-              <a href="#partners">Partner With Us</a>
-            </Button>
-          </div>
-        </Reveal>
-
-        {/* On a white card, not straight onto the green: the artwork carries a
-            baked-in white ground shadow and a pocket of white under the seat,
-            and neither can be cut away without also removing the rider's white
-            shoes. On white they read as intended. */}
+    <section id="get-started" className="relative pb-24 lg:pb-32 px-5 lg:px-8 bg-background">
+      <div className="mx-auto max-w-[80rem]">
         <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: "some" }}
-          transition={{ type: "spring", stiffness: 80, damping: 16 }}
-          className="mx-auto w-full max-w-sm rounded-4xl bg-card p-5 shadow-lift lg:max-w-md"
+          transition={{ duration: 0.7, type: "spring", stiffness: 50 }}
+          className="bg-primary rounded-[3rem] overflow-hidden flex flex-col md:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative shadow-xl"
         >
-          {/* Decorative: the heading already carries the message. */}
-          <img aria-hidden src="/rider.png" alt="" loading="lazy" className="w-full" />
+          {/* Subtle background decoration */}
+          <div className="absolute inset-0 bg-gradient-green opacity-50" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent-light/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-8 md:gap-12 w-full">
+            {/* Left Image */}
+            <div className="w-48 h-48 md:w-56 md:h-56 flex-shrink-0 flex items-center justify-center -mt-16 md:-my-16">
+              <img 
+                src="/cta-bag.png" 
+                alt="Groceries" 
+                className="w-full h-full object-contain object-bottom drop-shadow-2xl" 
+              />
+            </div>
+            
+            {/* Center Text */}
+            <div className="flex-1 max-w-xl self-center">
+              <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl">
+                Craving something delicious?
+              </h2>
+              <p className="mt-3 text-lg text-primary-foreground/90">
+                Order from your favorite restaurants in Jonai.
+              </p>
+            </div>
+            
+            {/* Right Button */}
+            <div className="flex-shrink-0 self-center mt-6 md:mt-0">
+              <Button className="rounded-full bg-card hover:bg-card/90 text-primary font-semibold px-8 h-14 shadow-lg text-lg" asChild>
+                <a href="#order">
+                  Order Now
+                  <ArrowRight className="ml-2 size-5" />
+                </a>
+              </Button>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

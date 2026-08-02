@@ -41,43 +41,39 @@
 }
 
 :root {
-  --radius: 1rem;
-  /* Warm off-white, not clinical white — the page reads as paper. */
-  --background: oklch(0.973 0.008 110);
-  --foreground: oklch(0.24 0.05 152);
+  --radius: 1.25rem;
+  /* Very light warm cream background to match the design */
+  --background: oklch(0.985 0.005 105);
+  --foreground: oklch(0.15 0.03 150);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.05 152);
+  --card-foreground: oklch(0.15 0.03 150);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.05 152);
-  /* #0B3D1B */
-  --primary: oklch(0.322 0.083 149.5);
+  --popover-foreground: oklch(0.15 0.03 150);
+  /* Deep forest green for primary text and buttons (#133321 approx) */
+  --primary: oklch(0.28 0.06 152);
   --primary-foreground: oklch(1 0 0);
-  --primary-deep: oklch(0.235 0.062 149.5);
-  --secondary: oklch(0.955 0.014 140);
-  --secondary-foreground: oklch(0.322 0.083 149.5);
-  --muted: oklch(0.955 0.014 140);
-  --muted-foreground: oklch(0.52 0.02 150);
-  /* Mid forest green. Dark enough that white text on it clears 5:1, since
-     every primary button uses this as its background. */
-  --accent: oklch(0.475 0.116 152);
+  --primary-deep: oklch(0.22 0.05 152);
+  --secondary: oklch(0.96 0.01 140);
+  --secondary-foreground: oklch(0.28 0.06 152);
+  --muted: oklch(0.95 0.01 140);
+  --muted-foreground: oklch(0.55 0.03 152);
+  /* Lighter mid-green for accent areas */
+  --accent: oklch(0.38 0.1 152);
   --accent-foreground: oklch(1 0 0);
-  /* For dark-green sections: the mid green accent vanishes against them, so
-     headings and icons there use this lighter tint instead. */
-  --accent-light: oklch(0.86 0.13 148);
+  --accent-light: oklch(0.88 0.08 148);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.905 0.012 140);
-  --input: oklch(0.905 0.012 140);
-  --ring: oklch(0.475 0.116 152);
-  --surface: oklch(1 0 0 / 0.08);
+  --border: oklch(0.92 0.01 140);
+  --input: oklch(0.92 0.01 140);
+  --ring: oklch(0.38 0.1 152);
+  --surface: oklch(1 0 0 / 0.4);
   --gradient-hero: linear-gradient(
-    100deg,
-    oklch(0.18 0.05 150 / 0.95) 0%,
-    oklch(0.18 0.05 150 / 0.72) 45%,
-    oklch(0.18 0.05 150 / 0.35) 100%
+    180deg,
+    var(--background) 0%,
+    oklch(0.96 0.01 120) 100%
   );
-  --gradient-accent: linear-gradient(135deg, oklch(0.5 0.115 150), oklch(0.43 0.115 155));
-  --gradient-green: linear-gradient(135deg, var(--primary-deep), oklch(0.4 0.1 150));
+  --gradient-accent: linear-gradient(135deg, var(--accent), oklch(0.34 0.1 155));
+  --gradient-green: linear-gradient(135deg, var(--primary-deep), var(--primary));
 }
 
 @layer base {
