@@ -100,7 +100,7 @@ export function Hero() {
             className="relative w-full h-[300px] sm:h-[400px] lg:h-[600px] xl:h-[700px] z-0 flex justify-center lg:justify-end items-center lg:-mr-12 xl:-mr-20"
           >
             <img
-              src="/hero-rider.png"
+              src="/hero-custom.png"
               alt="Poba Express Delivery Rider"
               className="object-contain w-full h-full max-w-[120%] lg:scale-110 drop-shadow-2xl origin-right"
               style={{ objectPosition: 'center right' }}
