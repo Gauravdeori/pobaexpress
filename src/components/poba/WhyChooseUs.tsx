@@ -54,7 +54,7 @@ export function WhyChooseUs() {
                 className="group relative h-full overflow-hidden rounded-3xl border border-border bg-card p-7 shadow-soft"
               >
                 <div className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gradient-accent transition-transform duration-500 group-hover:scale-x-100" />
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-green text-primary-foreground shadow-soft transition-transform duration-300 group-hover:scale-110">
+                <div className="flex size-12 items-center justify-center rounded-2xl bg-accent/10 text-accent transition-transform duration-300 group-hover:scale-110">
                   <f.icon className="size-5" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold text-primary">{f.title}</h3>

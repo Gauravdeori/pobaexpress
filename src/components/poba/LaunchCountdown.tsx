@@ -53,11 +53,11 @@ export function LaunchCountdown() {
         <h2 className="mt-5 text-3xl font-bold text-primary-foreground sm:text-4xl lg:text-5xl">
           {launched ? (
             <>
-              Poba Express is <span className="text-accent">now delivering</span>
+              Poba Express is <span className="text-accent-light">now delivering</span>
             </>
           ) : (
             <>
-              Deliveries begin <span className="text-accent">{LAUNCH_DATE_LABEL}</span>
+              Deliveries begin <span className="text-accent-light">{LAUNCH_DATE_LABEL}</span>
             </>
           )}
         </h2>
@@ -97,10 +97,10 @@ export function LaunchCountdown() {
           transition={{ duration: 0.5 }}
           className="mt-9 flex flex-wrap justify-center gap-3"
         >
-          <Button variant="accent" size="xl" asChild>
+          <Button variant="onGreen" size="xl" asChild>
             <a href="#order">{launched ? "Order Now" : "See the menu & prices"}</a>
           </Button>
-          <Button variant="onGreen" size="xl" asChild>
+          <Button variant="ghostOnGreen" size="xl" asChild>
             <a href="#partners">Partner With Us</a>
           </Button>
         </motion.div>

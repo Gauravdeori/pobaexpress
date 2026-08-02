@@ -38,7 +38,7 @@ function isIosSafari() {
  * click. iOS Safari has no such API — installing there is a manual Share →
  * Add to Home Screen, so it gets instructions instead.
  */
-export function InstallButton({ onDark = false }: { onDark?: boolean }) {
+export function InstallButton() {
   const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [ios, setIos] = useState(false);
@@ -90,12 +90,7 @@ export function InstallButton({ onDark = false }: { onDark?: boolean }) {
         type="button"
         onClick={handleClick}
         aria-label="Install the Poba Express app"
-        className={cn(
-          "flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium transition-colors",
-          onDark
-            ? "text-primary-foreground/90 hover:bg-white/10 hover:text-primary-foreground"
-            : "text-foreground hover:bg-secondary hover:text-primary",
-        )}
+        className="flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent"
       >
         <Download className="size-4" />
         <span className="hidden lg:inline">Install app</span>

@@ -15,10 +15,10 @@ export function CallToAction() {
             Experience Jonai's fastest and most reliable delivery service today.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <Button variant="accent" size="xl" asChild>
+            <Button variant="onGreen" size="xl" asChild>
               <a href="#order">Order Now</a>
             </Button>
-            <Button variant="onGreen" size="xl" asChild>
+            <Button variant="ghostOnGreen" size="xl" asChild>
               <a href="#partners">Partner With Us</a>
             </Button>
           </div>

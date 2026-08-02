@@ -21,7 +21,7 @@ import { signInWithPassword, signUpWithPassword, signInWithGoogle, signOut } fro
  *
  * `onDark` styles it for the transparent header over the hero photo.
  */
-export function AccountMenu({ user, onDark = false }: { user: User | null; onDark?: boolean }) {
+export function AccountMenu({ user }: { user: User | null }) {
   const [open, setOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
@@ -56,12 +56,8 @@ export function AccountMenu({ user, onDark = false }: { user: User | null; onDar
     setOpen(false); // Close on success
   };
 
-  const triggerClass = cn(
-    "flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium transition-colors",
-    onDark
-      ? "text-primary-foreground/90 hover:bg-white/10 hover:text-primary-foreground"
-      : "text-foreground hover:bg-secondary hover:text-primary",
-  );
+  const triggerClass =
+    "flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent";
 
   return (
     <Dialog

@@ -58,9 +58,6 @@ export function Navbar() {
     >
       {/* Tall enough to give the near-square logo lockup room to stay legible. */}
       <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 py-2 lg:px-8">
-        {/* The logo's wordmark is dark green, so it needs a light backing to stay
-            readable over the hero photo. On the scrolled (near-white) bar the
-            chip blends into the background and reads as no chip at all. */}
         <a href="#home" className="group flex items-center gap-2">
           <motion.img
             ref={logoRef}
@@ -70,7 +67,7 @@ export function Navbar() {
             whileHover={{ scale: 1.06, rotate: -2 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className="h-12 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]"
+            className="h-12 w-auto"
           />
         </a>
 
@@ -79,12 +76,7 @@ export function Navbar() {
             <li key={l.label}>
               <a
                 href={l.href}
-                className={cn(
-                  "relative text-sm font-medium transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100",
-                  scrolled
-                    ? "text-foreground hover:text-primary"
-                    : "text-primary-foreground/90 hover:text-primary-foreground",
-                )}
+                className="relative text-sm font-medium text-foreground transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:text-accent hover:after:origin-bottom-left hover:after:scale-x-100"
               >
                 {l.label}
               </a>
@@ -94,9 +86,9 @@ export function Navbar() {
 
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Renders only where the browser can actually install. */}
-          <InstallButton onDark={!scrolled} />
+          <InstallButton />
           {/* Optional: ordering never depends on being signed in. */}
-          {isFirebaseConfigured && <AccountMenu user={user} onDark={!scrolled} />}
+          {isFirebaseConfigured && <AccountMenu user={user} />}
           <Button variant="accent" size="lg" className="hidden rounded-full sm:inline-flex" asChild>
             <a href="#order">{launched ? "Order Now" : "See the Menu"}</a>
           </Button>
@@ -106,10 +98,7 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
-            className={cn(
-              "flex size-11 items-center justify-center rounded-full transition-colors md:hidden",
-              scrolled ? "text-foreground" : "text-primary-foreground",
-            )}
+            className="flex size-11 items-center justify-center rounded-full text-foreground transition-colors md:hidden"
           >
             {open ? <X /> : <Menu />}
           </button>

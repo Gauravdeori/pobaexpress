@@ -27,6 +27,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-light: var(--accent-light);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -41,8 +42,8 @@
 
 :root {
   --radius: 1rem;
-  /* #F8FAF8 */
-  --background: oklch(0.983 0.004 150);
+  /* Warm off-white, not clinical white — the page reads as paper. */
+  --background: oklch(0.973 0.008 110);
   --foreground: oklch(0.24 0.05 152);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.24 0.05 152);
@@ -52,18 +53,22 @@
   --primary: oklch(0.322 0.083 149.5);
   --primary-foreground: oklch(1 0 0);
   --primary-deep: oklch(0.235 0.062 149.5);
-  --secondary: oklch(0.955 0.012 150);
+  --secondary: oklch(0.955 0.014 140);
   --secondary-foreground: oklch(0.322 0.083 149.5);
-  --muted: oklch(0.955 0.012 150);
+  --muted: oklch(0.955 0.014 140);
   --muted-foreground: oklch(0.52 0.02 150);
-  /* #FF6A00 */
-  --accent: oklch(0.687 0.208 44);
+  /* Mid forest green. Dark enough that white text on it clears 5:1, since
+     every primary button uses this as its background. */
+  --accent: oklch(0.475 0.116 152);
   --accent-foreground: oklch(1 0 0);
+  /* For dark-green sections: the mid green accent vanishes against them, so
+     headings and icons there use this lighter tint instead. */
+  --accent-light: oklch(0.86 0.13 148);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.012 150);
-  --input: oklch(0.9 0.012 150);
-  --ring: oklch(0.687 0.208 44);
+  --border: oklch(0.905 0.012 140);
+  --input: oklch(0.905 0.012 140);
+  --ring: oklch(0.475 0.116 152);
   --surface: oklch(1 0 0 / 0.08);
   --gradient-hero: linear-gradient(
     100deg,
@@ -71,16 +76,8 @@
     oklch(0.18 0.05 150 / 0.72) 45%,
     oklch(0.18 0.05 150 / 0.35) 100%
   );
-  --gradient-accent: linear-gradient(
-    135deg,
-    oklch(0.72 0.19 55),
-    oklch(0.65 0.215 36)
-  );
-  --gradient-green: linear-gradient(
-    135deg,
-    var(--primary-deep),
-    oklch(0.4 0.1 150)
-  );
+  --gradient-accent: linear-gradient(135deg, oklch(0.5 0.115 150), oklch(0.43 0.115 155));
+  --gradient-green: linear-gradient(135deg, var(--primary-deep), oklch(0.4 0.1 150));
 }
 
 @layer base {

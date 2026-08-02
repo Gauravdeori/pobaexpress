@@ -23,6 +23,8 @@ const buttonVariants = cva(
           "glass text-primary-foreground hover:bg-white/20 transition-all duration-300 hover:-translate-y-0.5",
         onGreen:
           "bg-background text-primary shadow-soft hover:-translate-y-0.5 hover:shadow-lift transition-all duration-300",
+        ghostOnGreen:
+          "border border-white/40 text-primary-foreground hover:bg-white/10 transition-all duration-300",
       },
       size: {
         default: "h-9 px-4 py-2",

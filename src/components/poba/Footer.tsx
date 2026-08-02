@@ -75,13 +75,13 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-accent-light">
             Quick Links
           </h3>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/75">
             {quickLinks.map((l) => (
               <li key={l.label}>
-                <a href={l.href} className="transition-colors hover:text-accent">
+                <a href={l.href} className="transition-colors hover:text-accent-light">
                   {l.label}
                 </a>
               </li>
@@ -90,7 +90,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-accent-light">
             Services
           </h3>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/75">
@@ -101,17 +101,19 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">Contact</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-accent-light">
+            Contact
+          </h3>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/75">
             <li className="flex items-center gap-2">
-              <MapPin className="size-4 shrink-0 text-accent" /> {ADDRESS}
+              <MapPin className="size-4 shrink-0 text-accent-light" /> {ADDRESS}
             </li>
             <li>
               <a
                 href={PHONE_HREF}
-                className="flex items-center gap-2 transition-colors hover:text-accent"
+                className="flex items-center gap-2 transition-colors hover:text-accent-light"
               >
-                <Phone className="size-4 shrink-0 text-accent" /> {PHONE_DISPLAY}
+                <Phone className="size-4 shrink-0 text-accent-light" /> {PHONE_DISPLAY}
               </a>
             </li>
             <li>
@@ -119,9 +121,9 @@ export function Footer() {
                 href={whatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-2 transition-colors hover:text-accent"
+                className="flex items-start gap-2 transition-colors hover:text-accent-light"
               >
-                <MessageCircle className="mt-0.5 size-4 shrink-0 text-accent" />
+                <MessageCircle className="mt-0.5 size-4 shrink-0 text-accent-light" />
                 <span>
                   {WHATSAPP_DISPLAY}
                   <span className="block text-xs text-primary-foreground/55">
@@ -133,9 +135,9 @@ export function Footer() {
             <li>
               <a
                 href={EMAIL_HREF}
-                className="flex items-center gap-2 transition-colors hover:text-accent"
+                className="flex items-center gap-2 transition-colors hover:text-accent-light"
               >
-                <Mail className="size-4 shrink-0 text-accent" /> {EMAIL}
+                <Mail className="size-4 shrink-0 text-accent-light" /> {EMAIL}
               </a>
             </li>
           </ul>
@@ -145,7 +147,11 @@ export function Footer() {
       <div className="border-t border-white/10 py-5 text-center text-xs text-primary-foreground/60">
         <nav aria-label="Legal" className="mb-3 flex flex-wrap justify-center gap-x-5 gap-y-2">
           {legalLinks.map((l) => (
-            <Link key={l.to} to={l.to} className="min-h-8 transition-colors hover:text-accent">
+            <Link
+              key={l.to}
+              to={l.to}
+              className="min-h-8 transition-colors hover:text-accent-light"
+            >
               {l.label}
             </Link>
           ))}

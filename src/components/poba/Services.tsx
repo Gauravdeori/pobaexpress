@@ -38,7 +38,7 @@ export function Services() {
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className="group h-full rounded-3xl border border-border bg-card/70 p-7 shadow-soft backdrop-blur-xl transition-colors duration-300 hover:border-accent"
               >
-                <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/8 text-primary transition-colors duration-300 group-hover:bg-gradient-accent group-hover:text-accent-foreground">
+                <div className="flex size-14 items-center justify-center rounded-2xl bg-accent/10 text-accent transition-colors duration-300 group-hover:bg-accent group-hover:text-accent-foreground">
                   <s.icon className="size-6" />
                 </div>
                 <h3 className="mt-6 text-lg font-semibold text-primary">{s.title}</h3>
