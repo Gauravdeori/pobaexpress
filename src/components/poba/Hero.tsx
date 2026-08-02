@@ -47,7 +47,7 @@ export function Hero() {
         className="pointer-events-none absolute right-[6%] top-24 z-10 hidden h-28 w-auto drop-shadow-[0_10px_24px_rgba(0,0,0,0.14)] xl:block xl:h-32"
       />
 
-      <div className="relative mx-auto max-w-[88rem] px-5 pt-28 pb-20 lg:px-8 lg:pt-32 lg:pb-28">
+      <div className="relative pt-28 pb-20 lg:pt-32 lg:pb-28 mx-auto max-w-[120rem] px-5 lg:px-12 2xl:px-20">
         <div className="max-w-xl">
           <motion.span
             initial={{ opacity: 0, y: 16 }}
