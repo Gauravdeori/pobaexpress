@@ -90,7 +90,7 @@ export function InstallButton() {
         type="button"
         onClick={handleClick}
         aria-label="Install the Poba Express app"
-        className="flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent"
+        className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent"
       >
         <Download className="size-4" />
         <span className="hidden lg:inline">Install app</span>

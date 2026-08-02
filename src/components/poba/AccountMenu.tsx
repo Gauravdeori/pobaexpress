@@ -57,7 +57,7 @@ export function AccountMenu({ user }: { user: User | null }) {
   };
 
   const triggerClass =
-    "flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent";
+    "flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent";
 
   return (
     <Dialog

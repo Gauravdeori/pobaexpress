@@ -33,24 +33,27 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background/85 to-background/30 lg:bg-gradient-to-r lg:from-background lg:via-background/90 lg:to-transparent" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 pt-28 pb-24 lg:px-8 lg:pt-36 lg:pb-40">
-        <div className="max-w-xl">
-          <motion.img
-            ref={logoRef}
-            src={LOGO_SRC}
-            onError={onLogoError}
-            alt="Poba Express"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="h-20 w-auto sm:h-24"
-          />
+      {/* Sits in the sky the artwork leaves open, so the mark is part of the
+          scene instead of stacked under the header's copy of it. Desktop only:
+          the layout collapses on phones and there is nowhere for it to go. */}
+      <motion.img
+        ref={logoRef}
+        src={LOGO_SRC}
+        onError={onLogoError}
+        alt="Poba Express"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="pointer-events-none absolute right-[6%] top-24 z-10 hidden h-28 w-auto drop-shadow-[0_10px_24px_rgba(0,0,0,0.14)] xl:block xl:h-32"
+      />
 
+      <div className="relative mx-auto max-w-[88rem] px-5 pt-28 pb-20 lg:px-8 lg:pt-32 lg:pb-28">
+        <div className="max-w-xl">
           <motion.span
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-accent"
+            className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-accent"
           >
             <Rocket className="size-3.5" />
             Launching {LAUNCH_DATE_LABEL}
