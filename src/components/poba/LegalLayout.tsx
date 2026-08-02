@@ -94,7 +94,7 @@ export function LegalLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex h-20 max-w-3xl items-center justify-between gap-4 px-5 lg:px-8">
           <Link to="/" className="flex items-center gap-2">

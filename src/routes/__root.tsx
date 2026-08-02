@@ -127,6 +127,14 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        {/* The hero illustration, blurred, carried behind every page so the
+            scroll stays in one scene rather than dropping to flat cream.
+            The blur is baked into a 4KB file rather than applied in CSS —
+            blurring a full-size fixed image repaints on every scroll frame
+            and janks on phones. */}
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-background">
+          <img src="/hero-blur.jpg" alt="" className="h-full w-full object-cover opacity-50" />
+        </div>
         {children}
         <Scripts />
       </body>
