@@ -32,10 +32,7 @@ export function Hero() {
       </div>
 
       <div className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
-        {/* The map is wider than it is tall and carries small labels, so it
-            takes the larger share of the row — at an even split its boundary
-            names stop being readable. */}
-        <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-10">
           {/* Left Column: Text and Actions */}
           <div className="max-w-xl z-10">
             <motion.div
@@ -129,7 +126,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 32, rotate: -1.6 }}
             animate={{ opacity: 1, y: 0, rotate: -1.6 }}
             transition={{ duration: 0.9, delay: 0.2, type: "spring", stiffness: 50 }}
-            className="relative mx-auto mt-12 w-full max-w-[560px] lg:ml-auto lg:mr-0 lg:mt-0 lg:max-w-none"
+            className="relative mx-auto mt-12 w-full max-w-[440px] sm:max-w-[500px] lg:mt-0 lg:max-w-[560px]"
           >
             <div className="rounded-[2rem] border border-border/70 bg-card p-2 shadow-lift sm:p-3">
               {/* Not decorative: this is the only place the delivery boundary is
