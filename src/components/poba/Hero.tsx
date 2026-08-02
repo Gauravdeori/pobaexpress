@@ -16,8 +16,16 @@ export function Hero() {
 
   return (
     <section id="home" className="relative overflow-hidden bg-background">
-      {/* Subtle background gradient to mimic the design's soft background */}
-      <div className="absolute inset-0 bg-gradient-hero opacity-50 pointer-events-none" />
+      {/* Custom Background Image */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <img
+          src="/hero-bg.png"
+          alt=""
+          className="h-full w-full object-cover object-center opacity-60"
+        />
+        {/* Soft overlay to ensure text remains readable */}
+        <div className="absolute inset-0 bg-background/50" />
+      </div>
 
       <div className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 mx-auto max-w-[120rem] px-6 lg:px-12 2xl:px-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
