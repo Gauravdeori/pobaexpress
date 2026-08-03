@@ -1,13 +1,31 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { UtensilsCrossed, Pill, Cake, Clock, Minus, Paperclip, Plus, Send, X } from "lucide-react";
+import {
+  UtensilsCrossed,
+  Pill,
+  Cake,
+  Clock,
+  Minus,
+  Paperclip,
+  Plus,
+  Send,
+  Store,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { whatsappLink } from "@/lib/contact";
-import { deliveryFee, getMenu, itemLabel, rupees } from "@/lib/menu";
+import {
+  deliveryFee,
+  getMenu,
+  getMenuSections,
+  itemLabel,
+  rupees,
+  type MenuItem,
+} from "@/lib/menu";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { useAccount, saveProfile } from "@/lib/account";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
@@ -17,6 +35,83 @@ import { Reveal, SectionHeading } from "./Reveal";
 
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+/** One row of the price list. Tapping anywhere on the name adds one. */
+function MenuItemCard({
+  item,
+  quantity,
+  onChange,
+}: {
+  item: MenuItem;
+  quantity: number;
+  onChange: (quantity: number) => void;
+}) {
+  return (
+    <li>
+      <div
+        className={cn(
+          "flex items-center gap-3 rounded-2xl border p-3 transition-colors duration-200",
+          quantity ? "border-accent bg-accent/5" : "border-border bg-background",
+        )}
+      >
+        <button
+          type="button"
+          onClick={() => onChange(quantity + 1)}
+          className="min-w-0 flex-1 text-left flex items-center gap-3"
+          aria-label={`Add ${itemLabel(item)}, ${rupees(item.price)}`}
+        >
+          {item.image && (
+            <img
+              src={item.image}
+              alt={item.name}
+              className="size-12 shrink-0 rounded-lg object-cover shadow-sm"
+            />
+          )}
+          <div className="min-w-0">
+            <span className="block truncate text-sm font-medium text-primary">{item.name}</span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {item.variant ? `${item.variant} · ` : ""}
+              {rupees(item.price)}
+            </span>
+          </div>
+        </button>
+
+        {quantity > 0 ? (
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => onChange(quantity - 1)}
+              aria-label={`Remove one ${itemLabel(item)}`}
+              className="flex size-11 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent sm:size-9"
+            >
+              <Minus className="size-4" />
+            </button>
+            <span aria-live="polite" className="w-6 text-center text-sm font-semibold text-primary">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              onClick={() => onChange(quantity + 1)}
+              aria-label={`Add one more ${itemLabel(item)}`}
+              className="flex size-11 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground sm:size-9"
+            >
+              <Plus className="size-4" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onChange(1)}
+            aria-label={`Add ${itemLabel(item)}`}
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent hover:text-accent sm:size-9"
+          >
+            <Plus className="size-4" />
+          </button>
+        )}
+      </div>
+    </li>
+  );
+}
 
 const categories = [
   {
@@ -54,6 +149,7 @@ export function OrderForm() {
 
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
+  const sections = getMenuSections(category);
   const fee = deliveryFee(category);
 
   const picked = (menu ?? []).filter((item) => cart[item.id] > 0);
@@ -322,7 +418,7 @@ export function OrderForm() {
 
             {/* Menu — only the categories with a fixed price list get one */}
             <AnimatePresence initial={false} mode="wait">
-              {menu && (
+              {sections && (
                 <motion.div
                   key={category}
                   initial={{ opacity: 0, y: -8 }}
@@ -338,83 +434,41 @@ export function OrderForm() {
                       <p className="text-xs text-muted-foreground">Prices exclude delivery</p>
                     </div>
 
-                    <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                      {menu.map((item) => {
-                        const quantity = cart[item.id] ?? 0;
-                        return (
-                          <li key={item.id}>
-                            <div
-                              className={cn(
-                                "flex items-center gap-3 rounded-2xl border p-3 transition-colors duration-200",
-                                quantity
-                                  ? "border-accent bg-accent/5"
-                                  : "border-border bg-background",
-                              )}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => setQuantity(item.id, quantity + 1)}
-                                className="min-w-0 flex-1 text-left flex items-center gap-3"
-                                aria-label={`Add ${itemLabel(item)}, ${rupees(item.price)}`}
-                              >
-                                {item.image && (
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="size-12 shrink-0 rounded-lg object-cover shadow-sm"
-                                  />
-                                )}
-                                <div className="min-w-0">
-                                  <span className="block truncate text-sm font-medium text-primary">
-                                    {item.name}
-                                  </span>
-                                  <span className="block truncate text-xs text-muted-foreground">
-                                    {item.variant ? `${item.variant} · ` : ""}
-                                    {rupees(item.price)}
-                                  </span>
-                                </div>
-                              </button>
-
-                              {quantity > 0 ? (
-                                <div className="flex shrink-0 items-center gap-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => setQuantity(item.id, quantity - 1)}
-                                    aria-label={`Remove one ${itemLabel(item)}`}
-                                    className="flex size-11 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent sm:size-9"
-                                  >
-                                    <Minus className="size-4" />
-                                  </button>
-                                  <span
-                                    aria-live="polite"
-                                    className="w-6 text-center text-sm font-semibold text-primary"
-                                  >
-                                    {quantity}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => setQuantity(item.id, quantity + 1)}
-                                    aria-label={`Add one more ${itemLabel(item)}`}
-                                    className="flex size-11 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground sm:size-9"
-                                  >
-                                    <Plus className="size-4" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => setQuantity(item.id, 1)}
-                                  aria-label={`Add ${itemLabel(item)}`}
-                                  className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:border-accent hover:text-accent sm:size-9"
-                                >
-                                  <Plus className="size-4" />
-                                </button>
-                              )}
+                    <div className="mt-5 space-y-7">
+                      {sections.map((section, index) => (
+                        <div key={section.restaurant ?? index}>
+                          {/* A named partner gets a heading. The single unnamed
+                              section a category falls back to renders bare, so
+                              cake looks exactly as it did. */}
+                          {section.restaurant && (
+                            <div className="mb-3 flex items-center gap-2.5">
+                              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                                <Store className="size-4" />
+                              </span>
+                              <div className="min-w-0">
+                                <h4 className="truncate text-sm font-semibold text-primary">
+                                  {section.restaurant}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">
+                                  {section.items.length} items
+                                </p>
+                              </div>
                             </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                          )}
+
+                          <ul className="grid gap-2.5 sm:grid-cols-2">
+                            {section.items.map((item) => (
+                              <MenuItemCard
+                                key={item.id}
+                                item={item}
+                                quantity={cart[item.id] ?? 0}
+                                onChange={(next) => setQuantity(item.id, next)}
+                              />
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
 
                     {/* Running total */}
                     <AnimatePresence initial={false}>

@@ -27,6 +27,18 @@ export type MenuItem = {
   image?: string;
 };
 
+/**
+ * A run of items from one kitchen or shop.
+ *
+ * Categories we don't source from a single named partner — cake, where the
+ * order goes to whichever bakery is free — have one section with no
+ * `restaurant`, and render without a heading.
+ */
+export type MenuSection = {
+  restaurant?: string;
+  items: MenuItem[];
+};
+
 import biryaniImg from "@/assets/biryani.png";
 import chowmeinImg from "@/assets/chowmein.png";
 import friedRiceImg from "@/assets/fried_rice.png";
@@ -37,8 +49,8 @@ import rollImg from "@/assets/roll.png";
 import burgerImg from "@/assets/burger.png";
 
 export const FOOD_MENU: MenuItem[] = [
-  { id: "biryani-half", name: "Biryani Bite", variant: "Half plate", price: 49, image: biryaniImg },
-  { id: "biryani-full", name: "Biryani Bite", variant: "Full plate", price: 99, image: biryaniImg },
+  { id: "biryani-half", name: "Biryani", variant: "Half plate", price: 49, image: biryaniImg },
+  { id: "biryani-full", name: "Biryani", variant: "Full plate", price: 99, image: biryaniImg },
   {
     id: "chicken-chowmein-half",
     name: "Chicken Chowmein",
@@ -104,14 +116,27 @@ export const CAKE_MENU: MenuItem[] = [
   { id: "cake-bento", name: "Bento Cake", price: 250 },
 ];
 
-/** Categories without an entry here are free-text only. */
-const MENUS: Record<string, MenuItem[]> = {
-  food: FOOD_MENU,
-  cake: CAKE_MENU,
+/**
+ * Categories without an entry here are free-text only.
+ *
+ * Sections are the source of truth and the flat list below is derived from
+ * them, so a new partner is one entry here and nothing else — the cart, the
+ * totals and the WhatsApp message all read the flat list.
+ */
+const MENU_SECTIONS: Record<string, MenuSection[]> = {
+  // Every dish on the list currently comes out of this one kitchen. To add a
+  // second, split the items into another section rather than a flat append.
+  food: [{ restaurant: "Biryani Bite", items: FOOD_MENU }],
+  cake: [{ items: CAKE_MENU }],
 };
 
+export function getMenuSections(categoryId: string): MenuSection[] | undefined {
+  return MENU_SECTIONS[categoryId];
+}
+
+/** Every item in a category, flattened across its sections. */
 export function getMenu(categoryId: string): MenuItem[] | undefined {
-  return MENUS[categoryId];
+  return MENU_SECTIONS[categoryId]?.flatMap((section) => section.items);
 }
 
 export function itemLabel(item: MenuItem): string {
