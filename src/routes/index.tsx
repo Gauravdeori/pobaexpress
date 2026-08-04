@@ -35,11 +35,11 @@ function Index() {
       <Navbar />
       <main>
         <Hero />
+        <OrderForm />
         <LaunchCountdown />
         <Services />
         <About />
         <WhyChooseUs />
-        <OrderForm />
         <CallToAction />
       </main>
       <Footer />
