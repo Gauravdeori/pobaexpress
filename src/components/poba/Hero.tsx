@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ChevronDown, Zap, ShieldCheck, Handshake, ArrowRight, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { InstallButton } from "./InstallButton";
 import { useLaunched } from "@/lib/launch";
 
 /** Three promises, each with a supporting line, as a row under the buttons. */
@@ -80,17 +81,17 @@ export function Hero() {
                   <ArrowRight className="size-4" />
                 </a>
               </Button>
-              <Button
-                variant="outline"
-                size="xl"
-                className="border-border bg-card font-semibold text-foreground shadow-sm hover:bg-card/90 hover:text-foreground"
-                asChild
+              <InstallButton
+                className={buttonVariants({
+                  variant: "outline",
+                  size: "xl",
+                  className:
+                    "border-border bg-card font-semibold text-foreground shadow-sm hover:bg-card/90 hover:text-foreground",
+                })}
               >
-                <a href="#">
-                  Download the app now
-                  <Download className="size-4 text-muted-foreground" />
-                </a>
-              </Button>
+                Download the app now
+                <Download className="size-4 text-muted-foreground" />
+              </InstallButton>
               <Button
                 variant="outline"
                 size="xl"
