@@ -7,10 +7,10 @@ import { useEffect, useState } from "react";
  * down to the same moment. Change the time here to launch at a business hour
  * instead of midnight — for example `2026-08-07T09:00:00+05:30`.
  */
-export const LAUNCH_AT = new Date("2026-08-07T00:00:00+05:30");
+export const LAUNCH_AT = new Date("2026-08-25T00:00:00+05:30");
 
 /** Shown alongside the countdown. */
-export const LAUNCH_DATE_LABEL = "7 August 2026";
+export const LAUNCH_DATE_LABEL = "25 August 2026";
 
 export type Remaining = {
   days: number;
