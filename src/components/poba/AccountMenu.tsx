@@ -101,8 +101,8 @@ export function AccountMenu({ user }: { user: User | null }) {
             <DialogHeader>
               <DialogTitle>{isSignUp ? "Create Account" : "Sign in"}</DialogTitle>
               <DialogDescription>
-                Signing in is required to place an order. It also saves your name, phone and
-                address so you don&apos;t retype them next time.
+                Signing in is required to place an order. It also saves your name, phone and address
+                so you don&apos;t retype them next time.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="mt-2 space-y-3">

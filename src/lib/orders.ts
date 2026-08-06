@@ -9,6 +9,25 @@ export type OrderLine = {
   price: number;
 };
 
+/**
+ * How the customer said they would pay.
+ *
+ * `awaiting-verification` is the honest state for UPI: without a payment
+ * gateway nothing tells us the money arrived, so the order is not paid until
+ * someone has checked the bank app against `paymentReference`. Never promote a
+ * UPI order to paid from the client — the client is exactly what a customer
+ * could lie to.
+ */
+export type Payment = {
+  method: "cod" | "upi";
+  status: "cod" | "awaiting-verification";
+  /** Short code shown to the customer and sent in the UPI note, so a payment
+   *  in the bank app can be matched back to this order. */
+  reference: string | null;
+  /** UPI transaction id, as typed in by the customer. Unverified. */
+  customerReference: string | null;
+};
+
 export type OrderDraft = {
   category: string;
   customerName: string;
@@ -23,6 +42,8 @@ export type OrderDraft = {
   /** Cloudinary public_id, or null when there was no photo or it failed. */
   prescriptionId: string | null;
   prescriptionUrl: string | null;
+  /** Absent on orders placed through the marketing page's WhatsApp form. */
+  payment?: Payment;
 };
 
 /**

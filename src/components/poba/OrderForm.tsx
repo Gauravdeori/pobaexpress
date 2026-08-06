@@ -227,7 +227,9 @@ export function OrderForm() {
     }
 
     if (!user) {
-      setError("You must be signed in to place an order. Please use the Sign in button at the top.");
+      setError(
+        "You must be signed in to place an order. Please use the Sign in button at the top.",
+      );
       return;
     }
 
@@ -386,7 +388,8 @@ export function OrderForm() {
                 ) : (
                   <>
                     You must be signed in to place an order. Use{" "}
-                    <span className="font-medium text-primary">Sign in</span> at the top to continue.
+                    <span className="font-medium text-primary">Sign in</span> at the top to
+                    continue.
                   </>
                 )}
               </p>

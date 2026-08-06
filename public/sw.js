@@ -7,12 +7,15 @@
  * served from cache and refreshed in the background.
  */
 
-const VERSION = "v1";
+// Bumped so installed clients drop the v1 shell, which cached "/" as the
+// start_url before the app moved to /app.
+const VERSION = "v2";
 const SHELL_CACHE = `poba-shell-${VERSION}`;
 const ASSET_CACHE = `poba-assets-${VERSION}`;
 
-// Enough to render something useful with no network.
-const SHELL_URLS = ["/", "/manifest.webmanifest", "/icon-192.png", "/poba-logo.png"];
+// Enough to render something useful with no network. /app is the installed
+// app's start_url, so it matters more here than the marketing page.
+const SHELL_URLS = ["/", "/app", "/manifest.webmanifest", "/icon-192.png", "/poba-logo.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

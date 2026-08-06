@@ -10,13 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppAccountRouteImport } from './routes/app/account'
+import { Route as AppCakeRouteImport } from './routes/app/cake'
+import { Route as AppCartRouteImport } from './routes/app/cart'
+import { Route as AppCheckoutRouteImport } from './routes/app/checkout'
+import { Route as AppFoodRouteImport } from './routes/app/food'
+import { Route as AppMedicineRouteImport } from './routes/app/medicine'
+import { Route as AppRSlugRouteImport } from './routes/app/r/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -34,36 +48,142 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCakeRoute = AppCakeRouteImport.update({
+  id: '/cake',
+  path: '/cake',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCartRoute = AppCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCheckoutRoute = AppCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFoodRoute = AppFoodRouteImport.update({
+  id: '/food',
+  path: '/food',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMedicineRoute = AppMedicineRouteImport.update({
+  id: '/medicine',
+  path: '/medicine',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRSlugRoute = AppRSlugRouteImport.update({
+  id: '/r/$slug',
+  path: '/r/$slug',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/terms': typeof TermsRoute
+  '/app/account': typeof AppAccountRoute
+  '/app/cake': typeof AppCakeRoute
+  '/app/cart': typeof AppCartRoute
+  '/app/checkout': typeof AppCheckoutRoute
+  '/app/food': typeof AppFoodRoute
+  '/app/medicine': typeof AppMedicineRoute
+  '/app/': typeof AppIndexRoute
+  '/app/r/$slug': typeof AppRSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/terms': typeof TermsRoute
+  '/app/account': typeof AppAccountRoute
+  '/app/cake': typeof AppCakeRoute
+  '/app/cart': typeof AppCartRoute
+  '/app/checkout': typeof AppCheckoutRoute
+  '/app/food': typeof AppFoodRoute
+  '/app/medicine': typeof AppMedicineRoute
+  '/app': typeof AppIndexRoute
+  '/app/r/$slug': typeof AppRSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/terms': typeof TermsRoute
+  '/app/account': typeof AppAccountRoute
+  '/app/cake': typeof AppCakeRoute
+  '/app/cart': typeof AppCartRoute
+  '/app/checkout': typeof AppCheckoutRoute
+  '/app/food': typeof AppFoodRoute
+  '/app/medicine': typeof AppMedicineRoute
+  '/app/': typeof AppIndexRoute
+  '/app/r/$slug': typeof AppRSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/refunds' | '/terms'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/privacy'
+    | '/refunds'
+    | '/terms'
+    | '/app/account'
+    | '/app/cake'
+    | '/app/cart'
+    | '/app/checkout'
+    | '/app/food'
+    | '/app/medicine'
+    | '/app/'
+    | '/app/r/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/refunds' | '/terms'
-  id: '__root__' | '/' | '/privacy' | '/refunds' | '/terms'
+  to:
+    | '/'
+    | '/privacy'
+    | '/refunds'
+    | '/terms'
+    | '/app/account'
+    | '/app/cake'
+    | '/app/cart'
+    | '/app/checkout'
+    | '/app/food'
+    | '/app/medicine'
+    | '/app'
+    | '/app/r/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/privacy'
+    | '/refunds'
+    | '/terms'
+    | '/app/account'
+    | '/app/cake'
+    | '/app/cart'
+    | '/app/checkout'
+    | '/app/food'
+    | '/app/medicine'
+    | '/app/'
+    | '/app/r/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RefundsRoute: typeof RefundsRoute
   TermsRoute: typeof TermsRoute
@@ -76,6 +196,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -99,11 +226,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/account': {
+      id: '/app/account'
+      path: '/account'
+      fullPath: '/app/account'
+      preLoaderRoute: typeof AppAccountRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/cake': {
+      id: '/app/cake'
+      path: '/cake'
+      fullPath: '/app/cake'
+      preLoaderRoute: typeof AppCakeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/cart': {
+      id: '/app/cart'
+      path: '/cart'
+      fullPath: '/app/cart'
+      preLoaderRoute: typeof AppCartRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/checkout': {
+      id: '/app/checkout'
+      path: '/checkout'
+      fullPath: '/app/checkout'
+      preLoaderRoute: typeof AppCheckoutRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/food': {
+      id: '/app/food'
+      path: '/food'
+      fullPath: '/app/food'
+      preLoaderRoute: typeof AppFoodRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/medicine': {
+      id: '/app/medicine'
+      path: '/medicine'
+      fullPath: '/app/medicine'
+      preLoaderRoute: typeof AppMedicineRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/r/$slug': {
+      id: '/app/r/$slug'
+      path: '/r/$slug'
+      fullPath: '/app/r/$slug'
+      preLoaderRoute: typeof AppRSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAccountRoute: typeof AppAccountRoute
+  AppCakeRoute: typeof AppCakeRoute
+  AppCartRoute: typeof AppCartRoute
+  AppCheckoutRoute: typeof AppCheckoutRoute
+  AppFoodRoute: typeof AppFoodRoute
+  AppMedicineRoute: typeof AppMedicineRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppRSlugRoute: typeof AppRSlugRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAccountRoute: AppAccountRoute,
+  AppCakeRoute: AppCakeRoute,
+  AppCartRoute: AppCartRoute,
+  AppCheckoutRoute: AppCheckoutRoute,
+  AppFoodRoute: AppFoodRoute,
+  AppMedicineRoute: AppMedicineRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppRSlugRoute: AppRSlugRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   RefundsRoute: RefundsRoute,
   TermsRoute: TermsRoute,

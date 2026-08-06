@@ -86,6 +86,14 @@ export function Footer() {
                 </a>
               </li>
             ))}
+            {/* The app is the installed PWA's start_url, but iPhones install
+                by hand and some browsers never offer it at all, so it needs a
+                way in that does not depend on installing anything. */}
+            <li>
+              <Link to="/app" className="font-medium transition-colors hover:text-accent-light">
+                Open the app
+              </Link>
+            </li>
           </ul>
         </div>
 
