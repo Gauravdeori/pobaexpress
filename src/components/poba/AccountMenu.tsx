@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils";
 import { signInWithPassword, signUpWithPassword, signInWithGoogle, signOut } from "@/lib/account";
 
 /**
- * Sign-in control for the header. Purely optional — ordering never requires an
- * account, so this is a convenience that saves your details for next time.
+ * Sign-in control for the header. Users are required to be signed in
+ * before they can place an order. It also saves user details for convenience.
  *
  * `onDark` styles it for the transparent header over the hero photo.
  */
@@ -101,7 +101,7 @@ export function AccountMenu({ user }: { user: User | null }) {
             <DialogHeader>
               <DialogTitle>{isSignUp ? "Create Account" : "Sign in"}</DialogTitle>
               <DialogDescription>
-                Optional — you can order without an account. Signing in saves your name, phone and
+                Signing in is required to place an order. It also saves your name, phone and
                 address so you don&apos;t retype them next time.
               </DialogDescription>
             </DialogHeader>

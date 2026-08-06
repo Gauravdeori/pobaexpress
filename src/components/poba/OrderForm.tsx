@@ -226,6 +226,11 @@ export function OrderForm() {
       return;
     }
 
+    if (!user) {
+      setError("You must be signed in to place an order. Please use the Sign in button at the top.");
+      return;
+    }
+
     if (!name.trim() || !phone.trim() || !location.trim()) {
       setError("Please fill in your name, phone number and delivery location.");
       return;
@@ -359,7 +364,7 @@ export function OrderForm() {
         <SectionHeading
           eyebrow="Place an Order"
           title="Tell Us What You Need — We'll Bring It"
-          subtitle="Pick a category, fill in a few details and send it straight to our WhatsApp. No app, no signup."
+          subtitle="Pick a category, fill in a few details and send it straight to our WhatsApp. Sign in to place your order."
         />
 
         {/* The form is taller than the viewport once a menu is open, so it
@@ -370,9 +375,7 @@ export function OrderForm() {
             noValidate
             className="mt-12 rounded-4xl border border-border bg-card/80 p-6 shadow-soft backdrop-blur-xl sm:p-9"
           >
-            {/* Status only — signing in lives in the header, so the form isn't
-                cluttered with a second copy of the same thing. Ordering never
-                depends on being signed in either way. */}
+            {/* Status only — signing in lives in the header. We require it now to order. */}
             {isFirebaseConfigured && (
               <p className="mb-6 rounded-2xl border border-border bg-secondary/50 px-4 py-3 text-sm text-muted-foreground">
                 {user ? (
@@ -382,9 +385,8 @@ export function OrderForm() {
                   </>
                 ) : (
                   <>
-                    Ordering as a guest — no account needed. Use{" "}
-                    <span className="font-medium text-primary">Sign in</span> at the top if
-                    you&apos;d like your details saved for next time.
+                    You must be signed in to place an order. Use{" "}
+                    <span className="font-medium text-primary">Sign in</span> at the top to continue.
                   </>
                 )}
               </p>
@@ -656,15 +658,17 @@ export function OrderForm() {
                 variant="accent"
                 size="xl"
                 type="submit"
-                disabled={sending || !launched}
+                disabled={sending || !launched || !user}
                 className="w-full sm:w-auto"
               >
                 {launched ? <Send className="size-4" /> : <Clock className="size-4" />}
                 {!launched
                   ? `Ordering opens ${LAUNCH_DATE_LABEL}`
-                  : sending
-                    ? "Uploading photo…"
-                    : "Order Now on WhatsApp"}
+                  : !user
+                    ? "Sign in to Order"
+                    : sending
+                      ? "Uploading photo…"
+                      : "Order Now on WhatsApp"}
               </Button>
               <p className="text-xs text-muted-foreground">
                 {launched ? (
