@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { LogIn, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
+import { useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { rupees } from "@/lib/menu";
 
@@ -12,6 +13,8 @@ export const Route = createFileRoute("/app/cart")({
 
 function CartScreen() {
   const { cart, subtotal, fee, total, setQuantity, clear } = useCart();
+  const { user, loading: authLoading } = useAccount();
+  const needsSignIn = !authLoading && !user;
 
   if (cart.lines.length === 0) {
     return (
@@ -90,9 +93,19 @@ function CartScreen() {
         </div>
       </div>
 
-      <Button variant="accent" className="mt-4 h-12 w-full rounded-2xl" asChild>
-        <Link to="/app/checkout">Checkout</Link>
-      </Button>
+      {/* Sent to sign-in first rather than into a form they cannot submit.
+          The cart is in storage, so it is still here afterwards. */}
+      {needsSignIn ? (
+        <Button variant="accent" className="mt-4 h-12 w-full rounded-2xl" asChild>
+          <Link to="/app/account">
+            <LogIn className="size-4" /> Sign in to order
+          </Link>
+        </Button>
+      ) : (
+        <Button variant="accent" className="mt-4 h-12 w-full rounded-2xl" asChild>
+          <Link to="/app/checkout">Checkout</Link>
+        </Button>
+      )}
       <button
         type="button"
         onClick={clear}

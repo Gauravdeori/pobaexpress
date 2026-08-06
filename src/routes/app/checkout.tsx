@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { BadgeIndianRupee, Banknote, Check, Loader2, ShieldAlert } from "lucide-react";
+import { BadgeIndianRupee, Banknote, Check, Loader2, LogIn, ShieldAlert } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { saveProfile, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/contact";
-import { isFirebaseConfigured } from "@/lib/firebase";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { deliveryFee, rupees } from "@/lib/menu";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
@@ -31,7 +30,7 @@ function CheckoutScreen() {
   const { kind } = Route.useSearch();
   const navigate = useNavigate();
   const { cart, subtotal, fee, total, clear } = useCart();
-  const { user, profile } = useAccount();
+  const { user, profile, loading: authLoading } = useAccount();
   const launched = useLaunched();
 
   const medicine = kind === "medicine";
@@ -98,12 +97,18 @@ function CheckoutScreen() {
     );
   }
 
-  // Matches the marketing form, which requires an account to order. Without
-  // this the app would simply be a way around that rule.
-  const needsSignIn = isFirebaseConfigured && !user;
+  // An account is required to order, matching the marketing form — otherwise
+  // the app is just a way around that rule.
+  //
+  // Deliberately not gated on isFirebaseConfigured: a deploy that lost its env
+  // vars would quietly turn the requirement off, which is exactly the failure
+  // you would not notice. If auth is unavailable, ordering stops rather than
+  // falling open.
+  const needsSignIn = !authLoading && !user;
 
   const placeOrder = async () => {
-    if (!launched || needsSignIn) return;
+    // Re-checked here rather than trusting the button being hidden.
+    if (!launched || !user) return;
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError("Name, phone and address are all needed so the rider can find you.");
       return;
@@ -194,6 +199,22 @@ function CheckoutScreen() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-5">
       <ScreenHeading title="Checkout" />
+
+      {/* Said up front rather than only on the button, so nobody fills in the
+          whole form before finding out an account is needed. */}
+      {needsSignIn && (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-4">
+          <LogIn className="mt-0.5 size-4 shrink-0 text-accent" />
+          <p className="text-sm text-primary">
+            <span className="font-semibold">Sign in to place this order.</span> Your cart is kept
+            while you do —{" "}
+            <Link to="/app/account" className="font-semibold text-accent underline">
+              sign in or create an account
+            </Link>
+            .
+          </p>
+        </div>
+      )}
 
       {/* Summary */}
       <div className="rounded-2xl border border-border bg-card p-4 text-sm">
@@ -362,9 +383,15 @@ function CheckoutScreen() {
         </p>
       )}
 
-      {needsSignIn ? (
+      {authLoading ? (
+        <Button variant="accent" className="mt-5 h-12 w-full rounded-2xl" disabled>
+          <Loader2 className="size-4 animate-spin" /> Checking your account…
+        </Button>
+      ) : needsSignIn ? (
         <Button variant="accent" className="mt-5 h-12 w-full rounded-2xl" asChild>
-          <Link to="/app/account">Sign in to order</Link>
+          <Link to="/app/account">
+            <LogIn className="size-4" /> Sign in to order
+          </Link>
         </Button>
       ) : (
         <Button

@@ -44,8 +44,8 @@ function AccountScreen() {
 
       {!isFirebaseConfigured ? (
         <p className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-          Accounts aren&apos;t switched on yet. You can order without one — nothing on the menu
-          needs signing in.
+          Accounts aren&apos;t reachable right now, and an account is needed to order. Browsing
+          still works — send your order on WhatsApp in the meantime.
         </p>
       ) : loading ? (
         <p className="text-sm text-muted-foreground">Checking…</p>
