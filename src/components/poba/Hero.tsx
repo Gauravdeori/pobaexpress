@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
-import { ChevronDown, Zap, ShieldCheck, Handshake, ArrowRight } from "lucide-react";
+import { ChevronDown, Zap, ShieldCheck, Handshake, ArrowRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLaunched } from "@/lib/launch";
 
@@ -78,6 +78,17 @@ export function Hero() {
                 <a href="#order">
                   {launched ? "Order Now" : "See the Menu"}
                   <ArrowRight className="size-4" />
+                </a>
+              </Button>
+              <Button
+                variant="outline"
+                size="xl"
+                className="border-border bg-card font-semibold text-foreground shadow-sm hover:bg-card/90 hover:text-foreground"
+                asChild
+              >
+                <a href="#">
+                  Download the app now
+                  <Download className="size-4 text-muted-foreground" />
                 </a>
               </Button>
               <Button
