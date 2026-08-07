@@ -6,7 +6,7 @@
 /** Delivery fee per order, by category. */
 const DELIVERY_FEES: Record<string, number> = {
   food: 20,
-  cake: 10,
+  cake: 5,
   medicine: 30,
 };
 

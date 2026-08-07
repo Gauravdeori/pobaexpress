@@ -15,7 +15,7 @@ import { startAnalytics } from "../lib/firebase";
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
 const siteDescription =
-  "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — flat ₹20 delivery, no app, no signup.";
+  "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — flat delivery from ₹5, no app, no signup.";
 
 function NotFoundComponent() {
   return (

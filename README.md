@@ -57,7 +57,7 @@ public/               favicon and robots.txt
 - **Prices** — the food and cake menus and the per-category delivery fees live
   in [`src/lib/menu.ts`](src/lib/menu.ts). Editing a price there updates the
   menu, the running total and the WhatsApp message together. Delivery is
-  charged once per order: ₹20 food, ₹10 cake, ₹30 medicine.
+  charged once per order: ₹20 food, ₹5 cake, ₹30 medicine.
 - **Order categories** and their placeholder hints are the `categories` array in
   [`src/components/poba/OrderForm.tsx`](src/components/poba/OrderForm.tsx). A
   category gets a tappable menu by having an entry in `menu.ts`; the rest are
