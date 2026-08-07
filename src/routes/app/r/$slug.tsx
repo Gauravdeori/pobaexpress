@@ -34,7 +34,7 @@ function RestaurantScreen() {
       </Link>
 
       <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
-        <RestaurantThumb restaurant={restaurant} className="size-16" />
+        <RestaurantThumb image={restaurant.image} className="size-16" />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="truncate text-lg font-bold text-primary">{restaurant.name}</h1>

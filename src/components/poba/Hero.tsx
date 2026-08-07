@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { ChevronDown, Zap, ShieldCheck, Handshake, ArrowRight, Download } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { InstallButton } from "./InstallButton";
+import { PartnerSlider } from "./PartnerSlider";
 import { useLaunched } from "@/lib/launch";
 
 /** Three promises, each with a supporting line, as a row under the buttons. */
@@ -152,6 +153,18 @@ export function Hero() {
             </div>
           </motion.figure>
         </div>
+
+        {/* The partner rail sits under both columns so it can run the full
+            width of the hero, and so a new shop shows up here the moment it is
+            added to the menu rather than only inside the app. */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="relative z-10"
+        >
+          <PartnerSlider />
+        </motion.div>
       </div>
 
       <motion.a

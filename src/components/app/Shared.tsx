@@ -36,14 +36,8 @@ export function Rating({ restaurant }: { restaurant: Restaurant }) {
  * The fallback is deliberately not a picture of some other shop's food: the
  * thumbnail sits right beside the name and reads as what they sell.
  */
-export function RestaurantThumb({
-  restaurant,
-  className,
-}: {
-  restaurant: Restaurant;
-  className: string;
-}) {
-  if (!restaurant.image) {
+export function RestaurantThumb({ image, className }: { image?: string; className: string }) {
+  if (!image) {
     return (
       <span
         aria-hidden
@@ -58,7 +52,7 @@ export function RestaurantThumb({
   }
   return (
     <img
-      src={restaurant.image}
+      src={image}
       alt=""
       aria-hidden
       className={cn("shrink-0 rounded-xl object-cover", className)}
@@ -73,7 +67,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
       params={{ slug: restaurant.slug }}
       className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-accent"
     >
-      <RestaurantThumb restaurant={restaurant} className="size-20" />
+      <RestaurantThumb image={restaurant.image} className="size-20" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate font-semibold text-primary">{restaurant.name}</h3>
