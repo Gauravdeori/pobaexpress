@@ -13,7 +13,7 @@ const categories = [
   {
     to: "/app/food",
     label: "Food",
-    hint: "Biryani, chowmein, momos",
+    hint: "Biryani, chowmein, momos, pizza",
     icon: UtensilsCrossed,
   },
   { to: "/app/cake", label: "Cake", hint: "Dcakery — cakes and cheesecakes", icon: Cake },

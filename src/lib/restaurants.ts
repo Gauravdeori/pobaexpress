@@ -6,6 +6,7 @@ import {
   BIRYANI_BITE_MENU,
   DAJU_BAHADUR_MENU,
   DCAKERY_MENU,
+  DISPY_BAKERY_MENU,
   PRARTHONA_MENU,
   type MenuItem,
 } from "./menu";
@@ -16,9 +17,17 @@ export type Restaurant = {
   category: "food" | "cake";
   /** One line under the name — what they actually cook. */
   cuisine: string;
-  image: string;
+  /** Optional: a partner with no photo yet gets a plain tile, not a stand-in
+   *  picture of food they don't sell. */
+  image?: string;
   /** Typical door-to-door range in minutes. */
   eta: [number, number];
+  /**
+   * When the shop is actually open, for partners that don't run all day.
+   * Omitted where the hours are the usual ones, so it never states a schedule
+   * nobody gave us.
+   */
+  hours?: string;
   items: MenuItem[];
   /**
    * Out of 5, and only ever a real figure.
@@ -64,6 +73,15 @@ export const RESTAURANTS: Restaurant[] = [
     image: momosImg,
     eta: [15, 25],
     items: DAJU_BAHADUR_MENU,
+  },
+  {
+    slug: "dispy-bakery",
+    name: "Dispy Bakery",
+    category: "food",
+    cuisine: "Homemade pizza · Regular, medium, large",
+    eta: [15, 25],
+    hours: "Daily 1 PM – 6 PM",
+    items: DISPY_BAKERY_MENU,
   },
 ];
 

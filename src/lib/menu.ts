@@ -181,6 +181,22 @@ export const DAJU_BAHADUR_MENU: MenuItem[] = [
   },
 ];
 
+/** R / M / L on the shop's board, spelled out so a size is never guessed at. */
+export const DISPY_BAKERY_MENU: MenuItem[] = [
+  { id: "dp-veg-cheese-regular", name: "Veg Cheese Pizza", variant: "Regular", price: 179 },
+  { id: "dp-veg-cheese-medium", name: "Veg Cheese Pizza", variant: "Medium", price: 249 },
+  { id: "dp-veg-cheese-large", name: "Veg Cheese Pizza", variant: "Large", price: 360 },
+  { id: "dp-sweetcorn-regular", name: "Sweetcorn Pizza", variant: "Regular", price: 199 },
+  { id: "dp-sweetcorn-medium", name: "Sweetcorn Pizza", variant: "Medium", price: 269 },
+  { id: "dp-sweetcorn-large", name: "Sweetcorn Pizza", variant: "Large", price: 389 },
+  { id: "dp-paneer-regular", name: "Paneer Pizza", variant: "Regular", price: 205 },
+  { id: "dp-paneer-medium", name: "Paneer Pizza", variant: "Medium", price: 279 },
+  { id: "dp-paneer-large", name: "Paneer Pizza", variant: "Large", price: 405 },
+  { id: "dp-chicken-regular", name: "Chicken Pizza", variant: "Regular", price: 208 },
+  { id: "dp-chicken-medium", name: "Chicken Pizza", variant: "Medium", price: 310 },
+  { id: "dp-chicken-large", name: "Chicken Pizza", variant: "Large", price: 469 },
+];
+
 /**
  * Cake now comes from one named bakery, so these are Dcakery's own prices.
  *
@@ -237,6 +253,7 @@ const MENU_SECTIONS: Record<string, MenuSection[]> = {
     { restaurant: "Biryani Bite", items: BIRYANI_BITE_MENU },
     { restaurant: "Prarthona Restaurant", items: PRARTHONA_MENU },
     { restaurant: "Daju Bahadur", items: DAJU_BAHADUR_MENU },
+    { restaurant: "Dispy Bakery", items: DISPY_BAKERY_MENU },
   ],
   cake: [{ restaurant: "Dcakery", items: DCAKERY_MENU }],
 };

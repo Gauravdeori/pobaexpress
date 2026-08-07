@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Clock } from "lucide-react";
 
-import { ItemRow, Rating } from "@/components/app/Shared";
+import { ItemRow, Rating, RestaurantThumb } from "@/components/app/Shared";
 import { useCart } from "@/lib/cart";
 import { deliveryFee, rupees } from "@/lib/menu";
 import { getRestaurant } from "@/lib/restaurants";
@@ -34,12 +34,7 @@ function RestaurantScreen() {
       </Link>
 
       <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
-        <img
-          src={restaurant.image}
-          alt=""
-          aria-hidden
-          className="size-16 shrink-0 rounded-xl object-cover"
-        />
+        <RestaurantThumb restaurant={restaurant} className="size-16" />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="truncate text-lg font-bold text-primary">{restaurant.name}</h1>
@@ -51,6 +46,9 @@ function RestaurantScreen() {
             {restaurant.eta[0]}–{restaurant.eta[1]} min · {rupees(deliveryFee(restaurant.category))}{" "}
             delivery
           </p>
+          {restaurant.hours && (
+            <p className="mt-1 text-xs font-semibold text-accent">Open {restaurant.hours}</p>
+          )}
         </div>
       </div>
 

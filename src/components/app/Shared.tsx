@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Minus, Plus, Star } from "lucide-react";
+import { Minus, Plus, Star, UtensilsCrossed } from "lucide-react";
 
 import { itemLabel, rupees, type MenuItem } from "@/lib/menu";
 import { priceFrom, type Restaurant } from "@/lib/restaurants";
@@ -30,6 +30,42 @@ export function Rating({ restaurant }: { restaurant: Restaurant }) {
   );
 }
 
+/**
+ * A partner's photo, or a plain branded tile when there isn't one.
+ *
+ * The fallback is deliberately not a picture of some other shop's food: the
+ * thumbnail sits right beside the name and reads as what they sell.
+ */
+export function RestaurantThumb({
+  restaurant,
+  className,
+}: {
+  restaurant: Restaurant;
+  className: string;
+}) {
+  if (!restaurant.image) {
+    return (
+      <span
+        aria-hidden
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent",
+          className,
+        )}
+      >
+        <UtensilsCrossed className="size-7" />
+      </span>
+    );
+  }
+  return (
+    <img
+      src={restaurant.image}
+      alt=""
+      aria-hidden
+      className={cn("shrink-0 rounded-xl object-cover", className)}
+    />
+  );
+}
+
 export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   return (
     <Link
@@ -37,12 +73,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
       params={{ slug: restaurant.slug }}
       className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-accent"
     >
-      <img
-        src={restaurant.image}
-        alt=""
-        aria-hidden
-        className="size-20 shrink-0 rounded-xl object-cover"
-      />
+      <RestaurantThumb restaurant={restaurant} className="size-20" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate font-semibold text-primary">{restaurant.name}</h3>
@@ -52,6 +83,9 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
         <p className="mt-1.5 text-xs font-medium text-muted-foreground">
           {restaurant.eta[0]}–{restaurant.eta[1]} min · from {rupees(priceFrom(restaurant))}
         </p>
+        {restaurant.hours && (
+          <p className="mt-0.5 truncate text-xs font-medium text-accent">{restaurant.hours}</p>
+        )}
       </div>
     </Link>
   );
