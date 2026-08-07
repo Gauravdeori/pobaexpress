@@ -6,7 +6,7 @@ const services = [
   {
     icon: UtensilsCrossed,
     title: "Food Delivery",
-    text: "Biryani, chowmein, momos and more — from ₹29, hot to your door.",
+    text: "Biryani, chowmein, momos and more — from ₹39, hot to your door.",
   },
   {
     icon: Cake,

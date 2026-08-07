@@ -46,65 +46,134 @@ import momosImg from "@/assets/momos.png";
 import lollipopImg from "@/assets/lollipop.png";
 import chilliChickenImg from "@/assets/chilli_chicken.png";
 import rollImg from "@/assets/roll.png";
-import burgerImg from "@/assets/burger.png";
 
-export const FOOD_MENU: MenuItem[] = [
-  { id: "biryani-half", name: "Biryani", variant: "Half plate", price: 49, image: biryaniImg },
-  { id: "biryani-full", name: "Biryani", variant: "Full plate", price: 99, image: biryaniImg },
+/**
+ * Item ids are prefixed per kitchen because two partners sell the same dish at
+ * different prices — an unprefixed `chicken-chowmein-half` would collide in the
+ * cart and in saved orders.
+ */
+export const BIRYANI_BITE_MENU: MenuItem[] = [
   {
-    id: "chicken-chowmein-half",
+    id: "bb-chicken-biryani-quarter",
+    name: "Chicken Biryani",
+    variant: "Quarter",
+    price: 59,
+    image: biryaniImg,
+  },
+  {
+    id: "bb-chicken-biryani-half",
+    name: "Chicken Biryani",
+    variant: "Half",
+    price: 109,
+    image: biryaniImg,
+  },
+  {
+    id: "bb-chicken-biryani-full",
+    name: "Chicken Biryani",
+    variant: "Full",
+    price: 210,
+    image: biryaniImg,
+  },
+  { id: "bb-chicken-maggi", name: "Chicken Maggi", price: 59 },
+  { id: "bb-egg-maggi", name: "Egg Maggi", price: 49 },
+  { id: "bb-veg-maggi", name: "Veg Maggi", price: 49 },
+  { id: "bb-chicken-pasta", name: "Chicken Pasta", price: 59 },
+  { id: "bb-veg-pasta", name: "Veg Pasta", price: 49 },
+];
+
+export const PRARTHONA_MENU: MenuItem[] = [
+  { id: "pr-veg-fried-rice", name: "Veg Fried Rice", price: 67, image: friedRiceImg },
+  { id: "pr-egg-fried-rice", name: "Egg Fried Rice", price: 78, image: friedRiceImg },
+  { id: "pr-chicken-fried-rice", name: "Chicken Fried Rice", price: 78, image: friedRiceImg },
+  { id: "pr-mix-fried-rice", name: "Mix Fried Rice", price: 98, image: friedRiceImg },
+  { id: "pr-veg-chowmein", name: "Veg Chowmein", price: 68, image: chowmeinImg },
+  { id: "pr-chicken-chow", name: "Chicken Chow", price: 78, image: chowmeinImg },
+  { id: "pr-egg-chow", name: "Egg Chow", price: 78, image: chowmeinImg },
+  { id: "pr-mix-chow", name: "Mix Chow", price: 88, image: chowmeinImg },
+  { id: "pr-veg-roll", name: "Veg Roll", price: 68, image: rollImg },
+  { id: "pr-chicken-roll", name: "Chicken Roll", price: 88, image: rollImg },
+  { id: "pr-egg-roll", name: "Egg Roll", price: 78, image: rollImg },
+  { id: "pr-french-fries", name: "French Fries", price: 58 },
+  { id: "pr-pasta", name: "Pasta", price: 88 },
+  { id: "pr-maggi", name: "Maggi", price: 88 },
+  { id: "pr-chicken-lollipop", name: "Chicken Lollipop", price: 108, image: lollipopImg },
+  { id: "pr-chilli-chicken", name: "Chilli Chicken", price: 145, image: chilliChickenImg },
+  { id: "pr-chicken-dry-fry", name: "Chicken Dry Fry", price: 109, image: chilliChickenImg },
+  { id: "pr-steam-momo", name: "Steam Momo", price: 78, image: momosImg },
+  { id: "pr-fry-momo", name: "Fry Momo", price: 98, image: momosImg },
+];
+
+export const DAJU_BAHADUR_MENU: MenuItem[] = [
+  {
+    id: "db-chicken-chowmein-half",
     name: "Chicken Chowmein",
     variant: "Half plate",
-    price: 49,
+    price: 59,
     image: chowmeinImg,
   },
   {
-    id: "chicken-chowmein-full",
+    id: "db-chicken-chowmein-full",
     name: "Chicken Chowmein",
     variant: "Full plate",
-    price: 99,
+    price: 109,
     image: chowmeinImg,
   },
   {
-    id: "veg-chowmein-half",
-    name: "Veg Chowmein",
-    variant: "Half plate",
-    price: 49,
-    image: chowmeinImg,
-  },
-  {
-    id: "veg-chowmein-full",
-    name: "Veg Chowmein",
-    variant: "Full plate",
-    price: 95,
-    image: chowmeinImg,
-  },
-  {
-    id: "fried-rice-half",
-    name: "Fried Rice",
-    variant: "Half plate",
-    price: 49,
-    image: friedRiceImg,
-  },
-  {
-    id: "fried-rice-full",
-    name: "Fried Rice",
-    variant: "Full plate",
-    price: 99,
-    image: friedRiceImg,
-  },
-  { id: "egg-chowmein", name: "Egg Chowmein", price: 49, image: chowmeinImg },
-  { id: "veg-momos", name: "Veg Momos", price: 49, image: momosImg },
-  {
-    id: "chicken-lollipop",
+    id: "db-chicken-lollipop-1",
     name: "Chicken Lollipop",
-    variant: "2 pieces",
-    price: 50,
+    variant: "1 piece",
+    price: 39,
     image: lollipopImg,
   },
-  { id: "chilli-chicken", name: "Chilli Chicken", price: 49, image: chilliChickenImg },
-  { id: "chicken-roll", name: "Chicken Roll", price: 29, image: rollImg },
-  { id: "burger", name: "Burger", price: 49, image: burgerImg },
+  {
+    id: "db-chicken-lollipop-4",
+    name: "Chicken Lollipop",
+    variant: "4 pieces",
+    price: 109,
+    image: lollipopImg,
+  },
+  {
+    id: "db-veg-momo-half",
+    name: "Veg Momo",
+    variant: "Half plate · 8 pieces",
+    price: 59,
+    image: momosImg,
+  },
+  {
+    id: "db-veg-momo-full",
+    name: "Veg Momo",
+    variant: "Full plate · 16 pieces",
+    price: 109,
+    image: momosImg,
+  },
+  {
+    id: "db-fried-rice-half",
+    name: "Fried Rice",
+    variant: "Half plate",
+    price: 59,
+    image: friedRiceImg,
+  },
+  {
+    id: "db-fried-rice-full",
+    name: "Fried Rice",
+    variant: "Full plate",
+    price: 109,
+    image: friedRiceImg,
+  },
+  {
+    id: "db-chilli-chicken-half",
+    name: "Chilli Chicken",
+    variant: "Half plate",
+    price: 59,
+    image: chilliChickenImg,
+  },
+  {
+    id: "db-chilli-chicken-full",
+    name: "Chilli Chicken",
+    variant: "Full plate",
+    price: 109,
+    image: chilliChickenImg,
+  },
 ];
 
 export const CAKE_MENU: MenuItem[] = [
@@ -124,9 +193,14 @@ export const CAKE_MENU: MenuItem[] = [
  * totals and the WhatsApp message all read the flat list.
  */
 const MENU_SECTIONS: Record<string, MenuSection[]> = {
-  // Every dish on the list currently comes out of this one kitchen. To add a
-  // second, split the items into another section rather than a flat append.
-  food: [{ restaurant: "Biryani Bite", items: FOOD_MENU }],
+  // One section per kitchen — never a flat append, or the WhatsApp order loses
+  // track of who is cooking it. Names must match `RESTAURANTS` in
+  // restaurants.ts, which is what the cart records as its source.
+  food: [
+    { restaurant: "Biryani Bite", items: BIRYANI_BITE_MENU },
+    { restaurant: "Prarthona Restaurant", items: PRARTHONA_MENU },
+    { restaurant: "Daju Bahadur", items: DAJU_BAHADUR_MENU },
+  ],
   cake: [{ items: CAKE_MENU }],
 };
 

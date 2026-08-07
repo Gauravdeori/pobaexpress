@@ -24,7 +24,9 @@ export type CartState = {
 
 const EMPTY: CartState = { category: "food", source: null, lines: [] };
 
-const STORAGE_KEY = "poba.cart.v1";
+// Bumped when the item ids changed: a cart saved under v1 holds dishes and
+// prices that no longer exist on any menu, and nothing on screen could edit it.
+const STORAGE_KEY = "poba.cart.v2";
 
 type CartContextValue = {
   cart: CartState;

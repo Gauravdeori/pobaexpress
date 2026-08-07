@@ -1,6 +1,14 @@
 import biryaniImg from "@/assets/biryani.png";
+import friedRiceImg from "@/assets/fried_rice.png";
+import momosImg from "@/assets/momos.png";
 
-import { CAKE_MENU, FOOD_MENU, type MenuItem } from "./menu";
+import {
+  BIRYANI_BITE_MENU,
+  CAKE_MENU,
+  DAJU_BAHADUR_MENU,
+  PRARTHONA_MENU,
+  type MenuItem,
+} from "./menu";
 
 export type Restaurant = {
   slug: string;
@@ -25,15 +33,37 @@ export type Restaurant = {
   ratingCount?: number;
 };
 
+/**
+ * `name` is what the cart stores as its source and what the WhatsApp order
+ * quotes, so it has to match the section headings in menu.ts exactly.
+ */
 export const RESTAURANTS: Restaurant[] = [
   {
     slug: "biryani-bite",
     name: "Biryani Bite",
     category: "food",
-    cuisine: "Biryani · Chinese · Rolls",
+    cuisine: "Biryani · Maggi · Pasta",
     image: biryaniImg,
     eta: [15, 25],
-    items: FOOD_MENU,
+    items: BIRYANI_BITE_MENU,
+  },
+  {
+    slug: "prarthona",
+    name: "Prarthona Restaurant",
+    category: "food",
+    cuisine: "Fried rice · Chowmein · Rolls · Momo",
+    image: friedRiceImg,
+    eta: [15, 25],
+    items: PRARTHONA_MENU,
+  },
+  {
+    slug: "daju-bahadur",
+    name: "Daju Bahadur",
+    category: "food",
+    cuisine: "Nepali fast food · Momo · Chowmein",
+    image: momosImg,
+    eta: [15, 25],
+    items: DAJU_BAHADUR_MENU,
   },
 ];
 
