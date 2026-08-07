@@ -11,7 +11,7 @@ const services = [
   {
     icon: Cake,
     title: "Cake Delivery",
-    text: "Vanilla to black forest, plus bento cakes for last-minute surprises.",
+    text: "Vanilla to black forest, plus Dcakery's cheesecakes and loaves.",
   },
   {
     icon: Pill,

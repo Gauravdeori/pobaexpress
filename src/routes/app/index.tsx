@@ -16,7 +16,7 @@ const categories = [
     hint: "Biryani, chowmein, momos",
     icon: UtensilsCrossed,
   },
-  { to: "/app/cake", label: "Cake", hint: "Birthday and bento", icon: Cake },
+  { to: "/app/cake", label: "Cake", hint: "Dcakery — cakes and cheesecakes", icon: Cake },
   { to: "/app/medicine", label: "Medicine", hint: "Send a prescription", icon: Pill },
 ];
 

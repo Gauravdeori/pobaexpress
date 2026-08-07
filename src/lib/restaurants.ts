@@ -4,8 +4,8 @@ import momosImg from "@/assets/momos.png";
 
 import {
   BIRYANI_BITE_MENU,
-  CAKE_MENU,
   DAJU_BAHADUR_MENU,
+  DCAKERY_MENU,
   PRARTHONA_MENU,
   type MenuItem,
 } from "./menu";
@@ -68,11 +68,14 @@ export const RESTAURANTS: Restaurant[] = [
 ];
 
 /**
- * Cakes come from whichever bakery is free rather than one named partner, so
- * they are listed as a category rather than a shop. Kept here so the cake
- * screen and the restaurant screens read from one place.
+ * Cake is its own screen rather than a card in the restaurant list, so Dcakery
+ * is not in `RESTAURANTS`. Re-exported here so the cake screen and the
+ * restaurant screens still read their items from one place.
  */
-export const CAKE_ITEMS = CAKE_MENU;
+export const CAKE_ITEMS = DCAKERY_MENU;
+
+/** The bakery every cake order goes to. Must match the cart's stored source. */
+export const CAKE_SOURCE = "Dcakery";
 
 export function restaurantsIn(category: Restaurant["category"]): Restaurant[] {
   return RESTAURANTS.filter((r) => r.category === category);

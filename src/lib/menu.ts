@@ -30,9 +30,9 @@ export type MenuItem = {
 /**
  * A run of items from one kitchen or shop.
  *
- * Categories we don't source from a single named partner — cake, where the
- * order goes to whichever bakery is free — have one section with no
- * `restaurant`, and render without a heading.
+ * A section with no `restaurant` renders without a heading — for a category we
+ * ever source from whoever is free rather than one named partner. Every
+ * section currently names its shop.
  */
 export type MenuSection = {
   restaurant?: string;
@@ -46,6 +46,11 @@ import momosImg from "@/assets/momos.png";
 import lollipopImg from "@/assets/lollipop.png";
 import chilliChickenImg from "@/assets/chilli_chicken.png";
 import rollImg from "@/assets/roll.png";
+import japaneseCheesecakeImg from "@/assets/japanese-cheesecake.jpg";
+import newYorkCheesecakeImg from "@/assets/new-york-cheesecake.jpg";
+import blueberryCheesecakeImg from "@/assets/blueberry-cheesecake.jpg";
+import burntBasqueCheesecakeImg from "@/assets/burnt-basque-cheesecake.jpg";
+import milletCakeLoafImg from "@/assets/millet-cake-loaf.jpg";
 
 /**
  * Item ids are prefixed per kitchen because two partners sell the same dish at
@@ -176,13 +181,45 @@ export const DAJU_BAHADUR_MENU: MenuItem[] = [
   },
 ];
 
-export const CAKE_MENU: MenuItem[] = [
-  { id: "cake-vanilla", name: "Vanilla", variant: "Half kg", price: 450 },
-  { id: "cake-chocolate", name: "Chocolate", variant: "Half kg", price: 550 },
-  { id: "cake-butterscotch", name: "Butterscotch", variant: "Half kg", price: 500 },
-  { id: "cake-pineapple", name: "Pineapple", variant: "Half kg", price: 500 },
-  { id: "cake-black-forest", name: "Black Forest", variant: "Half kg", price: 600 },
-  { id: "cake-bento", name: "Bento Cake", price: 250 },
+/**
+ * Cake now comes from one named bakery, so these are Dcakery's own prices.
+ *
+ * No `variant` on the round cakes: Dcakery quotes one price per cake rather
+ * than per weight, and inventing a "Half kg" line here would be quoting a size
+ * the bakery never gave.
+ */
+export const DCAKERY_MENU: MenuItem[] = [
+  { id: "dc-chocolate", name: "Chocolate Cake", price: 630 },
+  { id: "dc-black-forest", name: "Black Forest Cake", price: 540 },
+  { id: "dc-butterscotch", name: "Butterscotch Cake", price: 500 },
+  { id: "dc-vanilla", name: "Vanilla Cake", price: 440 },
+  {
+    id: "dc-japanese-cheesecake",
+    name: "Japanese Cheesecake",
+    price: 740,
+    image: japaneseCheesecakeImg,
+  },
+  {
+    id: "dc-new-york-cheesecake",
+    name: "New York Cheesecake",
+    price: 730,
+    image: newYorkCheesecakeImg,
+  },
+  {
+    id: "dc-blueberry-cheesecake",
+    name: "Blueberry Cheesecake",
+    price: 840,
+    image: blueberryCheesecakeImg,
+  },
+  {
+    id: "dc-burnt-basque-cheesecake",
+    name: "Burnt Basque Cheesecake",
+    price: 730,
+    image: burntBasqueCheesecakeImg,
+  },
+  { id: "dc-rice-cake-loaf", name: "Rice Cake Loaf", price: 300 },
+  { id: "dc-millet-cake-loaf", name: "Millet Cake Loaf", price: 330, image: milletCakeLoafImg },
+  { id: "dc-tiramisu-mini-tub", name: "Tiramisu", variant: "Mini tub", price: 240 },
 ];
 
 /**
@@ -201,7 +238,7 @@ const MENU_SECTIONS: Record<string, MenuSection[]> = {
     { restaurant: "Prarthona Restaurant", items: PRARTHONA_MENU },
     { restaurant: "Daju Bahadur", items: DAJU_BAHADUR_MENU },
   ],
-  cake: [{ items: CAKE_MENU }],
+  cake: [{ restaurant: "Dcakery", items: DCAKERY_MENU }],
 };
 
 export function getMenuSections(categoryId: string): MenuSection[] | undefined {
