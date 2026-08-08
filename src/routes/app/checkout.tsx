@@ -1,9 +1,10 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   BadgeIndianRupee,
   Banknote,
   Check,
+  Copy,
   Loader2,
   LogIn,
   Paperclip,
@@ -20,9 +21,13 @@ import { useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/contact";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { deliveryFee, rupees } from "@/lib/menu";
-import { readMedicineRequest, type MedicineRequest } from "@/lib/medicine-request";
+import {
+  clearMedicineRequest,
+  readMedicineRequest,
+  type MedicineRequest,
+} from "@/lib/medicine-request";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
-import { paymentReference, UPI_APPS, upiAppLink, upiQrDataUrl } from "@/lib/payments";
+import { paymentReference, UPI_MOBILE, UPI_PAYEE, UPI_VPA, upiQrDataUrl } from "@/lib/payments";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/checkout")({
@@ -35,6 +40,85 @@ export const Route = createFileRoute("/app/checkout")({
 
 type Method = "cod" | "upi";
 
+/** Everything the confirmation needs, captured before the cart is emptied. */
+type PlacedOrder = {
+  medicine: boolean;
+  method: Method;
+  reference: string | null;
+  total: number;
+  whatsappUrl: string;
+};
+
+/**
+ * What the customer sees the moment the order is in.
+ *
+ * The order is already recorded and WhatsApp has already been opened by this
+ * point, but a tab that opens behind the app — or a popup blocker — used to
+ * leave someone staring at the home screen with no idea whether anything
+ * happened. This says so, and keeps the link in reach if the tab never showed.
+ */
+function OrderPlaced({ medicine, method, reference, total, whatsappUrl }: PlacedOrder) {
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-12">
+      <div className="flex flex-col items-center text-center">
+        <span className="flex size-16 items-center justify-center rounded-full bg-accent/10 text-accent">
+          <Check className="size-8" />
+        </span>
+        <h1 className="mt-5 text-2xl font-bold text-primary">Order placed</h1>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+          We&apos;ve opened WhatsApp with your order. Send that message and we&apos;ll confirm it,
+          usually within a few minutes.
+        </p>
+      </div>
+
+      <div className="mt-7 grid gap-2.5 rounded-2xl border border-border bg-card p-4 text-sm">
+        <div className="flex justify-between gap-3">
+          <span className="text-muted-foreground">Total</span>
+          <span className="font-semibold text-primary">
+            {medicine ? "Confirmed after the pharmacy quotes" : rupees(total)}
+          </span>
+        </div>
+        <div className="flex justify-between gap-3">
+          <span className="text-muted-foreground">Payment</span>
+          <span className="font-semibold text-primary">
+            {medicine ? "Cash on delivery" : method === "cod" ? "Cash on delivery" : "UPI"}
+          </span>
+        </div>
+        {reference && (
+          <div className="flex justify-between gap-3">
+            <span className="text-muted-foreground">Payment reference</span>
+            <span className="font-mono font-semibold text-primary">{reference}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Said plainly rather than shown as a tick: nothing here has checked a
+          bank account, and telling someone their payment is confirmed when
+          nobody has looked would be a lie they act on. */}
+      {reference && (
+        <p className="mt-3 flex gap-2 rounded-2xl bg-secondary/70 p-3 text-xs text-muted-foreground">
+          <ShieldAlert className="mt-0.5 size-4 shrink-0 text-accent" />
+          <span>
+            If you&apos;ve paid, quote <span className="font-mono font-semibold">{reference}</span>{" "}
+            in the chat. We check the payment landed before the rider sets off.
+          </span>
+        </p>
+      )}
+
+      <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+        <Button variant="accent" className="h-12 rounded-2xl" asChild>
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+            Open WhatsApp again
+          </a>
+        </Button>
+        <Button variant="outline" className="h-12 rounded-2xl" asChild>
+          <Link to="/app">Back to menu</Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /** What the WhatsApp message says about the prescription, if anything. */
 function prescriptionLine(medicine: MedicineRequest): string {
   if (medicine.prescriptionUrl) return `Prescription: ${medicine.prescriptionUrl}`;
@@ -45,7 +129,6 @@ function prescriptionLine(medicine: MedicineRequest): string {
 
 function CheckoutScreen() {
   const { kind } = Route.useSearch();
-  const navigate = useNavigate();
   const { cart, subtotal, fee, total, clear } = useCart();
   const { user, profile, loading: authLoading } = useAccount();
   const launched = useLaunched();
@@ -68,6 +151,7 @@ function CheckoutScreen() {
   const [qr, setQr] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<PlacedOrder | null>(null);
 
   // Stable for the life of the screen: regenerating it per render would hand
   // the customer a different code than the one encoded in the QR they scanned.
@@ -102,6 +186,10 @@ function CheckoutScreen() {
       cancelled = true;
     };
   }, [method, payable, reference]);
+
+  // Checked before `empty`, because placing an order clears the cart and the
+  // confirmation must not be mistaken for an empty basket.
+  if (placed) return <OrderPlaced {...placed} />;
 
   const empty = medicine ? !request.trim() : cart.lines.length === 0;
 
@@ -210,13 +298,22 @@ function CheckoutScreen() {
       .filter((line) => line !== undefined)
       .join("\n");
 
-    const url = whatsappLink(message);
-    const opened = window.open(url, "_blank", "noopener,noreferrer");
-    if (!opened) window.location.href = url;
+    // Captured before the cart is emptied, since the confirmation outlives it.
+    const confirmation: PlacedOrder = {
+      medicine,
+      method,
+      reference: method === "upi" ? reference : null,
+      total: payable,
+      whatsappUrl: whatsappLink(message),
+    };
 
-    if (!medicine) clear();
+    const opened = window.open(confirmation.whatsappUrl, "_blank", "noopener,noreferrer");
+    if (!opened) window.location.href = confirmation.whatsappUrl;
+
+    if (medicine) clearMedicineRequest();
+    else clear();
     setSending(false);
-    void navigate({ to: "/app" });
+    setPlaced(confirmation);
   };
 
   return (
@@ -360,33 +457,38 @@ function CheckoutScreen() {
                 <span className="font-mono font-bold">{reference}</span>
               </p>
 
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {UPI_APPS.map((app) => (
-                  <a
-                    key={app.id}
-                    href={upiAppLink(app, { amount: payable, reference })}
-                    className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-background px-3 text-sm font-semibold text-primary transition-colors hover:border-accent"
-                  >
-                    {app.label}
-                  </a>
-                ))}
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                The buttons open a UPI app on a phone. On a computer, scan the code instead.
-              </p>
-
+              {/* No "open GPay" buttons here on purpose. A link that hands a
+                  UPI app a prefilled payment to a personal address is refused
+                  under NPCI's risk policy — Paytm says so outright and offers
+                  the number or the QR instead. Those two are what this shows,
+                  because they are what works. */}
               {qr && (
                 <div className="mt-4 flex flex-col items-center">
                   <img
                     src={qr}
-                    alt={`UPI QR code to pay ${rupees(payable)} to Poba Express`}
+                    alt={`UPI QR code to pay ${rupees(payable)} to ${UPI_PAYEE}`}
                     className="size-44 rounded-xl border border-border"
                   />
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Amount is already filled in — nothing to type.
+                  <p className="mt-2 text-center text-xs text-muted-foreground">
+                    Amount is already filled in. Scan from another phone, or press and hold to save
+                    it and use your UPI app&apos;s{" "}
+                    <span className="font-medium">scan from gallery</span>.
                   </p>
                 </div>
               )}
+
+              <div className="mt-4 rounded-xl border border-border bg-background p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Or pay this number in any UPI app
+                </p>
+                <CopyRow label="UPI ID" value={UPI_VPA} />
+                <CopyRow label="Mobile number" value={UPI_MOBILE} />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Pays to <span className="font-medium text-primary">{UPI_PAYEE}</span>. Enter{" "}
+                  {rupees(payable)} and put{" "}
+                  <span className="font-mono font-semibold">{reference}</span> in the note.
+                </p>
+              </div>
 
               <div className="mt-4">
                 <Label htmlFor="co-txn">UPI reference number (after paying)</Label>
@@ -453,6 +555,44 @@ function CheckoutScreen() {
           ? "An account is needed to place an order. Your cart is kept."
           : "Sending the order opens WhatsApp so we can confirm it with you."}
       </p>
+    </div>
+  );
+}
+
+/**
+ * A payment detail with a copy button.
+ *
+ * Copying beats reading a UPI ID off one screen and typing it into another,
+ * which is where a wrong digit sends someone else's money away.
+ */
+function CopyRow({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Denied clipboard permission, or an insecure origin. The value is on
+      // screen either way, so there is nothing to report.
+    }
+  };
+
+  return (
+    <div className="mt-2 flex items-center gap-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="truncate font-mono text-sm font-semibold text-primary">{value}</p>
+      </div>
+      <button
+        type="button"
+        onClick={() => void copy()}
+        className="flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:border-accent"
+      >
+        {copied ? <Check className="size-3.5 text-accent" /> : <Copy className="size-3.5" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
     </div>
   );
 }

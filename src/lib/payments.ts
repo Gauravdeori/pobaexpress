@@ -14,15 +14,15 @@ import QRCode from "qrcode";
 export const UPI_VPA = "7099728406@slc";
 export const UPI_PAYEE = "Mr Bijit Pegu";
 
-/** UPI apps we offer as one-tap buttons, in the order they're shown. */
-export const UPI_APPS = [
-  { id: "gpay", label: "Google Pay", scheme: "tez://upi/pay" },
-  { id: "phonepe", label: "PhonePe", scheme: "phonepe://pay" },
-  { id: "paytm", label: "Paytm", scheme: "paytmmp://pay" },
-  { id: "other", label: "Other UPI app", scheme: "upi://pay" },
-] as const;
-
-export type UpiApp = (typeof UPI_APPS)[number];
+/**
+ * The same account, as a number to type into a UPI app.
+ *
+ * Offered because a deep link cannot be: a prefilled payment handed to a UPI
+ * app for a personal address is refused under NPCI's risk policy, and the apps
+ * tell the customer to use the number or the QR instead. Derived from the VPA
+ * so the two can never drift apart.
+ */
+export const UPI_MOBILE = UPI_VPA.split("@")[0];
 
 /**
  * Reference we print on the order and ask the customer to quote. UPI has no
@@ -75,15 +75,6 @@ function upiParams({ amount, reference }: PaymentRequest): string {
 /** The canonical `upi://` URI, which is also what the QR encodes. */
 export function upiUri(request: PaymentRequest): string {
   return `upi://pay?${upiParams(request)}`;
-}
-
-/**
- * Deep link into one specific UPI app. These custom schemes only resolve on a
- * phone with the app installed — on desktop nothing happens, which is why the
- * QR is always shown alongside.
- */
-export function upiAppLink(app: UpiApp, request: PaymentRequest): string {
-  return `${app.scheme}?${upiParams(request)}`;
 }
 
 /**

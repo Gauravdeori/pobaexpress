@@ -34,6 +34,15 @@ export function saveMedicineRequest(value: MedicineRequest): void {
   }
 }
 
+/** Cleared once the order is placed, so the next visit starts blank. */
+export function clearMedicineRequest(): void {
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Nothing to clear if storage is unavailable.
+  }
+}
+
 export function readMedicineRequest(): MedicineRequest {
   try {
     const raw = window.sessionStorage.getItem(STORAGE_KEY);
