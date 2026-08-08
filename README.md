@@ -94,6 +94,33 @@ so photos go to Cloudinary's free tier instead.
 4. Authentication → Settings → **Authorized domains**: add your deployed
    domain, or the email sign-in link is rejected.
 
+**Email sign-in codes**
+
+The headline way in is a six-digit code emailed to the customer. Firebase has
+no email OTP of its own — its passwordless option mails a _link_ — so the code
+is generated, stored and checked by this app in `src/lib/auth-otp.ts`, and a
+correct one is traded for a Firebase custom token the browser signs in with.
+
+Only a hash of each code is stored, five wrong guesses burn it, it expires
+after ten minutes, and one address can only be sent a code once a minute.
+
+1. Firebase console → Project settings → **Service accounts** → _Generate new
+   private key_. Put the whole JSON, on one line, in `FIREBASE_SERVICE_ACCOUNT`.
+   **This one is a secret** — unlike the web config above, it can mint a
+   session for any account. It has no `VITE_` prefix precisely so the bundler
+   cannot ship it to the browser; never add one.
+2. Sign up at [resend.com](https://resend.com), create an API key, put it in
+   `RESEND_API_KEY`.
+3. Verify a domain in Resend and set `OTP_FROM_EMAIL` to an address on it, e.g.
+   `Poba Express <hello@pobaexpress.com>`. Left unset it falls back to Resend's
+   shared sender, which **only delivers to the address that owns the Resend
+   account** — enough to test, not enough to launch.
+4. Deploy the rules again, so `emailCodes` is closed to the browser.
+
+Set these wherever the site is hosted, not just in the local `.env`. With any of
+them missing the code form says email sign-in is not switched on, and the
+password and Google buttons are unaffected.
+
 **Cloudinary setup**
 
 1. Settings → Upload → **Add upload preset**, signing mode **Unsigned**.

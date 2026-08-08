@@ -6,7 +6,7 @@ import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PhoneSignIn } from "@/components/poba/PhoneSignIn";
+import { EmailCodeSignIn } from "@/components/poba/EmailCodeSignIn";
 import {
   accountLabel,
   signInWithGoogle,
@@ -55,10 +55,11 @@ function AccountScreen() {
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">Signed in as</p>
           <p className="truncate font-semibold text-primary">{accountLabel(user)}</p>
-          {/* A phone account's number is what the rider calls, so it is worth
-              showing under the name rather than only in the profile. */}
-          {user.displayName && user.phoneNumber && (
-            <p className="truncate text-sm text-muted-foreground">{user.phoneNumber}</p>
+          {/* The label above is the name once there is one, so the address it
+              displaced is worth keeping in view — it is what the next code
+              goes to. */}
+          {user.displayName && user.email && (
+            <p className="truncate text-sm text-muted-foreground">{user.email}</p>
           )}
           {profile?.address && (
             <p className="mt-3 text-sm text-muted-foreground">
@@ -76,12 +77,12 @@ function AccountScreen() {
       ) : (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">
-            Sign in with your mobile number — we&apos;ll text you a code. Your name and number are
-            saved so the next order fills itself in.
+            Sign in with your name and email — we&apos;ll send you a six-digit code. Your details
+            are saved so the next order fills itself in.
           </p>
 
           <div className="mt-4">
-            <PhoneSignIn />
+            <EmailCodeSignIn />
           </div>
 
           <div className="relative my-6">
@@ -89,7 +90,7 @@ function AccountScreen() {
               <span className="w-full border-t border-border" />
             </span>
             <span className="relative mx-auto block w-max bg-card px-2 text-xs uppercase tracking-wide text-muted-foreground">
-              Or use email
+              Or use a password
             </span>
           </div>
 

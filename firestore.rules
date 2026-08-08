@@ -11,6 +11,14 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Sign-in codes. Written and read only by the server, which holds the
+    // service-account key and bypasses these rules; the browser must never
+    // touch them. Spelled out rather than left to the catch-all below, because
+    // a permissive rule added here later would hand out sign-ins.
+    match /emailCodes/{id} {
+      allow read, write: if false;
+    }
+
     match /orders/{orderId} {
       // A row may only be attributed to the person placing it, so nobody can
       // write orders into someone else's history.

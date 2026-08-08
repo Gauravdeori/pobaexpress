@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogIn, LogOut, Mail, Smartphone, UserRound } from "lucide-react";
+import { KeyRound, LogIn, LogOut, Mail, UserRound } from "lucide-react";
 import type { User } from "firebase/auth";
 
 import {
@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { PhoneSignIn } from "./PhoneSignIn";
+import { EmailCodeSignIn } from "./EmailCodeSignIn";
 import {
   accountLabel,
   signInWithPassword,
@@ -30,9 +30,10 @@ import {
  */
 export function AccountMenu({ user }: { user: User | null }) {
   const [open, setOpen] = useState(false);
-  // Phone first: a number is the one thing every customer here has, and it is
-  // what the rider needs anyway.
-  const [method, setMethod] = useState<"phone" | "email">("phone");
+  // The emailed code leads: it is the only route that needs nothing remembered,
+  // and it doubles as sign-up. The password form stays for accounts that
+  // already have one.
+  const [method, setMethod] = useState<"code" | "password">("code");
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -110,7 +111,7 @@ export function AccountMenu({ user }: { user: User | null }) {
           <>
             <DialogHeader>
               <DialogTitle>
-                {method === "phone" ? "Sign in" : isSignUp ? "Create Account" : "Sign in"}
+                {method === "code" ? "Sign in" : isSignUp ? "Create Account" : "Sign in"}
               </DialogTitle>
               <DialogDescription>
                 Signing in is required to place an order. It also saves your name, phone and address
@@ -121,7 +122,7 @@ export function AccountMenu({ user }: { user: User | null }) {
             {/* Two ways in, side by side rather than one behind the other:
                 whichever the customer has, it is one tap away. */}
             <div className="mt-2 grid grid-cols-2 gap-2 rounded-2xl bg-secondary p-1">
-              {(["phone", "email"] as const).map((option) => (
+              {(["code", "password"] as const).map((option) => (
                 <button
                   key={option}
                   type="button"
@@ -137,19 +138,19 @@ export function AccountMenu({ user }: { user: User | null }) {
                       : "text-muted-foreground hover:text-primary",
                   )}
                 >
-                  {option === "phone" ? (
-                    <Smartphone className="size-4" />
-                  ) : (
+                  {option === "code" ? (
                     <Mail className="size-4" />
+                  ) : (
+                    <KeyRound className="size-4" />
                   )}
-                  {option === "phone" ? "Phone" : "Email"}
+                  {option === "code" ? "Email code" : "Password"}
                 </button>
               ))}
             </div>
 
-            {method === "phone" ? (
+            {method === "code" ? (
               <div className="mt-4">
-                <PhoneSignIn onDone={() => setOpen(false)} />
+                <EmailCodeSignIn onDone={() => setOpen(false)} />
               </div>
             ) : (
               <>

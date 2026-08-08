@@ -3,18 +3,17 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithCustomToken,
   signInWithPopup,
-  signInWithPhoneNumber,
   updateProfile,
   GoogleAuthProvider,
-  RecaptchaVerifier,
   signOut as firebaseSignOut,
-  type ConfirmationResult,
   type User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { auth, db, isFirebaseConfigured } from "./firebase";
+import { requestEmailCode, verifyEmailCode } from "./auth-otp";
 
 /** The saved details we prefill the order form with. */
 export type Profile = {
@@ -118,127 +117,60 @@ export async function signOut() {
   if (auth) await firebaseSignOut(auth);
 }
 
-/* ---------------------------------------------------------------- phone --- */
+/* ----------------------------------------------------------- email code --- */
 
 /**
- * Phone sign-in, in two steps: send a code, then confirm it with a name.
+ * The browser's half of email sign-in. The code itself is checked on the
+ * server — see auth-otp.ts — which answers with a short-lived custom token.
  *
- * This is the route most customers here will take — a number is the one thing
- * everyone has, and it is what a rider needs anyway. The name is asked for at
- * the same time because a phone account arrives with no display name at all,
- * and both the order form and the WhatsApp message want one.
- *
- * Needs Phone enabled under Authentication → Sign-in method in the Firebase
- * console, and the site's domain listed under Authorized domains. Without
- * that, Firebase answers `auth/operation-not-allowed` and the message below
- * says so rather than blaming the customer's number.
+ * That token is the whole point of the round trip: it is the only way to turn
+ * "this person read a code we mailed them" into a real Firebase session, and
+ * it can only be minted by something holding the service-account key.
  */
 
-/** Poba Express delivers in one town, so numbers are Indian mobiles. */
-const DIAL_CODE = "+91";
-
-/**
- * A typed number as E.164, or null if it isn't ten digits.
- *
- * Accepts what people actually type: spaces, dashes, a leading 0, or the
- * country code already on the front.
- */
-export function toE164(input: string): string | null {
-  const digits = input.replace(/\D/g, "");
-  const local = digits.length > 10 ? digits.slice(-10) : digits;
-  return /^[6-9]\d{9}$/.test(local) ? `${DIAL_CODE}${local}` : null;
-}
-
-/**
- * One verifier at a time, kept outside React.
- *
- * A reCAPTCHA widget is spent once it has answered, and a re-render must not
- * build a second one over the same container, so it is created on demand and
- * cleared after every attempt, successful or not.
- */
-let verifier: RecaptchaVerifier | null = null;
-
-export function clearPhoneVerifier() {
+/** Step one: ask the server to mail a code. */
+export async function requestSignInCode(name: string, email: string): Promise<string | null> {
+  if (!auth) return "Accounts aren't set up yet.";
   try {
-    verifier?.clear();
-  } catch {
-    // Already torn down with its container — nothing left to clear.
-  }
-  verifier = null;
-}
-
-export type PhoneCodeResult = { confirmation?: ConfirmationResult; error?: string };
-
-/** Step one: text a six-digit code to `phone`. */
-export async function sendPhoneCode(phone: string, containerId: string): Promise<PhoneCodeResult> {
-  if (!auth) return { error: "Accounts aren't set up yet." };
-
-  const e164 = toE164(phone);
-  if (!e164) return { error: "Enter a 10-digit mobile number." };
-
-  try {
-    clearPhoneVerifier();
-    verifier = new RecaptchaVerifier(auth, containerId, { size: "invisible" });
-    const confirmation = await signInWithPhoneNumber(auth, e164, verifier);
-    return { confirmation };
+    const result = await requestEmailCode({ data: { name, email } });
+    return result.ok ? null : (result.error ?? "Could not send the code.");
   } catch (error) {
-    console.error("Could not send the code", error);
-    clearPhoneVerifier();
-    switch (authErrorCode(error)) {
-      case "auth/invalid-phone-number":
-        return { error: "That number doesn't look right." };
-      case "auth/too-many-requests":
-        return { error: "Too many attempts from this number. Try again in a little while." };
-      case "auth/operation-not-allowed":
-        return { error: "Phone sign-in isn't switched on for this site yet." };
-      case "auth/quota-exceeded":
-        return { error: "We've hit today's limit on codes. Please use email for now." };
-      default:
-        return { error: "Could not send the code. Check the number and try again." };
-    }
+    console.error("Could not request a code", error);
+    return "Could not reach the server. Check your connection and try again.";
   }
 }
 
-/** Step two: confirm the code and put the name on the account. */
-export async function confirmPhoneCode(
-  confirmation: ConfirmationResult,
-  code: string,
-  fullName: string,
-): Promise<string | null> {
-  const name = fullName.trim();
+/** Step two: trade a correct code for a session. */
+export async function signInWithCode(email: string, code: string): Promise<string | null> {
+  if (!auth) return "Accounts aren't set up yet.";
   try {
-    const { user } = await confirmation.confirm(code);
+    const result = await verifyEmailCode({ data: { email, code } });
+    if (!result.token) return result.error ?? "That code isn't right.";
 
-    // Best effort, both of them: the customer is signed in either way, and
-    // failing them over a name that can be retyped at checkout would be worse
-    // than a profile that fills in one field short.
-    if (name) await updateProfile(user, { displayName: name }).catch(() => {});
-    await saveProfile(user.uid, { fullName: name || user.displayName, phone: user.phoneNumber });
+    const { user } = await signInWithCustomToken(auth, result.token);
+
+    // The account already carries the name; this mirrors it into the profile
+    // the order form reads. Best effort — they are signed in either way, and
+    // failing them over a prefill would be worse than one empty field.
+    const name = result.name?.trim();
+    if (name && !user.displayName) await updateProfile(user, { displayName: name }).catch(() => {});
+    await saveProfile(user.uid, { fullName: name || user.displayName });
     return null;
   } catch (error) {
-    console.error("Could not confirm the code", error);
-    switch (authErrorCode(error)) {
-      case "auth/invalid-verification-code":
-        return "That code isn't right. Check the message and try again.";
-      case "auth/code-expired":
-        return "That code has expired. Ask for a new one.";
-      default:
-        return "Could not verify the code. Ask for a new one.";
-    }
-  } finally {
-    clearPhoneVerifier();
+    console.error("Could not sign in with the code", error);
+    return "Could not sign you in. Ask for a new code.";
   }
 }
 
 /**
  * What to call someone on screen.
  *
- * A phone account has no email and, until they give one, no name — printing
- * `user.email` for them would render an empty line where their identity should
- * be.
+ * Falls through the identifiers an account might have: a code sign-in always
+ * has a name and an email, a Google one has both, and an old password account
+ * may have only the email.
  */
 export function accountLabel(user: User): string {
-  return user.displayName || user.phoneNumber || user.email || "your account";
+  return user.displayName || user.email || user.phoneNumber || "your account";
 }
 
 /**
