@@ -42,6 +42,12 @@ export type OrderDraft = {
   /** Cloudinary public_id, or null when there was no photo or it failed. */
   prescriptionId: string | null;
   prescriptionUrl: string | null;
+  /**
+   * The pin the customer shared, if they did. Kept alongside `address` rather
+   * than instead of it — a fix can be far enough out that the typed address is
+   * what settles where the rider knocks.
+   */
+  location: { latitude: number; longitude: number; accuracy: number; url: string } | null;
   /** Absent on orders placed through the marketing page's WhatsApp form. */
   payment?: Payment;
 };

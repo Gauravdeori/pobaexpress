@@ -31,6 +31,8 @@ import { accountLabel, useAccount, saveProfile } from "@/lib/account";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { recordOrder, type OrderLine } from "@/lib/orders";
 import { uploadPrescription } from "@/lib/uploads";
+import { mapsLink, type Coords } from "@/lib/location";
+import { LocationShare } from "@/components/app/LocationShare";
 import { Reveal, SectionHeading } from "./Reveal";
 
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
@@ -138,6 +140,7 @@ export function OrderForm() {
   const [location, setLocation] = useState("");
   const [items, setItems] = useState("");
   const [notes, setNotes] = useState("");
+  const [coords, setCoords] = useState<Coords | null>(null);
   const [prescription, setPrescription] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -262,6 +265,9 @@ export function OrderForm() {
         `*Delivery location:* ${location.trim()}`,
       ];
 
+      // Straight after the address, because that is what the rider reads.
+      if (coords) lines.push(`*Map pin:* ${mapsLink(coords)}`);
+
       if (picked.length) {
         lines.push("", "*Items:*");
         for (const item of picked) {
@@ -310,6 +316,7 @@ export function OrderForm() {
           notes: notes.trim() || null,
           prescriptionId: upload?.publicId ?? null,
           prescriptionUrl: upload?.url ?? null,
+          location: coords ? { ...coords, url: mapsLink(coords) } : null,
         },
         uid,
       );
@@ -553,6 +560,9 @@ export function OrderForm() {
                   placeholder="House / landmark, area, Jonai"
                   className="h-12 rounded-2xl"
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <LocationShare coords={coords} onChange={setCoords} className="rounded-3xl" />
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="order-items">

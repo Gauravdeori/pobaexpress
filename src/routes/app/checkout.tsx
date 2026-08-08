@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Banknote, Check, Loader2, LogIn, Paperclip } from "lucide-react";
 
+import { LocationShare } from "@/components/app/LocationShare";
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { saveProfile, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/contact";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import { mapsLink, type Coords } from "@/lib/location";
 import { deliveryFee, rupees } from "@/lib/menu";
 import {
   clearMedicineRequest,
@@ -110,6 +112,7 @@ function CheckoutScreen() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
+  const [coords, setCoords] = useState<Coords | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
@@ -200,6 +203,7 @@ function CheckoutScreen() {
         notes: notes.trim() || null,
         prescriptionId: medicine ? medicineRequest.prescriptionId : null,
         prescriptionUrl: medicine ? medicineRequest.prescriptionUrl : null,
+        location: coords ? { ...coords, url: mapsLink(coords) } : null,
         payment,
       },
       user?.uid ?? null,
@@ -232,6 +236,8 @@ function CheckoutScreen() {
       `Name: ${name.trim()}`,
       `Phone: ${phone.trim()}`,
       `Address: ${address.trim()}`,
+      // Straight after the address, because that is what the rider reads.
+      coords ? `Location: ${mapsLink(coords)}` : ``,
       notes.trim() ? `Notes: ${notes.trim()}` : ``,
       // Only ever claims a photo is attached when there is a link to it. A
       // failed upload asks for it in the chat rather than leaving the pharmacy
@@ -350,6 +356,7 @@ function CheckoutScreen() {
             className="mt-1.5"
           />
         </div>
+        <LocationShare coords={coords} onChange={setCoords} />
         <div>
           <Label htmlFor="co-notes">Notes (optional)</Label>
           <Input
