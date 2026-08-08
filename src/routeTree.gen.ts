@@ -21,6 +21,7 @@ import { Route as AppCartRouteImport } from './routes/app/cart'
 import { Route as AppCheckoutRouteImport } from './routes/app/checkout'
 import { Route as AppFoodRouteImport } from './routes/app/food'
 import { Route as AppMedicineRouteImport } from './routes/app/medicine'
+import { Route as AppOrdersRouteImport } from './routes/app/orders'
 import { Route as AppRSlugRouteImport } from './routes/app/r/$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -83,6 +84,11 @@ const AppMedicineRoute = AppMedicineRouteImport.update({
   path: '/medicine',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOrdersRoute = AppOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRSlugRoute = AppRSlugRouteImport.update({
   id: '/r/$slug',
   path: '/r/$slug',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/app/checkout': typeof AppCheckoutRoute
   '/app/food': typeof AppFoodRoute
   '/app/medicine': typeof AppMedicineRoute
+  '/app/orders': typeof AppOrdersRoute
   '/app/': typeof AppIndexRoute
   '/app/r/$slug': typeof AppRSlugRoute
 }
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/app/checkout': typeof AppCheckoutRoute
   '/app/food': typeof AppFoodRoute
   '/app/medicine': typeof AppMedicineRoute
+  '/app/orders': typeof AppOrdersRoute
   '/app': typeof AppIndexRoute
   '/app/r/$slug': typeof AppRSlugRoute
 }
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/app/checkout': typeof AppCheckoutRoute
   '/app/food': typeof AppFoodRoute
   '/app/medicine': typeof AppMedicineRoute
+  '/app/orders': typeof AppOrdersRoute
   '/app/': typeof AppIndexRoute
   '/app/r/$slug': typeof AppRSlugRoute
 }
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/app/checkout'
     | '/app/food'
     | '/app/medicine'
+    | '/app/orders'
     | '/app/'
     | '/app/r/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/app/checkout'
     | '/app/food'
     | '/app/medicine'
+    | '/app/orders'
     | '/app'
     | '/app/r/$slug'
   id:
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/app/checkout'
     | '/app/food'
     | '/app/medicine'
+    | '/app/orders'
     | '/app/'
     | '/app/r/$slug'
   fileRoutesById: FileRoutesById
@@ -275,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMedicineRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/orders': {
+      id: '/app/orders'
+      path: '/orders'
+      fullPath: '/app/orders'
+      preLoaderRoute: typeof AppOrdersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/r/$slug': {
       id: '/app/r/$slug'
       path: '/r/$slug'
@@ -292,6 +311,7 @@ interface AppRouteChildren {
   AppCheckoutRoute: typeof AppCheckoutRoute
   AppFoodRoute: typeof AppFoodRoute
   AppMedicineRoute: typeof AppMedicineRoute
+  AppOrdersRoute: typeof AppOrdersRoute
   AppIndexRoute: typeof AppIndexRoute
   AppRSlugRoute: typeof AppRSlugRoute
 }
@@ -303,6 +323,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCheckoutRoute: AppCheckoutRoute,
   AppFoodRoute: AppFoodRoute,
   AppMedicineRoute: AppMedicineRoute,
+  AppOrdersRoute: AppOrdersRoute,
   AppIndexRoute: AppIndexRoute,
   AppRSlugRoute: AppRSlugRoute,
 }

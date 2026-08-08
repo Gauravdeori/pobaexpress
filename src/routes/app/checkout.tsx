@@ -54,7 +54,11 @@ function OrderPlaced({ medicine, total, whatsappUrl }: PlacedOrder) {
         <h1 className="mt-5 text-2xl font-bold text-primary">Order placed</h1>
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
           We&apos;ve opened WhatsApp with your order. Send that message and we&apos;ll confirm it,
-          usually within a few minutes.
+          usually within a few minutes. It&apos;s saved under{" "}
+          <Link to="/app/orders" className="font-semibold text-accent underline">
+            Your orders
+          </Link>{" "}
+          either way.
         </p>
       </div>
 
@@ -78,7 +82,7 @@ function OrderPlaced({ medicine, total, whatsappUrl }: PlacedOrder) {
           </a>
         </Button>
         <Button variant="outline" className="h-12 rounded-2xl" asChild>
-          <Link to="/app">Back to menu</Link>
+          <Link to="/app/orders">Your orders</Link>
         </Button>
       </div>
     </div>

@@ -1,4 +1,12 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+  type Timestamp,
+} from "firebase/firestore";
 
 import { db } from "./firebase";
 
@@ -56,6 +64,43 @@ export type OrderDraft = {
  * Keeps a record of the order beyond the WhatsApp thread. Best-effort: a
  * failure here is logged, never surfaced, and never stops the order.
  */
+/** A stored order, as the history screen reads it back. */
+export type OrderRecord = OrderDraft & {
+  id: string;
+  /** Set by us on create, moved on from the console as the order progresses. */
+  status: string;
+  /** Null for the moment between the write and the server stamping it. */
+  placedAt: Date | null;
+};
+
+/**
+ * Every order this customer has placed, newest first.
+ *
+ * Sorted here rather than with `orderBy`, because pairing that with the
+ * `where` needs a composite index built in the console — one more setup step,
+ * for a list that is a handful of rows per person.
+ *
+ * Throws rather than swallowing: an empty list and a failed read look identical
+ * on screen, and "no orders yet" is a lie to tell someone who has ordered.
+ */
+export async function listOrders(uid: string): Promise<OrderRecord[]> {
+  if (!db) return [];
+
+  const snapshot = await getDocs(query(collection(db, "orders"), where("userId", "==", uid)));
+
+  return snapshot.docs
+    .map((entry) => {
+      const data = entry.data() as OrderDraft & { status?: string; createdAt?: Timestamp };
+      return {
+        ...data,
+        id: entry.id,
+        status: data.status ?? "new",
+        placedAt: data.createdAt?.toDate() ?? null,
+      };
+    })
+    .sort((a, b) => (b.placedAt?.getTime() ?? 0) - (a.placedAt?.getTime() ?? 0));
+}
+
 export async function recordOrder(draft: OrderDraft, uid: string | null): Promise<void> {
   if (!db) return;
   try {

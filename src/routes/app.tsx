@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Home, ShoppingBag, UserRound } from "lucide-react";
+import { Home, Package, ShoppingBag, UserRound } from "lucide-react";
 
 import { CartProvider, useCart } from "@/lib/cart";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
@@ -23,6 +23,9 @@ export const Route = createFileRoute("/app")({
 const tabs = [
   { to: "/app", label: "Home", icon: Home, exact: true },
   { to: "/app/cart", label: "Cart", icon: ShoppingBag, exact: false },
+  // Most people order from a phone and come straight back to check on it, so
+  // the order list is a tab rather than something to find inside Account.
+  { to: "/app/orders", label: "Orders", icon: Package, exact: false },
   { to: "/app/account", label: "Account", icon: UserRound, exact: false },
 ];
 
