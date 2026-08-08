@@ -6,7 +6,9 @@ import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneSignIn } from "@/components/poba/PhoneSignIn";
 import {
+  accountLabel,
   signInWithGoogle,
   signInWithPassword,
   signOut,
@@ -52,7 +54,12 @@ function AccountScreen() {
       ) : user ? (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">Signed in as</p>
-          <p className="truncate font-semibold text-primary">{user.email}</p>
+          <p className="truncate font-semibold text-primary">{accountLabel(user)}</p>
+          {/* A phone account's number is what the rider calls, so it is worth
+              showing under the name rather than only in the profile. */}
+          {user.displayName && user.phoneNumber && (
+            <p className="truncate text-sm text-muted-foreground">{user.phoneNumber}</p>
+          )}
           {profile?.address && (
             <p className="mt-3 text-sm text-muted-foreground">
               Saved address: <span className="text-primary">{profile.address}</span>
@@ -69,8 +76,22 @@ function AccountScreen() {
       ) : (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">
-            Signing in just saves your details for next time. Ordering never needs it.
+            Sign in with your mobile number — we&apos;ll text you a code. Your name and number are
+            saved so the next order fills itself in.
           </p>
+
+          <div className="mt-4">
+            <PhoneSignIn />
+          </div>
+
+          <div className="relative my-6">
+            <span className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </span>
+            <span className="relative mx-auto block w-max bg-card px-2 text-xs uppercase tracking-wide text-muted-foreground">
+              Or use email
+            </span>
+          </div>
 
           <div className="mt-4 grid gap-3">
             <div>

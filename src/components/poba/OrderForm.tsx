@@ -27,7 +27,7 @@ import {
   type MenuItem,
 } from "@/lib/menu";
 import { isFirebaseConfigured } from "@/lib/firebase";
-import { useAccount, saveProfile } from "@/lib/account";
+import { accountLabel, useAccount, saveProfile } from "@/lib/account";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { recordOrder, type OrderLine } from "@/lib/orders";
 import { uploadPrescription } from "@/lib/uploads";
@@ -382,8 +382,9 @@ export function OrderForm() {
               <p className="mb-6 rounded-2xl border border-border bg-secondary/50 px-4 py-3 text-sm text-muted-foreground">
                 {user ? (
                   <>
-                    Signed in as <span className="font-medium text-primary">{user.email}</span> —
-                    your details are filled in below and saved when you order.
+                    Signed in as{" "}
+                    <span className="font-medium text-primary">{accountLabel(user)}</span> — your
+                    details are filled in below and saved when you order.
                   </>
                 ) : (
                   <>
