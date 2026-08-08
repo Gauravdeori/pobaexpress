@@ -1,15 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import {
-  BadgeIndianRupee,
-  Banknote,
-  Check,
-  Copy,
-  Loader2,
-  LogIn,
-  Paperclip,
-  ShieldAlert,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Banknote, Check, Loader2, LogIn, Paperclip } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
@@ -27,15 +18,6 @@ import {
   type MedicineRequest,
 } from "@/lib/medicine-request";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
-import {
-  paymentReference,
-  UPI_MOBILE,
-  UPI_PAYEE,
-  UPI_VPA,
-  upiIntentUri,
-  upiQrDataUrl,
-} from "@/lib/payments";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/checkout")({
   // Returning the key unconditionally would make ?kind= required on every link
@@ -45,13 +27,9 @@ export const Route = createFileRoute("/app/checkout")({
   component: CheckoutScreen,
 });
 
-type Method = "cod" | "upi";
-
 /** Everything the confirmation needs, captured before the cart is emptied. */
 type PlacedOrder = {
   medicine: boolean;
-  method: Method;
-  reference: string | null;
   total: number;
   whatsappUrl: string;
 };
@@ -64,7 +42,7 @@ type PlacedOrder = {
  * leave someone staring at the home screen with no idea whether anything
  * happened. This says so, and keeps the link in reach if the tab never showed.
  */
-function OrderPlaced({ medicine, method, reference, total, whatsappUrl }: PlacedOrder) {
+function OrderPlaced({ medicine, total, whatsappUrl }: PlacedOrder) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <div className="flex flex-col items-center text-center">
@@ -87,30 +65,9 @@ function OrderPlaced({ medicine, method, reference, total, whatsappUrl }: Placed
         </div>
         <div className="flex justify-between gap-3">
           <span className="text-muted-foreground">Payment</span>
-          <span className="font-semibold text-primary">
-            {medicine ? "Cash on delivery" : method === "cod" ? "Cash on delivery" : "UPI"}
-          </span>
+          <span className="font-semibold text-primary">Cash on delivery</span>
         </div>
-        {reference && (
-          <div className="flex justify-between gap-3">
-            <span className="text-muted-foreground">Payment reference</span>
-            <span className="font-mono font-semibold text-primary">{reference}</span>
-          </div>
-        )}
       </div>
-
-      {/* Said plainly rather than shown as a tick: nothing here has checked a
-          bank account, and telling someone their payment is confirmed when
-          nobody has looked would be a lie they act on. */}
-      {reference && (
-        <p className="mt-3 flex gap-2 rounded-2xl bg-secondary/70 p-3 text-xs text-muted-foreground">
-          <ShieldAlert className="mt-0.5 size-4 shrink-0 text-accent" />
-          <span>
-            If you&apos;ve paid, quote <span className="font-mono font-semibold">{reference}</span>{" "}
-            in the chat. We check the payment landed before the rider sets off.
-          </span>
-        </p>
-      )}
 
       <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
         <Button variant="accent" className="h-12 rounded-2xl" asChild>
@@ -153,16 +110,9 @@ function CheckoutScreen() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
-  const [method, setMethod] = useState<Method>("cod");
-  const [customerReference, setCustomerReference] = useState("");
-  const [qr, setQr] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
-
-  // Stable for the life of the screen: regenerating it per render would hand
-  // the customer a different code than the one encoded in the QR they scanned.
-  const reference = useMemo(() => paymentReference(), []);
 
   // Medicine has no priced lines, so its total is settled on WhatsApp.
   const payable = medicine ? 0 : total;
@@ -178,21 +128,6 @@ function CheckoutScreen() {
     if (profile.phone) setPhone((v) => v || profile.phone!);
     if (profile.address) setAddress((v) => v || profile.address!);
   }, [profile]);
-
-  // Only meaningful once there is an amount to collect.
-  useEffect(() => {
-    if (method !== "upi" || payable <= 0) {
-      setQr(null);
-      return;
-    }
-    let cancelled = false;
-    upiQrDataUrl({ amount: payable, reference })
-      .then((url) => !cancelled && setQr(url))
-      .catch(() => !cancelled && setQr(null));
-    return () => {
-      cancelled = true;
-    };
-  }, [method, payable, reference]);
 
   // Checked before `empty`, because placing an order clears the cart and the
   // confirmation must not be mistaken for an empty basket.
@@ -234,11 +169,14 @@ function CheckoutScreen() {
     setError(null);
     setSending(true);
 
+    // Cash only for now. `Payment` still describes UPI because orders already
+    // placed that way are in Firestore, and narrowing the type would
+    // misdescribe records that exist.
     const payment: Payment = {
-      method,
-      status: method === "cod" ? "cod" : "awaiting-verification",
-      reference: method === "upi" ? reference : null,
-      customerReference: method === "upi" ? customerReference.trim() || null : null,
+      method: "cod",
+      status: "cod",
+      reference: null,
+      customerReference: null,
     };
 
     const lines: OrderLine[] = cart.lines.map((line) => ({
@@ -289,9 +227,7 @@ function CheckoutScreen() {
       medicine ? `` : `Delivery: ${rupees(fee)}`,
       medicine ? `Total: confirmed after the pharmacy quotes` : `*Total: ${rupees(total)}*`,
       ``,
-      method === "cod"
-        ? `Payment: Cash on delivery`
-        : `Payment: UPI (paid online) — ref ${reference}${customerReference.trim() ? `, txn ${customerReference.trim()}` : ""}`,
+      `Payment: Cash on delivery`,
       ``,
       `Name: ${name.trim()}`,
       `Phone: ${phone.trim()}`,
@@ -308,8 +244,6 @@ function CheckoutScreen() {
     // Captured before the cart is emptied, since the confirmation outlives it.
     const confirmation: PlacedOrder = {
       medicine,
-      method,
-      reference: method === "upi" ? reference : null,
       total: payable,
       whatsappUrl: whatsappLink(message),
     };
@@ -433,105 +367,23 @@ function CheckoutScreen() {
         Payment
       </h2>
 
-      {medicine ? (
-        <p className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-          Medicine is cash on delivery — the total depends on what the pharmacy has in stock, so we
-          confirm it on WhatsApp before the rider collects.
-        </p>
-      ) : (
-        <>
-          <div className="grid gap-2.5 sm:grid-cols-2">
-            <MethodButton
-              active={method === "cod"}
-              onClick={() => setMethod("cod")}
-              icon={Banknote}
-              title="Cash on delivery"
-              hint="Pay the rider"
-            />
-            <MethodButton
-              active={method === "upi"}
-              onClick={() => setMethod("upi")}
-              icon={BadgeIndianRupee}
-              title="Pay now by UPI"
-              hint="GPay, PhonePe, Paytm"
-            />
-          </div>
-
-          {method === "upi" && (
-            <div className="mt-3 rounded-2xl border border-border bg-card p-4">
-              <p className="text-sm font-medium text-primary">
-                Pay {rupees(payable)} — reference{" "}
-                <span className="font-mono font-bold">{reference}</span>
-              </p>
-
-              {/* One button, the standard `upi://` intent, stripped to payee
-                  and amount. Apps still refuse these to a personal address
-                  often enough that it is offered as the shortcut and not the
-                  instruction — the QR and the number below are the paths that
-                  actually work, so they stay in view rather than behind it. */}
-              <a
-                href={upiIntentUri({ amount: payable, reference })}
-                className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent px-3 text-sm font-semibold text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
-              >
-                <BadgeIndianRupee className="size-4" />
-                Open UPI app
-              </a>
-              <p className="mt-2 text-xs text-muted-foreground">
-                If your UPI app warns that the payment may fail, come back and use the QR or the
-                number below — both work.
-              </p>
-
-              {qr && (
-                <div className="mt-4 flex flex-col items-center">
-                  <img
-                    src={qr}
-                    alt={`UPI QR code to pay ${rupees(payable)} to ${UPI_PAYEE}`}
-                    className="size-44 rounded-xl border border-border"
-                  />
-                  <p className="mt-2 text-center text-xs text-muted-foreground">
-                    Amount is already filled in. Scan from another phone, or press and hold to save
-                    it and use your UPI app&apos;s{" "}
-                    <span className="font-medium">scan from gallery</span>.
-                  </p>
-                </div>
-              )}
-
-              <div className="mt-4 rounded-xl border border-border bg-background p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Or pay this number in any UPI app
-                </p>
-                <CopyRow label="UPI ID" value={UPI_VPA} />
-                <CopyRow label="Mobile number" value={UPI_MOBILE} />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Pays to <span className="font-medium text-primary">{UPI_PAYEE}</span>. Enter{" "}
-                  {rupees(payable)} and put{" "}
-                  <span className="font-mono font-semibold">{reference}</span> in the note.
-                </p>
-              </div>
-
-              <div className="mt-4">
-                <Label htmlFor="co-txn">UPI reference number (after paying)</Label>
-                <Input
-                  id="co-txn"
-                  value={customerReference}
-                  onChange={(e) => setCustomerReference(e.target.value)}
-                  placeholder="12-digit number from your UPI app"
-                  inputMode="numeric"
-                  className="mt-1.5"
-                />
-              </div>
-
-              <p className="mt-3 flex gap-2 rounded-xl bg-secondary/70 p-3 text-xs text-muted-foreground">
-                <ShieldAlert className="mt-0.5 size-4 shrink-0 text-accent" />
-                <span>
-                  Your order is placed straight away, but it is only confirmed once we&apos;ve
-                  checked the payment landed. We&apos;ll message you on WhatsApp either way.
-                </span>
-              </p>
-            </div>
-          )}
-        </>
-      )}
+      {/* One method, so this states it rather than asking. Prepaid UPI is off
+          until there is a merchant account behind it: apps refuse a prefilled
+          payment to a personal address, and nothing here could confirm the
+          money arrived anyway. */}
+      <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-accent text-accent-foreground">
+          <Banknote className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-primary">Cash on delivery</p>
+          <p className="text-xs text-muted-foreground">
+            {medicine
+              ? "The total depends on what the pharmacy has in stock, so we confirm it on WhatsApp before the rider collects."
+              : `Pay the rider ${rupees(payable)} when your order arrives.`}
+          </p>
+        </div>
+      </div>
 
       {error && (
         <p role="alert" className="mt-4 text-sm font-medium text-destructive">
@@ -575,84 +427,5 @@ function CheckoutScreen() {
           : "Sending the order opens WhatsApp so we can confirm it with you."}
       </p>
     </div>
-  );
-}
-
-/**
- * A payment detail with a copy button.
- *
- * Copying beats reading a UPI ID off one screen and typing it into another,
- * which is where a wrong digit sends someone else's money away.
- */
-function CopyRow({ label, value }: { label: string; value: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch {
-      // Denied clipboard permission, or an insecure origin. The value is on
-      // screen either way, so there is nothing to report.
-    }
-  };
-
-  return (
-    <div className="mt-2 flex items-center gap-3">
-      <div className="min-w-0 flex-1">
-        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p className="truncate font-mono text-sm font-semibold text-primary">{value}</p>
-      </div>
-      <button
-        type="button"
-        onClick={() => void copy()}
-        className="flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:border-accent"
-      >
-        {copied ? <Check className="size-3.5 text-accent" /> : <Copy className="size-3.5" />}
-        {copied ? "Copied" : "Copy"}
-      </button>
-    </div>
-  );
-}
-
-function MethodButton({
-  active,
-  onClick,
-  icon: Icon,
-  title,
-  hint,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: typeof Banknote;
-  title: string;
-  hint: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "flex items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
-        active ? "border-accent bg-accent/5" : "border-border bg-card",
-      )}
-    >
-      <span
-        className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-xl",
-          active
-            ? "bg-gradient-accent text-accent-foreground"
-            : "bg-secondary text-muted-foreground",
-        )}
-      >
-        <Icon className="size-5" />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-sm font-semibold text-primary">{title}</span>
-        <span className="block truncate text-xs text-muted-foreground">{hint}</span>
-      </span>
-    </button>
   );
 }
