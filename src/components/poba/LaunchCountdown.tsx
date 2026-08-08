@@ -24,7 +24,14 @@ function pad(value: number) {
  * different seconds and React would report a hydration mismatch.
  */
 export function LaunchCountdown() {
-  const [remaining, setRemaining] = useState<Remaining | null>(null);
+  // Null means "no clock yet", which is what keeps the server and the client
+  // from disagreeing about the seconds. Once we are open there is no clock left
+  // to disagree about, so seed it and let the server render the real state
+  // instead of a "launching soon" shell the first paint has to take back.
+  const [remaining, setRemaining] = useState<Remaining | null>(() => {
+    const now = timeUntilLaunch();
+    return now.done ? now : null;
+  });
 
   useEffect(() => {
     const tick = () => setRemaining(timeUntilLaunch());
