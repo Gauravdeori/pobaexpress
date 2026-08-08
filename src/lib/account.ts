@@ -3,9 +3,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithCustomToken,
   signInWithPopup,
-  updateProfile,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   type User,
@@ -13,7 +11,6 @@ import {
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { auth, db, isFirebaseConfigured } from "./firebase";
-import { requestEmailCode, verifyEmailCode } from "./auth-otp";
 
 /** The saved details we prefill the order form with. */
 export type Profile = {
@@ -117,67 +114,23 @@ export async function signOut() {
   if (auth) await firebaseSignOut(auth);
 }
 
-/* ----------------------------------------------------------- email code --- */
-
-/**
- * The browser's half of email sign-in. The code itself is checked on the
- * server — see auth-otp.ts — which answers with a short-lived custom token.
- *
- * That token is the whole point of the round trip: it is the only way to turn
- * "this person read a code we mailed them" into a real Firebase session, and
- * it can only be minted by something holding the service-account key.
- */
-
-/** Step one: ask the server to mail a code. */
-export async function requestSignInCode(name: string, email: string): Promise<string | null> {
-  if (!auth) return "Accounts aren't set up yet.";
-  try {
-    const result = await requestEmailCode({ data: { name, email } });
-    return result.ok ? null : (result.error ?? "Could not send the code.");
-  } catch (error) {
-    console.error("Could not request a code", error);
-    return "Could not reach the server. Check your connection and try again.";
-  }
-}
-
-/** Step two: trade a correct code for a session. */
-export async function signInWithCode(email: string, code: string): Promise<string | null> {
-  if (!auth) return "Accounts aren't set up yet.";
-  try {
-    const result = await verifyEmailCode({ data: { email, code } });
-    if (!result.token) return result.error ?? "That code isn't right.";
-
-    const { user } = await signInWithCustomToken(auth, result.token);
-
-    // The account already carries the name; this mirrors it into the profile
-    // the order form reads. Best effort — they are signed in either way, and
-    // failing them over a prefill would be worse than one empty field.
-    const name = result.name?.trim();
-    if (name && !user.displayName) await updateProfile(user, { displayName: name }).catch(() => {});
-    await saveProfile(user.uid, { fullName: name || user.displayName });
-    return null;
-  } catch (error) {
-    console.error("Could not sign in with the code", error);
-    return "Could not sign you in. Ask for a new code.";
-  }
-}
-
 /**
  * What to call someone on screen.
  *
- * Falls through the identifiers an account might have: a code sign-in always
- * has a name and an email, a Google one has both, and an old password account
- * may have only the email.
+ * Google supplies a name, a password account may only ever have the email, so
+ * this falls through rather than printing an empty line where an identity
+ * should be.
  */
 export function accountLabel(user: User): string {
-  return user.displayName || user.email || user.phoneNumber || "your account";
+  return user.displayName || user.email || "your account";
 }
 
 /**
  * Stores the details entered on an order so the next one is prefilled.
  *
- * Partial on purpose: phone sign-in knows a name and a number but no address,
- * and a merge that wrote `address: null` would wipe one already saved.
+ * Partial on purpose: a caller that knows only a name must be able to save
+ * just that, since a merge writing `address: null` would wipe one already
+ * saved.
  */
 export async function saveProfile(uid: string, profile: Partial<Profile>) {
   if (!db) return;

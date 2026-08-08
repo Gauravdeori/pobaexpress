@@ -6,7 +6,6 @@ import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EmailCodeSignIn } from "@/components/poba/EmailCodeSignIn";
 import {
   accountLabel,
   signInWithGoogle,
@@ -77,22 +76,8 @@ function AccountScreen() {
       ) : (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">
-            Sign in with your name and email — we&apos;ll send you a six-digit code. Your details
-            are saved so the next order fills itself in.
+            Signing in saves your name, phone and address, so the next order fills itself in.
           </p>
-
-          <div className="mt-4">
-            <EmailCodeSignIn />
-          </div>
-
-          <div className="relative my-6">
-            <span className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </span>
-            <span className="relative mx-auto block w-max bg-card px-2 text-xs uppercase tracking-wide text-muted-foreground">
-              Or use a password
-            </span>
-          </div>
 
           <div className="mt-4 grid gap-3">
             <div>
