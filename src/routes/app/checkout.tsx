@@ -1,6 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { BadgeIndianRupee, Banknote, Check, Loader2, LogIn, ShieldAlert } from "lucide-react";
+import {
+  BadgeIndianRupee,
+  Banknote,
+  Check,
+  Loader2,
+  LogIn,
+  Paperclip,
+  ShieldAlert,
+} from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
@@ -12,6 +20,7 @@ import { useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/contact";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { deliveryFee, rupees } from "@/lib/menu";
+import { readMedicineRequest, type MedicineRequest } from "@/lib/medicine-request";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
 import { paymentReference, UPI_APPS, upiAppLink, upiQrDataUrl } from "@/lib/payments";
 import { cn } from "@/lib/utils";
@@ -26,6 +35,14 @@ export const Route = createFileRoute("/app/checkout")({
 
 type Method = "cod" | "upi";
 
+/** What the WhatsApp message says about the prescription, if anything. */
+function prescriptionLine(medicine: MedicineRequest): string {
+  if (medicine.prescriptionUrl) return `Prescription: ${medicine.prescriptionUrl}`;
+  if (medicine.photoName)
+    return `Prescription: photo to follow in this chat (${medicine.photoName})`;
+  return `Prescription: no photo attached`;
+}
+
 function CheckoutScreen() {
   const { kind } = Route.useSearch();
   const navigate = useNavigate();
@@ -34,7 +51,13 @@ function CheckoutScreen() {
   const launched = useLaunched();
 
   const medicine = kind === "medicine";
-  const [request, setRequest] = useState("");
+  const [medicineRequest, setMedicineRequest] = useState<MedicineRequest>({
+    request: "",
+    prescriptionId: null,
+    prescriptionUrl: null,
+    photoName: null,
+  });
+  const request = medicineRequest.request;
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,11 +78,7 @@ function CheckoutScreen() {
 
   useEffect(() => {
     if (!medicine) return;
-    try {
-      setRequest(window.sessionStorage.getItem("poba.medicine.v1") ?? "");
-    } catch {
-      setRequest("");
-    }
+    setMedicineRequest(readMedicineRequest());
   }, [medicine]);
 
   useEffect(() => {
@@ -146,8 +165,8 @@ function CheckoutScreen() {
         total: payable,
         extraRequest: medicine ? request.trim() : null,
         notes: notes.trim() || null,
-        prescriptionId: null,
-        prescriptionUrl: null,
+        prescriptionId: medicine ? medicineRequest.prescriptionId : null,
+        prescriptionUrl: medicine ? medicineRequest.prescriptionUrl : null,
         payment,
       },
       user?.uid ?? null,
@@ -183,6 +202,10 @@ function CheckoutScreen() {
       `Phone: ${phone.trim()}`,
       `Address: ${address.trim()}`,
       notes.trim() ? `Notes: ${notes.trim()}` : ``,
+      // Only ever claims a photo is attached when there is a link to it. A
+      // failed upload asks for it in the chat rather than leaving the pharmacy
+      // waiting on something that never arrives.
+      medicine ? prescriptionLine(medicineRequest) : ``,
     ]
       .filter((line) => line !== undefined)
       .join("\n");
@@ -219,7 +242,19 @@ function CheckoutScreen() {
       {/* Summary */}
       <div className="rounded-2xl border border-border bg-card p-4 text-sm">
         {medicine ? (
-          <p className="whitespace-pre-wrap text-muted-foreground">{request}</p>
+          <>
+            <p className="whitespace-pre-wrap text-muted-foreground">{request}</p>
+            {/* Shown so nobody re-attaches a photo that is already on the
+                order, or assumes one is there when the upload did not land. */}
+            {(medicineRequest.prescriptionUrl || medicineRequest.photoName) && (
+              <p className="mt-3 flex items-center gap-2 border-t border-border pt-3 text-xs font-medium text-muted-foreground">
+                <Paperclip className="size-3.5 shrink-0 text-accent" />
+                {medicineRequest.prescriptionUrl
+                  ? "Prescription attached"
+                  : `Prescription couldn't upload — send ${medicineRequest.photoName} in the chat`}
+              </p>
+            )}
+          </>
         ) : (
           <>
             {cart.lines.map((line) => (

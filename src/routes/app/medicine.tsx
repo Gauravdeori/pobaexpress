@@ -1,37 +1,77 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Paperclip, X } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { deliveryFee, rupees } from "@/lib/menu";
+import { saveMedicineRequest } from "@/lib/medicine-request";
+import { isUploadConfigured, uploadPrescription } from "@/lib/uploads";
 
 export const Route = createFileRoute("/app/medicine")({
   component: MedicineScreen,
 });
 
-const STORAGE_KEY = "poba.medicine.v1";
+/** Anything bigger than this is likely a mistake and won't share cleanly. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 /**
  * Medicine has no price list — what a strip costs depends on the brand the
  * pharmacy has in stock — so this collects the request and the total is
  * confirmed on WhatsApp before dispatch. The request is parked in storage and
  * picked up by checkout.
+ *
+ * The prescription is uploaded here rather than carried forward, because a File
+ * survives neither `sessionStorage` nor the navigation to checkout.
  */
 function MedicineScreen() {
   const navigate = useNavigate();
   const [request, setRequest] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fee = deliveryFee("medicine");
 
-  const submit = () => {
-    if (!request.trim()) return;
-    try {
-      window.sessionStorage.setItem(STORAGE_KEY, request.trim());
-    } catch {
-      // Storage can be unavailable; checkout falls back to an empty request
-      // and the customer retypes it there.
+  // Object URLs leak until revoked, so tie each one to the file it previews.
+  useEffect(() => {
+    if (!photo || !photo.type.startsWith("image/")) {
+      setPreview(null);
+      return;
     }
+    const url = URL.createObjectURL(photo);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photo]);
+
+  const attach = (file: File | null) => {
+    if (file && file.size > MAX_UPLOAD_BYTES) {
+      setError("That file is over 10 MB. Please pick a smaller photo.");
+      return;
+    }
+    setPhoto(file);
+    setError(null);
+  };
+
+  const submit = async () => {
+    if (!request.trim()) return;
+    setSending(true);
+
+    // Never fatal: `uploadPrescription` answers null rather than throwing, and
+    // an order that cannot carry its photo is still an order — the message asks
+    // for it in the chat instead.
+    const upload = photo ? await uploadPrescription(photo) : null;
+
+    saveMedicineRequest({
+      request: request.trim(),
+      prescriptionId: upload?.publicId ?? null,
+      prescriptionUrl: upload?.url ?? null,
+      photoName: photo && !upload ? photo.name : null,
+    });
+
+    setSending(false);
     void navigate({ to: "/app/checkout", search: { kind: "medicine" } });
   };
 
@@ -39,7 +79,7 @@ function MedicineScreen() {
     <div className="mx-auto max-w-3xl px-4 py-5">
       <ScreenHeading
         title="Medicine"
-        subtitle="List what you need, or send a photo of the prescription on WhatsApp after ordering."
+        subtitle="List what you need and attach the prescription — we confirm the total on WhatsApp before the rider collects."
       />
 
       <div className="rounded-2xl border border-border bg-card p-4">
@@ -58,13 +98,75 @@ function MedicineScreen() {
         </p>
       </div>
 
+      <div className="mt-3 rounded-2xl border border-dashed border-accent/50 bg-accent/5 p-4">
+        <Label htmlFor="medicine-prescription" className="text-primary">
+          Prescription photo
+        </Label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {isUploadConfigured
+            ? "Pharmacies need this before they dispatch. It goes up with your order and a link lands in the WhatsApp message — no need to attach it yourself."
+            : "Pharmacies need this before they dispatch. Send it in the WhatsApp chat once your order opens."}
+        </p>
+
+        <label
+          htmlFor="medicine-prescription"
+          className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          <Paperclip className="size-4" />
+          {photo ? "Change photo" : "Choose photo"}
+        </label>
+        <input
+          id="medicine-prescription"
+          type="file"
+          accept="image/*,.pdf"
+          className="sr-only"
+          onChange={(event) => attach(event.target.files?.[0] ?? null)}
+        />
+
+        {photo && (
+          <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-background p-3">
+            {preview ? (
+              <img
+                src={preview}
+                alt="Selected prescription"
+                className="size-14 shrink-0 rounded-xl object-cover"
+              />
+            ) : (
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+                <Paperclip className="size-5" />
+              </span>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-primary">{photo.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {Math.max(1, Math.round(photo.size / 1024))} KB
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label="Remove prescription"
+              onClick={() => attach(null)}
+              className="flex size-8 shrink-0 items-center justify-center rounded-full text-accent transition-colors hover:bg-secondary"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <p role="alert" className="mt-3 text-sm font-medium text-destructive">
+          {error}
+        </p>
+      )}
+
       <Button
         variant="accent"
         className="mt-4 h-12 w-full rounded-2xl"
-        disabled={!request.trim()}
-        onClick={submit}
+        disabled={!request.trim() || sending}
+        onClick={() => void submit()}
       >
-        Continue
+        {sending ? "Attaching photo…" : "Continue"}
       </Button>
     </div>
   );
