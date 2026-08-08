@@ -27,7 +27,14 @@ import {
   type MedicineRequest,
 } from "@/lib/medicine-request";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
-import { paymentReference, UPI_MOBILE, UPI_PAYEE, UPI_VPA, upiQrDataUrl } from "@/lib/payments";
+import {
+  paymentReference,
+  UPI_MOBILE,
+  UPI_PAYEE,
+  UPI_VPA,
+  upiIntentUri,
+  upiQrDataUrl,
+} from "@/lib/payments";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/checkout")({
@@ -457,11 +464,23 @@ function CheckoutScreen() {
                 <span className="font-mono font-bold">{reference}</span>
               </p>
 
-              {/* No "open GPay" buttons here on purpose. A link that hands a
-                  UPI app a prefilled payment to a personal address is refused
-                  under NPCI's risk policy — Paytm says so outright and offers
-                  the number or the QR instead. Those two are what this shows,
-                  because they are what works. */}
+              {/* One button, the standard `upi://` intent, stripped to payee
+                  and amount. Apps still refuse these to a personal address
+                  often enough that it is offered as the shortcut and not the
+                  instruction — the QR and the number below are the paths that
+                  actually work, so they stay in view rather than behind it. */}
+              <a
+                href={upiIntentUri({ amount: payable, reference })}
+                className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent px-3 text-sm font-semibold text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <BadgeIndianRupee className="size-4" />
+                Open UPI app
+              </a>
+              <p className="mt-2 text-xs text-muted-foreground">
+                If your UPI app warns that the payment may fail, come back and use the QR or the
+                number below — both work.
+              </p>
+
               {qr && (
                 <div className="mt-4 flex flex-col items-center">
                   <img

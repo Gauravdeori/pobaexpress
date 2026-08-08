@@ -59,22 +59,44 @@ function encodeUpiValue(value: string): string {
   return encodeURIComponent(value).replace(/%40/g, "@");
 }
 
-/** Query string shared by every UPI scheme. */
-function upiParams({ amount, reference }: PaymentRequest): string {
+function upiParams({ amount, reference }: PaymentRequest, withReference: boolean): string {
   const fields: Array<[string, string]> = [
     ["pa", UPI_VPA],
     ["pn", UPI_PAYEE],
     ["am", amount.toFixed(2)],
     ["cu", "INR"],
-    ["tn", `Poba Express ${reference}`],
-    ["tr", reference],
   ];
+  // `tr` is a merchant transaction id. On a payment to a personal address it is
+  // a field that does not belong there, and an app checking for merchant
+  // parameters it cannot find is one more reason to refuse.
+  if (withReference) {
+    fields.push(["tn", `Poba Express ${reference}`], ["tr", reference]);
+  }
   return fields.map(([key, value]) => `${key}=${encodeUpiValue(value)}`).join("&");
 }
 
-/** The canonical `upi://` URI, which is also what the QR encodes. */
+/** What the QR encodes. Scanning works, so this keeps the reference. */
 export function upiUri(request: PaymentRequest): string {
-  return `upi://pay?${upiParams(request)}`;
+  return `upi://pay?${upiParams(request, true)}`;
+}
+
+/**
+ * The link behind "Open UPI app" — payee and amount, nothing else.
+ *
+ * Pared back deliberately. Apps refuse a prefilled payment to a personal
+ * address under NPCI's risk policy, and this drops everything merchant-shaped
+ * so the intent is a plain person-to-person request and nothing more. It may
+ * still be refused; that is the policy, not the link.
+ *
+ * `upi://pay` rather than `tez://` or `phonepe://`: the standard scheme lets
+ * the phone offer whichever UPI apps are installed, instead of betting on one
+ * vendor's URL still being the one they support.
+ *
+ * The cost is that the payment carries no reference, so it can only be matched
+ * to an order by the amount and the code the customer quotes afterwards.
+ */
+export function upiIntentUri(request: PaymentRequest): string {
+  return `upi://pay?${upiParams(request, false)}`;
 }
 
 /**
