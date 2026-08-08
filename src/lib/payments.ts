@@ -45,16 +45,31 @@ type PaymentRequest = {
   reference: string;
 };
 
+/**
+ * Percent-encoding a UPI app will actually accept.
+ *
+ * `URLSearchParams` is the wrong tool here, twice over. It writes spaces as
+ * `+`, which is form encoding rather than URI encoding, and several UPI apps
+ * take the `+` literally — the payee reads "Mr+Bijit+Pegu". Worse, it escapes
+ * the `@` in the payment address to `%40`, and apps that look the address up
+ * without decoding it search for `7099728406%40slc`, find nothing, and refuse
+ * the payment. `@` is a legal sub-delimiter in a query string, so it stays.
+ */
+function encodeUpiValue(value: string): string {
+  return encodeURIComponent(value).replace(/%40/g, "@");
+}
+
 /** Query string shared by every UPI scheme. */
 function upiParams({ amount, reference }: PaymentRequest): string {
-  return new URLSearchParams({
-    pa: UPI_VPA,
-    pn: UPI_PAYEE,
-    am: amount.toFixed(2),
-    cu: "INR",
-    tn: `Poba Express ${reference}`,
-    tr: reference,
-  }).toString();
+  const fields: Array<[string, string]> = [
+    ["pa", UPI_VPA],
+    ["pn", UPI_PAYEE],
+    ["am", amount.toFixed(2)],
+    ["cu", "INR"],
+    ["tn", `Poba Express ${reference}`],
+    ["tr", reference],
+  ];
+  return fields.map(([key, value]) => `${key}=${encodeUpiValue(value)}`).join("&");
 }
 
 /** The canonical `upi://` URI, which is also what the QR encodes. */
