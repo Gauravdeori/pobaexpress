@@ -26,7 +26,7 @@ export const LAUNCH_DATE_LABEL = "14 August 2026";
  * thing to change, because everything that asks whether we are open goes
  * through `timeUntilLaunch` below.
  */
-const OPEN_FOR_TESTING = true;
+const OPEN_FOR_TESTING = false;
 
 export type Remaining = {
   days: number;
