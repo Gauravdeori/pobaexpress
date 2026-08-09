@@ -46,8 +46,13 @@ function RestaurantScreen() {
       </div>
 
       <div className="mx-auto max-w-3xl px-4">
-        {/* Lifted over the photo so the two read as one object. */}
-        <div className="-mt-8 rounded-2xl border border-border bg-card p-4 shadow-soft">
+        {/* Lifted over the photo so the two read as one object.
+
+            `relative` is load-bearing, not decoration: the photo above is
+            positioned, and a positioned element paints over a static sibling
+            however the markup is ordered. Without it the image covered the top
+            of this card and ate the shop's name. */}
+        <div className="relative z-10 -mt-8 rounded-2xl border border-border bg-card p-4 shadow-soft">
           <div className="flex items-center gap-2">
             <h1 className="min-w-0 truncate text-xl font-bold text-primary">{restaurant.name}</h1>
             <Rating restaurant={restaurant} />
