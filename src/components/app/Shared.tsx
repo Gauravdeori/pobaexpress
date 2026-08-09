@@ -65,7 +65,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
     <Link
       to="/app/r/$slug"
       params={{ slug: restaurant.slug }}
-      className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-accent"
+      className="flex items-center gap-3 rounded-2xl border border-border/70 bg-card p-3 transition-all duration-200 hover:border-accent active:scale-[0.99]"
     >
       <RestaurantThumb image={restaurant.image} className="size-20" />
       <div className="min-w-0 flex-1">
@@ -97,7 +97,7 @@ export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
     <Link
       to="/app/r/$slug"
       params={{ slug: restaurant.slug }}
-      className="group flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-accent sm:w-52"
+      className="group flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-all duration-200 hover:border-accent active:scale-[0.98] sm:w-52"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-secondary">
         {restaurant.image ? (
@@ -132,8 +132,8 @@ export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
   );
 }
 
-/** Menu row with a stepper. `quantity` of 0 collapses it to a single Add. */
-export function ItemRow({
+/** Add, or a stepper once it is in the cart. Compact enough to sit per size. */
+function AddControl({
   item,
   quantity,
   onAdd,
@@ -144,62 +144,171 @@ export function ItemRow({
   onAdd: () => void;
   onSetQuantity: (quantity: number) => void;
 }) {
+  if (quantity > 0) {
+    return (
+      <div className="flex shrink-0 items-center gap-1 rounded-full border border-accent bg-accent/5 p-0.5">
+        <button
+          type="button"
+          onClick={() => onSetQuantity(quantity - 1)}
+          aria-label={`Remove one ${itemLabel(item)}`}
+          className="flex size-8 items-center justify-center rounded-full text-accent transition-transform active:scale-90"
+        >
+          <Minus className="size-4" />
+        </button>
+        <span aria-live="polite" className="w-5 text-center text-sm font-bold text-accent">
+          {quantity}
+        </span>
+        <button
+          type="button"
+          onClick={() => onSetQuantity(quantity + 1)}
+          aria-label={`Add one more ${itemLabel(item)}`}
+          className="flex size-8 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground transition-transform active:scale-90"
+        >
+          <Plus className="size-4" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onAdd}
+      aria-label={`Add ${itemLabel(item)}`}
+      className="shrink-0 rounded-full border border-accent bg-card px-5 py-1.5 text-sm font-bold text-accent shadow-sm transition-all active:scale-95 hover:bg-accent hover:text-accent-foreground"
+    >
+      Add
+    </button>
+  );
+}
+
+/**
+ * One dish, with every size it comes in.
+ *
+ * The menu stores each size as its own item, because each is its own price and
+ * its own cart line. Rendering them that way put Chicken Biryani on screen
+ * three times over, one photo and one name repeated down the page. Grouping
+ * them back together is the difference between a price list and a menu.
+ */
+export function DishCard({
+  sizes,
+  quantityOf,
+  onAdd,
+  onSetQuantity,
+}: {
+  sizes: MenuItem[];
+  quantityOf: (id: string) => number;
+  onAdd: (item: MenuItem) => void;
+  onSetQuantity: (id: string, quantity: number) => void;
+}) {
+  const [first] = sizes;
+  const inCart = sizes.some((size) => quantityOf(size.id) > 0);
+  const single = sizes.length === 1;
+
   return (
     <li
       className={cn(
-        "flex items-center gap-3 rounded-2xl border p-3 transition-colors",
-        quantity ? "border-accent bg-accent/5" : "border-border bg-card",
+        "overflow-hidden rounded-2xl border bg-card transition-colors",
+        inCart ? "border-accent/60" : "border-border/70",
       )}
     >
-      {item.image && (
-        <img
-          src={item.image}
-          alt=""
-          aria-hidden
-          className="size-14 shrink-0 rounded-xl object-cover"
-        />
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-primary">{item.name}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {item.variant ? `${item.variant} · ` : ""}
-          {rupees(item.price)}
-        </p>
+      <div className="flex items-center gap-3 p-3">
+        {first.image && (
+          <img
+            src={first.image}
+            alt=""
+            aria-hidden
+            className="size-16 shrink-0 rounded-xl object-cover"
+          />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] font-semibold leading-tight text-primary">
+            {first.name}
+          </p>
+          {single ? (
+            <p className="mt-1 text-sm font-bold text-primary">{rupees(first.price)}</p>
+          ) : (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {sizes.length} sizes · from {rupees(Math.min(...sizes.map((s) => s.price)))}
+            </p>
+          )}
+        </div>
+
+        {single && (
+          <AddControl
+            item={first}
+            quantity={quantityOf(first.id)}
+            onAdd={() => onAdd(first)}
+            onSetQuantity={(next) => onSetQuantity(first.id, next)}
+          />
+        )}
       </div>
 
-      {quantity > 0 ? (
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onSetQuantity(quantity - 1)}
-            aria-label={`Remove one ${itemLabel(item)}`}
-            className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-primary"
-          >
-            <Minus className="size-4" />
-          </button>
-          <span aria-live="polite" className="w-6 text-center text-sm font-semibold text-primary">
-            {quantity}
-          </span>
-          <button
-            type="button"
-            onClick={() => onSetQuantity(quantity + 1)}
-            aria-label={`Add one more ${itemLabel(item)}`}
-            className="flex size-9 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground"
-          >
-            <Plus className="size-4" />
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={onAdd}
-          aria-label={`Add ${itemLabel(item)}`}
-          className="shrink-0 rounded-full border border-accent px-4 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
-        >
-          Add
-        </button>
+      {/* Each size keeps its own row, because each is a separate line in the
+          cart — collapsing them into one control would make "two biryanis"
+          ambiguous about which two. */}
+      {!single && (
+        <ul className="border-t border-border/70">
+          {sizes.map((size) => (
+            <li
+              key={size.id}
+              className="flex items-center gap-3 border-b border-border/50 px-3 py-2.5 last:border-b-0"
+            >
+              <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                {size.variant}
+              </span>
+              <span className="shrink-0 text-sm font-bold text-primary">{rupees(size.price)}</span>
+              <AddControl
+                item={size}
+                quantity={quantityOf(size.id)}
+                onAdd={() => onAdd(size)}
+                onSetQuantity={(next) => onSetQuantity(size.id, next)}
+              />
+            </li>
+          ))}
+        </ul>
       )}
     </li>
+  );
+}
+
+/**
+ * A whole menu, dishes grouped by name.
+ *
+ * Grouped on runs rather than globally, so the kitchen's own ordering survives
+ * — a menu is arranged the way the shop thinks about it, and sorting by name
+ * would scatter the biryanis through the maggi.
+ */
+export function MenuList({
+  items,
+  quantityOf,
+  onAdd,
+  onSetQuantity,
+}: {
+  items: MenuItem[];
+  quantityOf: (id: string) => number;
+  onAdd: (item: MenuItem) => void;
+  onSetQuantity: (id: string, quantity: number) => void;
+}) {
+  const groups: MenuItem[][] = [];
+  for (const item of items) {
+    const last = groups[groups.length - 1];
+    if (last && last[0].name === item.name) last.push(item);
+    else groups.push([item]);
+  }
+
+  return (
+    <ul className="grid gap-2.5">
+      {groups.map((sizes) => (
+        <DishCard
+          key={sizes[0].id}
+          sizes={sizes}
+          quantityOf={quantityOf}
+          onAdd={onAdd}
+          onSetQuantity={onSetQuantity}
+        />
+      ))}
+    </ul>
   );
 }
 

@@ -132,6 +132,35 @@ function OrderCard({ order }: { order: OrderRecord }) {
   );
 }
 
+/**
+ * The shape of the list before the list arrives.
+ *
+ * A word like "Loading…" tells someone to wait without telling them what for.
+ * Cards in the right places make the wait feel like the screen arriving rather
+ * than the screen being broken, and stop the layout jumping when it does.
+ */
+function OrderSkeletons() {
+  return (
+    <ul aria-hidden className="grid gap-3">
+      {[0, 1].map((row) => (
+        <li key={row} className="rounded-2xl border border-border/70 bg-card p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="w-full min-w-0 space-y-2">
+              <div className="h-4 w-24 animate-pulse rounded bg-secondary" />
+              <div className="h-3 w-32 animate-pulse rounded bg-secondary" />
+            </div>
+            <div className="h-6 w-24 shrink-0 animate-pulse rounded-full bg-secondary" />
+          </div>
+          <div className="mt-4 space-y-2 border-t border-border/70 pt-3">
+            <div className="h-3 w-full animate-pulse rounded bg-secondary" />
+            <div className="h-3 w-2/3 animate-pulse rounded bg-secondary" />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function OrdersScreen() {
   const { user, loading: authLoading } = useAccount();
   const [orders, setOrders] = useState<OrderRecord[] | null>(null);
@@ -160,7 +189,7 @@ function OrdersScreen() {
       <ScreenHeading title="Your orders" subtitle="Everything you've ordered, newest first." />
 
       {authLoading ? (
-        <p className="text-sm text-muted-foreground">Checking your account…</p>
+        <OrderSkeletons />
       ) : !user ? (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">
@@ -180,7 +209,7 @@ function OrdersScreen() {
           Couldn&apos;t load your orders just now. Check your connection and pull the page again.
         </p>
       ) : orders === null ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <OrderSkeletons />
       ) : orders.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-6 text-center">
           <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-secondary text-muted-foreground">

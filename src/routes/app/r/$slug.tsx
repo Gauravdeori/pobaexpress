@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Clock, UtensilsCrossed } from "lucide-react";
 
-import { ItemRow, Rating } from "@/components/app/Shared";
+import { MenuList, Rating } from "@/components/app/Shared";
 import { useCart } from "@/lib/cart";
 import { deliveryFee, rupees } from "@/lib/menu";
 import { getRestaurant, priceFrom } from "@/lib/restaurants";
@@ -81,20 +81,18 @@ function RestaurantScreen() {
           </div>
         </div>
 
-        <h2 className="mb-3 mt-6 text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-          Menu · {restaurant.items.length} items
-        </h2>
-        <ul className="grid gap-2.5">
-          {restaurant.items.map((item) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              quantity={mine ? quantityOf(item.id) : 0}
-              onAdd={() => add(item, restaurant.category, restaurant.name)}
-              onSetQuantity={(next) => setQuantity(item.id, next)}
-            />
-          ))}
-        </ul>
+        <div className="mb-3 mt-7 flex items-baseline justify-between gap-3">
+          <h2 className="text-base font-bold text-primary">Menu</h2>
+          <span className="shrink-0 text-xs font-medium text-muted-foreground">
+            {restaurant.items.length} items
+          </span>
+        </div>
+        <MenuList
+          items={restaurant.items}
+          quantityOf={(id) => (mine ? quantityOf(id) : 0)}
+          onAdd={(item) => add(item, restaurant.category, restaurant.name)}
+          onSetQuantity={setQuantity}
+        />
       </div>
 
       <CartBar />

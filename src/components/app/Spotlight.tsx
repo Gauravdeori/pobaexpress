@@ -109,7 +109,7 @@ function Banner({ banner }: { banner: Spotlight }) {
   );
 
   const className =
-    "relative flex w-[85%] shrink-0 snap-start gap-3 overflow-hidden rounded-3xl bg-gradient-green p-4 shadow-soft sm:w-[60%]";
+    "relative flex w-[85%] shrink-0 snap-start gap-3 overflow-hidden rounded-3xl bg-gradient-green p-4 shadow-soft transition-transform duration-200 active:scale-[0.98] sm:w-[60%]";
 
   return banner.kind === "cake" ? (
     <Link to="/app/cake" className={className}>

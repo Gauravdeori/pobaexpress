@@ -70,7 +70,7 @@ function AppHome() {
           <Link
             key={c.to}
             to={c.to}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card px-2 py-4 text-center transition-colors hover:border-accent"
+            className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-card px-2 py-4 text-center transition-all duration-200 hover:border-accent active:scale-[0.97]"
           >
             <span className="flex size-11 items-center justify-center rounded-xl bg-accent/10 text-accent">
               <c.icon className="size-5" />
