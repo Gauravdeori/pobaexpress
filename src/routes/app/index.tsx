@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Cake, ChevronRight, MapPin, Pill, Search, UtensilsCrossed } from "lucide-react";
 
 import { RestaurantTile } from "@/components/app/Shared";
+import { Spotlights } from "@/components/app/Spotlight";
 import { useAccount } from "@/lib/account";
 import { restaurantsIn } from "@/lib/restaurants";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
@@ -60,6 +61,8 @@ function AppHome() {
           prices now — ordering switches on that morning.
         </p>
       )}
+
+      <Spotlights />
 
       <h1 className="mb-3 mt-7 text-base font-bold text-primary">What do you need?</h1>
       <div className="grid grid-cols-3 gap-2.5">
