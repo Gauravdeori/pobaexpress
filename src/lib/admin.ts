@@ -26,10 +26,10 @@ import type { OrderDraft, OrderRecord } from "./orders";
  * the Admin SDK, which needs a server or a service-account key. There is
  * neither here, so the rules check for this document instead.
  *
- * The collection is unreadable and unwritable from the browser (see
- * firestore.rules): security rules evaluate `exists()` with their own
- * privileges, so nobody can list the admins or add themselves to them. Create
- * the document by hand in the Firebase console.
+ * A signed-in user can read their own entry and nothing else: `get` by id is
+ * allowed, `list` and every write are refused (see firestore.rules). So this
+ * check works, the collection still cannot be enumerated, and nobody can add
+ * themselves. Create the document by hand in the Firebase console.
  */
 export function useIsAdmin(user: User | null) {
   const [isAdmin, setIsAdmin] = useState(false);

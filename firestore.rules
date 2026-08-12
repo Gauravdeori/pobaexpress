@@ -15,10 +15,17 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    // Sealed on purpose. Nobody can list who the admins are and — more to the
-    // point — nobody can add themselves. Create these by hand in the console.
+    // A signed-in user may read their own entry and nothing else. The panel
+    // has no other way to know whether to show itself: isAdmin() above runs
+    // inside the rules, where the client cannot see the answer.
+    //
+    // `get` is a single document by id, so this only ever tells you about
+    // yourself. `list` stays closed, so the collection cannot be enumerated,
+    // and writes stay closed, so nobody can add themselves — create these by
+    // hand in the console.
     match /admins/{uid} {
-      allow read, write: if false;
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
     }
 
     match /profiles/{uid} {

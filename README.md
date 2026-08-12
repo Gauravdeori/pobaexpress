@@ -145,9 +145,11 @@ the rules check for this document instead.
    fields do not matter; only that the document exists.
 4. Reload `/admin`.
 
-The `admins` collection is unreadable and unwritable from the browser. Security
-rules evaluate `exists()` with their own privileges, so the check still works
-while nobody can list the admins or add themselves to them.
+A signed-in user can read their own `admins` entry and nothing else — the panel
+needs that to know whether to show itself, since `isAdmin()` runs inside the
+rules where the client cannot see the result. `get` by id only ever reveals
+your own status; listing the collection and every write stay closed, so it
+cannot be enumerated and nobody can add themselves.
 
 **What an admin can and cannot do**
 
