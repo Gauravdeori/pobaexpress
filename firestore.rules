@@ -1,11 +1,25 @@
 rules_version = '2';
 
-// Accounts are optional: guests order without signing in, so orders accept a
-// null userId. Guests may create an order but may never read one back — with
-// a single permissive read rule, the config in the JS bundle would expose
-// every customer's name, phone and address.
+// Guests order without signing in, so orders accept a null userId. A guest may
+// create an order but never read one back — with a single permissive read rule,
+// the config in the JS bundle would expose every customer's name, phone and
+// address.
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // An admin is whoever has a document at admins/{uid}. Rules evaluate
+    // exists() with their own privileges, so this works even though the
+    // collection below is sealed to every client.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Sealed on purpose. Nobody can list who the admins are and — more to the
+    // point — nobody can add themselves. Create these by hand in the console.
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
 
     match /profiles/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
@@ -18,12 +32,27 @@ service cloud.firestore {
                     || (request.auth != null
                         && request.resource.data.userId == request.auth.uid);
 
-      allow read: if request.auth != null
-                  && resource.data.userId == request.auth.uid;
+      allow read: if isAdmin()
+                  || (request.auth != null && resource.data.userId == request.auth.uid);
 
-      // Orders are a record. Change status from the console or the admin SDK,
-      // never from the browser.
-      allow update, delete: if false;
+      // An admin moves an order along and does nothing else to it. Prices,
+      // addresses and line items are the customer's record: not editable from
+      // a browser by anyone, so a stolen admin session cannot rewrite what
+      // someone ordered or what they owe.
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'updatedAt'])
+                    && request.resource.data.status in
+                         ['new', 'confirmed', 'delivered', 'cancelled'];
+
+      // Orders are a record. Cancel one; don't erase it.
+      allow delete: if false;
+    }
+
+    match /offers/{offerId} {
+      // Offers are meant to be seen, including by visitors who never sign in.
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // Anything not matched above is denied.

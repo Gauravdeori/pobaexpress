@@ -38,7 +38,10 @@ function isIosSafari() {
  * click. iOS Safari has no such API — installing there is a manual Share →
  * Add to Home Screen, so it gets instructions instead.
  */
-export function InstallButton({ className, children }: { className?: string, children?: React.ReactNode } = {}) {
+export function InstallButton({
+  className,
+  children,
+}: { className?: string; children?: React.ReactNode } = {}) {
   const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [ios, setIos] = useState(false);
@@ -90,7 +93,10 @@ export function InstallButton({ className, children }: { className?: string, chi
         type="button"
         onClick={handleClick}
         aria-label="Install the Poba Express app"
-        className={className || "flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent"}
+        className={
+          className ||
+          "flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-accent"
+        }
       >
         {children || (
           <>

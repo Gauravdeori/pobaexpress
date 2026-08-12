@@ -114,8 +114,8 @@ web config above.
 | Read orders back          | no                            | own orders only                  |
 | Prescription photo        | uploaded, link in the message | same                             |
 
-Orders are readable only by the customer who placed them, and are immutable
-from the browser — change status from the console or the Admin SDK.
+Orders are readable by the customer who placed them and by an admin (see
+below). Only the status is writable from a browser, and only by an admin.
 
 ⚠️ A Cloudinary delivery URL is **public to anyone holding it** and does not
 expire. The id is random so the URL is unguessable, but it is not access
@@ -126,6 +126,46 @@ Every call is best-effort. The upload gets a 3.5s head start so a fast one can
 put a link in the message, then the order is sent regardless and the upload
 finishes in the background — waiting on it would freeze the button whenever the
 network is poor.
+
+## Admin panel
+
+`/admin` lists every order and manages the offers shown on the app home. It is
+not linked from anywhere on the site and carries `noindex`.
+
+**Granting access**
+
+An admin is whoever has a document at `admins/{uid}` in Firestore. Firebase's
+own answer is a custom claim on the auth token, but setting one needs the Admin
+SDK, which needs a server or a service-account key — there is neither here, so
+the rules check for this document instead.
+
+1. Sign in to the site with the account that should be an admin.
+2. Open `/admin`. It will refuse you and print your uid.
+3. In the Firebase console, create a document at `admins/<that uid>`. The
+   fields do not matter; only that the document exists.
+4. Reload `/admin`.
+
+The `admins` collection is unreadable and unwritable from the browser. Security
+rules evaluate `exists()` with their own privileges, so the check still works
+while nobody can list the admins or add themselves to them.
+
+**What an admin can and cannot do**
+
+Orders are read in full and moved between `new`, `confirmed`, `delivered` and
+`cancelled`. Nothing else on an order is editable from a browser by anyone —
+the rules restrict an admin write to the `status` field — so a stolen admin
+session cannot rewrite what a customer ordered or what they owe. Orders cannot
+be deleted; cancel one instead.
+
+Offers are created, hidden and deleted here, and appear at the top of the app
+home. Anything promised there has to be honoured: a customer who taps through
+to find no such deal has been misled by their own app.
+
+Rules must be deployed before any of this works:
+
+```sh
+npx firebase deploy --only firestore:rules
+```
 
 ## Installable app (PWA)
 

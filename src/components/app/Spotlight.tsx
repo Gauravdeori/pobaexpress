@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, UtensilsCrossed } from "lucide-react";
+import { ArrowRight, Tag, UtensilsCrossed } from "lucide-react";
 
+import { listActiveOffers, type Offer } from "@/lib/admin";
 import { useLaunched } from "@/lib/launch";
 import { rupees } from "@/lib/menu";
 import { CAKE_ITEMS, priceFrom, restaurantsIn } from "@/lib/restaurants";
@@ -122,15 +124,52 @@ function Banner({ banner }: { banner: Spotlight }) {
   );
 }
 
+/** A real offer, written in the admin panel, rendered ahead of the dish rail. */
+function OfferBanner({ offer }: { offer: Offer }) {
+  return (
+    <div className="relative flex w-[85%] shrink-0 snap-start gap-3 overflow-hidden rounded-3xl bg-gradient-green p-4 shadow-soft sm:w-[60%]">
+      <div className="relative z-10 min-w-0 flex-1">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-light/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-accent-light">
+          <Tag className="size-3" />
+          Offer
+        </span>
+        <h3 className="mt-2 text-lg font-extrabold leading-tight text-primary-foreground">
+          {offer.headline}
+        </h3>
+        <p className="mt-1 text-xs text-primary-foreground/75">{offer.detail}</p>
+        {offer.code && (
+          <p className="mt-2 text-sm font-bold text-accent-light">Code {offer.code}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function Spotlights() {
   const banners = spotlights();
-  if (banners.length === 0) return null;
+  // Offers are written by hand in the admin panel and are usually none, so
+  // this reads once instead of holding a listener open on every visitor.
+  const [offers, setOffers] = useState<Offer[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    listActiveOffers().then((live) => {
+      if (!cancelled) setOffers(live);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (banners.length === 0 && offers.length === 0) return null;
 
   return (
     // Swipeable rather than auto-rotating: this sits at the top of a screen
     // people are already scrolling, and a banner that changes under a thumb
     // mid-reach is the one that gets tapped by mistake.
     <div className="-mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {offers.map((offer) => (
+        <OfferBanner key={offer.id} offer={offer} />
+      ))}
       {banners.map((banner) => (
         <Banner key={banner.key} banner={banner} />
       ))}
