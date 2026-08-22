@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
@@ -60,7 +60,7 @@ export function Navbar() {
           than a fixed share of the width: at md the six links need every pixel
           they can get, and a hard w-1/4 on each side starves them. */}
       <nav className="mx-auto flex h-24 max-w-[120rem] items-center justify-between px-6 lg:px-12 2xl:px-20">
-        <div className="flex flex-1 justify-start">
+        <div className="flex flex-1 items-center justify-start gap-3">
           <a href="#home" className="group flex items-center gap-2">
             <motion.img
               ref={logoRef}
@@ -72,6 +72,13 @@ export function Navbar() {
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className="h-10 w-auto lg:h-12"
             />
+          </a>
+          <a
+            href="#home"
+            className="hidden sm:flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-800 transition-colors hover:bg-emerald-500/20"
+          >
+            <MapPin className="size-3.5 fill-emerald-600 text-emerald-700" />
+            <span>Jonai Main Town</span>
           </a>
         </div>
 

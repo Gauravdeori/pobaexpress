@@ -15,10 +15,16 @@ import {
   Headphones,
   Shield,
   MessageCircle,
+  MapPin,
+  Search,
+  Sparkles,
+  Percent,
+  ArrowRight,
 } from "lucide-react";
 
 import { useAccount } from "@/lib/account";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import { whatsappLink } from "@/lib/contact";
 
 export const Route = createFileRoute("/app/")({
   component: AppHome,
@@ -79,7 +85,60 @@ function AppHome() {
   const { profile } = useAccount();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-5 font-sans">
+    <div className="mx-auto max-w-3xl px-4 py-5 font-sans space-y-6">
+      {/* Zomato / Swiggy Style App Location & Search Bar */}
+      <div className="rounded-2xl bg-gradient-to-r from-[#0a2717] to-[#124227] p-4 text-white shadow-xl">
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <MapPin className="size-4" />
+            </span>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                Deliver To
+              </div>
+              <div className="text-xs font-bold text-white">Jonai Main Town, Assam</div>
+            </div>
+          </div>
+
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2.5 py-1 text-[10px] font-extrabold text-amber-300 border border-amber-500/30">
+            <Percent className="size-3" />
+            FLAT ₹5 FEE
+          </span>
+        </div>
+
+        {/* Search Bar Input */}
+        <Link
+          to="/app/food"
+          className="flex items-center gap-2.5 rounded-xl bg-white/10 px-3.5 py-2.5 text-xs text-white/70 backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all"
+        >
+          <Search className="size-4 text-emerald-400 shrink-0" />
+          <span className="truncate">Search for biryani, momos, cake, medicines...</span>
+        </Link>
+
+        {/* Quick Food Offer Banner */}
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-emerald-950/60 p-3 border border-emerald-500/20">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-extrabold text-white">
+              <Sparkles className="size-3.5 text-amber-400" />
+              <span>50% OFF at Biryani Bite & Local Partners</span>
+            </div>
+            <p className="mt-0.5 text-[10px] text-white/70">
+              Fast 15–25 min doorstep delivery in Jonai town
+            </p>
+          </div>
+          <a
+            href={whatsappLink()}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-[11px] font-bold text-gray-950 shadow-md hover:bg-emerald-400 transition-colors"
+          >
+            <span>Order</span>
+            <ArrowRight className="size-3" />
+          </a>
+        </div>
+      </div>
+
       {/* What do you need Section */}
       <div className="mb-4 flex items-baseline justify-between gap-3">
         <h1 className="text-xl font-bold text-[#1a2f26]">What do you need?</h1>

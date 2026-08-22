@@ -15,6 +15,8 @@ import { partners, PartnerSlide } from "./HeroSlides";
 import { useLaunched } from "@/lib/launch";
 import { cn } from "@/lib/utils";
 
+import { ZomatoTopBanner } from "./ZomatoTopBanner";
+
 /** Three promises, each with a supporting line, as a row under the buttons. */
 const promises = [
   { icon: Zap, title: "Fast Delivery", detail: "On-time, every time" },
@@ -214,6 +216,10 @@ export function Hero() {
             falls away: down the page on phones, across from the rider on
             desktop. */}
         <div className="absolute inset-0 bg-gradient-to-b from-background from-30% via-background/70 via-62% to-transparent to-88% lg:bg-gradient-to-r lg:from-28% lg:via-background/55 lg:via-52% lg:to-78%" />
+      </div>
+
+      <div className="relative z-10">
+        <ZomatoTopBanner />
       </div>
 
       <Carousel
