@@ -67,6 +67,13 @@ const categories = [
   },
 ] as const;
 
+const promises = [
+  { icon: Bike, label: "Fast Delivery", detail: "At your doorstep" },
+  { icon: ShieldCheck, label: "Safe & Secure", detail: "Your safety is our priority" },
+  { icon: Award, label: "Trusted Partners", detail: "Quality you can rely on" },
+  { icon: Headphones, label: "24/7 Support", detail: "We're here to help" },
+] as const;
+
 function AppHome() {
   const launched = useLaunched();
   const { profile } = useAccount();
@@ -127,64 +134,52 @@ function AppHome() {
         })}
       </div>
 
-      {/* Hero Section */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#f8fcf9] to-[#ebf5ef] mb-6">
-        {/* Placeholder for the doctor image on the right */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden flex justify-end">
-          <img
-            src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=600&auto=format&fit=crop"
-            alt="Doctor taking blood sample"
-            className="object-cover object-right h-full w-full opacity-90 rounded-r-2xl"
-          />
-        </div>
-
-        {/* Overlapping badge on image */}
-        <div className="absolute top-8 right-16 bg-white rounded-full p-2 py-3 w-[80px] h-[80px] flex flex-col items-center justify-center shadow-md z-10 border-2 border-white">
-          <div className="relative">
-            <Home className="size-6 text-green-700 stroke-[1.5]" />
-            <Droplet className="size-3 text-red-500 absolute -bottom-1 -right-1 fill-red-500" />
-          </div>
-          <span className="text-[9px] font-bold text-center leading-tight mt-1 text-gray-800">
-            Blood Test
-            <br />
-            at Home
+      {/* The photo that used to sit here was an absolutely-positioned half of
+          the card behind text that ran 65% wide, so the button and the line
+          under it were overlapped and unreadable. The panel stacks instead:
+          nothing overlaps at any width, and the artwork is drawn rather than
+          hotlinked from a stock library. */}
+      <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#f8fcf9] to-[#ebf5ef] ring-1 ring-[#0f4427]/10">
+        <div className="flex items-center gap-3 border-b border-[#0f4427]/10 bg-white/60 px-4 py-3">
+          <span className="relative flex size-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+            <Home className="size-6 stroke-[1.5] text-green-700" />
+            <Droplet className="absolute -bottom-0.5 -right-0.5 size-3.5 fill-red-500 text-red-500" />
           </span>
+          <div className="min-w-0 flex-1">
+            <span className="mb-1 inline-block rounded bg-[#8a5a00] px-2 py-0.5 text-[9px] font-bold text-white">
+              COMING SOON
+            </span>
+            <h2 className="text-lg font-extrabold leading-tight text-[#1a2f26]">
+              Home Blood Sample Collection
+            </h2>
+          </div>
         </div>
 
-        <div className="relative z-10 p-5 w-[65%]">
-          <div className="mb-3 inline-block rounded bg-[#8a5a00] px-2 py-1 text-[10px] font-bold text-white">
-            COMING SOON
-          </div>
+        <div className="p-4">
+          <p className="mb-3 text-sm font-semibold text-[#0d6138]">Healthcare at your doorstep</p>
 
-          <h2 className="text-2xl font-extrabold text-[#1a2f26] leading-tight mb-1">
-            Home Blood
-            <br />
-            Sample Collection
-          </h2>
-          <p className="text-[#0d6138] text-sm font-semibold mb-4">Healthcare at your doorstep</p>
-
-          <ul className="space-y-3 mb-5">
-            <li className="flex items-start gap-2">
-              <div className="bg-[#dcf0e3] p-1.5 rounded-full mt-0.5">
+          <ul className="mb-4 space-y-2.5">
+            <li className="flex items-start gap-2.5">
+              <span className="mt-0.5 shrink-0 rounded-full bg-[#dcf0e3] p-1.5">
                 <Home className="size-4 text-green-800" />
-              </div>
-              <span className="text-xs text-gray-700 font-medium leading-snug">
+              </span>
+              <span className="text-xs font-medium leading-snug text-gray-700">
                 Trained professionals visit your home to collect blood samples.
               </span>
             </li>
-            <li className="flex items-start gap-2">
-              <div className="bg-[#dcf0e3] p-1.5 rounded-full mt-0.5">
+            <li className="flex items-start gap-2.5">
+              <span className="mt-0.5 shrink-0 rounded-full bg-[#dcf0e3] p-1.5">
                 <FlaskConical className="size-4 text-green-800" />
-              </div>
-              <span className="text-xs text-gray-700 font-medium leading-snug">
+              </span>
+              <span className="text-xs font-medium leading-snug text-gray-700">
                 Wide range of blood and diagnostic tests available.
               </span>
             </li>
-            <li className="flex items-start gap-2">
-              <div className="bg-[#dcf0e3] p-1.5 rounded-full mt-0.5">
-                <MessageCircle className="size-4 text-green-800 fill-green-800" />
-              </div>
-              <span className="text-xs text-gray-700 font-medium leading-snug">
+            <li className="flex items-start gap-2.5">
+              <span className="mt-0.5 shrink-0 rounded-full bg-[#dcf0e3] p-1.5">
+                <MessageCircle className="size-4 fill-green-800 text-green-800" />
+              </span>
+              <span className="text-xs font-medium leading-snug text-gray-700">
                 Reports delivered securely on WhatsApp.
               </span>
             </li>
@@ -197,7 +192,7 @@ function AppHome() {
           <button
             type="button"
             disabled
-            className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#0a3821]/40 px-4 py-3 text-xs font-bold text-white shadow-md"
+            className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#0a3821]/40 px-4 py-3 text-xs font-bold text-white"
           >
             <Calendar className="size-4" />
             BOOKING OPENS SOON
@@ -206,98 +201,53 @@ function AppHome() {
             We&rsquo;ll announce the date here once collection starts.
           </p>
 
-          <div className="flex items-center gap-1.5 mt-4">
-            <CheckCircle2 className="size-4 text-green-700" />
-            <span className="text-[10px] text-gray-600 font-medium leading-tight">
-              In association with
-              <br />
-              trusted diagnostic partners
+          <div className="mt-3 flex items-center gap-1.5 border-t border-[#0f4427]/10 pt-3">
+            <CheckCircle2 className="size-4 shrink-0 text-green-700" />
+            <span className="text-[10px] font-medium leading-tight text-gray-600">
+              In association with trusted diagnostic partners
             </span>
           </div>
         </div>
       </div>
 
-      {/* Trust Rail */}
-      <div className="flex justify-between items-center gap-2 mb-6 px-1">
-        <div className="flex items-center gap-2 max-w-[25%]">
-          <Bike className="size-7 text-green-800 stroke-[1.5]" />
-          <div>
-            <div className="text-[10px] font-bold text-gray-900">Fast Delivery</div>
-            <div className="text-[9px] text-gray-500 leading-tight">At your doorstep</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 max-w-[25%]">
-          <ShieldCheck className="size-7 text-green-800 stroke-[1.5]" />
-          <div>
-            <div className="text-[10px] font-bold text-gray-900">Safe & Secure</div>
-            <div className="text-[9px] text-gray-500 leading-tight">
-              Your safety is
-              <br />
-              our priority
+      {/* Four across on a phone gave each promise about 80px, which cut every
+          second line off mid-word. Two across fits the words. */}
+      <div className="mb-6 grid grid-cols-2 gap-x-3 gap-y-4">
+        {promises.map((p) => (
+          <div key={p.label} className="flex items-center gap-2.5">
+            <p.icon className="size-7 shrink-0 stroke-[1.5] text-green-800" />
+            <div className="min-w-0">
+              <div className="text-[11px] font-bold text-gray-900">{p.label}</div>
+              <div className="text-[10px] leading-tight text-gray-500">{p.detail}</div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2 max-w-[25%]">
-          <Award className="size-7 text-green-800 stroke-[1.5]" />
-          <div>
-            <div className="text-[10px] font-bold text-gray-900">Trusted Partners</div>
-            <div className="text-[9px] text-gray-500 leading-tight">
-              Quality you can
-              <br />
-              rely on
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 max-w-[25%]">
-          <Headphones className="size-7 text-green-800 stroke-[1.5]" />
-          <div>
-            <div className="text-[10px] font-bold text-gray-900">24/7 Support</div>
-            <div className="text-[9px] text-gray-500 leading-tight">
-              We're here
-              <br />
-              to help
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Bottom Trust Banner */}
-      <div className="bg-[#0f4427] rounded-xl p-3 flex items-center justify-between shadow-md mb-2 relative overflow-hidden">
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="bg-white/20 p-2 rounded-lg">
-            <Shield className="size-6 text-white stroke-[1.5]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-0.5">
-              <span className="block w-2 h-2.5 border-2 border-white rounded-t-sm border-b-0"></span>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-white font-bold text-[13px]">Your Health. Our Priority.</h3>
-            <p className="text-white/80 text-[10px] mt-0.5">Safe • Hygienic • Reliable</p>
-          </div>
-        </div>
-        <div className="relative z-10 flex flex-col items-end pr-2">
-          {/* Poba Express Logo placeholder */}
-          <div className="flex flex-col items-center">
-            <span className="text-white font-extrabold text-sm italic tracking-wide">POBA</span>
-            <span className="text-[#f36b21] font-bold text-[9px] -mt-1 tracking-widest">
-              EXPRESS
-            </span>
-          </div>
-          {/* Delivery icon placeholder */}
-          <div className="mt-1 flex items-center justify-center">
-            <img
-              src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=150&auto=format&fit=crop"
-              className="size-8 rounded-full border border-white/20 object-cover"
-              alt="Delivery illustration"
-            />
+      <div className="relative mb-2 flex items-center justify-between gap-3 overflow-hidden rounded-xl bg-[#0f4427] p-3 shadow-md">
+        <div className="relative z-10 flex min-w-0 items-center gap-3">
+          <span className="shrink-0 rounded-lg bg-white/20 p-2">
+            <Shield className="size-6 stroke-[1.5] text-white" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-[13px] font-bold text-white">Your Health. Our Priority.</h3>
+            <p className="mt-0.5 text-[10px] text-white/80">Safe • Hygienic • Reliable</p>
           </div>
         </div>
 
-        {/* Decorative background element */}
-        <div className="absolute right-0 bottom-0 w-32 h-full opacity-20 pointer-events-none">
+        {/* Wordmark rather than a photo: the stock delivery picture here was
+            hotlinked from Unsplash, so it broke the panel whenever that URL
+            moved and pulled a third-party request into every page view. */}
+        <div className="relative z-10 flex shrink-0 flex-col items-center pr-1">
+          <span className="text-sm font-extrabold italic tracking-wide text-white">POBA</span>
+          <span className="-mt-1 text-[9px] font-bold tracking-widest text-[#f36b21]">EXPRESS</span>
+        </div>
+
+        <div className="pointer-events-none absolute bottom-0 right-0 h-full w-32 opacity-20">
           <svg
             viewBox="0 0 100 100"
-            className="w-full h-full fill-white"
+            className="h-full w-full fill-white"
             preserveAspectRatio="none"
           >
             <path d="M100,100 L0,100 C30,70 70,30 100,0 Z"></path>
