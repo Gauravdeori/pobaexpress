@@ -1,4 +1,5 @@
 import biryaniImg from "@/assets/biryani.png";
+import burgerImg from "@/assets/burger.png";
 import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
 
@@ -6,6 +7,7 @@ import {
   BIRYANI_BITE_MENU,
   DAJU_BAHADUR_MENU,
   DCAKERY_MENU,
+  DIPJOY_BITE_HOUSE_MENU,
   DISPY_BAKERY_MENU,
   PRARTHONA_MENU,
   type MenuItem,
@@ -73,6 +75,15 @@ export const RESTAURANTS: Restaurant[] = [
     image: momosImg,
     eta: [15, 25],
     items: DAJU_BAHADUR_MENU,
+  },
+  {
+    slug: "dipjoys-bite-house",
+    name: "Dipjoy's Bite House",
+    category: "food",
+    cuisine: "Chowmein · Momo · Burger · Wraps",
+    image: burgerImg,
+    eta: [15, 25],
+    items: DIPJOY_BITE_HOUSE_MENU,
   },
   {
     slug: "dispy-bakery",

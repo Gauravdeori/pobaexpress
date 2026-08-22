@@ -46,6 +46,7 @@ import momosImg from "@/assets/momos.png";
 import lollipopImg from "@/assets/lollipop.png";
 import chilliChickenImg from "@/assets/chilli_chicken.png";
 import rollImg from "@/assets/roll.png";
+import burgerImg from "@/assets/burger.png";
 import japaneseCheesecakeImg from "@/assets/japanese-cheesecake.jpg";
 import newYorkCheesecakeImg from "@/assets/new-york-cheesecake.jpg";
 import blueberryCheesecakeImg from "@/assets/blueberry-cheesecake.jpg";
@@ -195,6 +196,58 @@ export const DISPY_BAKERY_MENU: MenuItem[] = [
   { id: "dp-chicken-regular", name: "Chicken Pizza", variant: "Regular", price: 208 },
   { id: "dp-chicken-medium", name: "Chicken Pizza", variant: "Medium", price: 310 },
   { id: "dp-chicken-large", name: "Chicken Pizza", variant: "Large", price: 469 },
+];
+
+/**
+ * Half and full plates carry no piece count: the shop's board gives sizes but
+ * not how many pieces are in each, and a count here would be invented.
+ *
+ * Chilli Mushroom, Chilli Paneer and French Fries have no photo — the only
+ * chilli picture in the repo is of chicken, and putting it on the two
+ * vegetarian dishes would misdescribe them to the customers who care most.
+ */
+export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
+  { id: "dbh-chilli-mushroom", name: "Chilli Mushroom", price: 96 },
+  { id: "dbh-chilli-paneer", name: "Chilli Paneer", price: 96 },
+  {
+    id: "dbh-chicken-chowmein-half",
+    name: "Chicken Chowmein",
+    variant: "Half plate",
+    price: 66,
+    image: chowmeinImg,
+  },
+  {
+    id: "dbh-chicken-chowmein-full",
+    name: "Chicken Chowmein",
+    variant: "Full plate",
+    price: 126,
+    image: chowmeinImg,
+  },
+  {
+    id: "dbh-chicken-momo-half",
+    name: "Chicken Momo",
+    variant: "Half plate",
+    price: 66,
+    image: momosImg,
+  },
+  {
+    id: "dbh-chicken-momo-full",
+    name: "Chicken Momo",
+    variant: "Full plate",
+    price: 126,
+    image: momosImg,
+  },
+  { id: "dbh-burger", name: "Burger", price: 126, image: burgerImg },
+  {
+    id: "dbh-chicken-lollipop-5",
+    name: "Chicken Lollipop",
+    variant: "5 pieces",
+    price: 126,
+    image: lollipopImg,
+  },
+  { id: "dbh-chicken-wrap", name: "Chicken Wrap", price: 126, image: rollImg },
+  { id: "dbh-french-fries-half", name: "French Fries", variant: "Half plate", price: 66 },
+  { id: "dbh-french-fries-full", name: "French Fries", variant: "Full plate", price: 126 },
 ];
 
 /**
