@@ -28,6 +28,7 @@ const categories = [
   {
     to: "/app/food",
     label: "Food",
+    soon: false,
     hint: "Biryani, momos,\npizza & more",
     icon: UtensilsCrossed,
     bgClass: "bg-[#F4FBF4]",
@@ -37,6 +38,7 @@ const categories = [
   {
     to: "/app/cake",
     label: "Cakes",
+    soon: false,
     hint: "Fresh cakes for\nevery occasion",
     icon: Cake,
     bgClass: "bg-[#FFF5F5]",
@@ -46,6 +48,7 @@ const categories = [
   {
     to: "/app/medicine",
     label: "Medicine",
+    soon: false,
     hint: "Send prescription,\nget it delivered",
     icon: Pill,
     bgClass: "bg-[#F0F8FF]",
@@ -55,6 +58,7 @@ const categories = [
   {
     to: "/app/medicine",
     label: "Health Tests",
+    soon: true,
     hint: "Blood tests\nat home",
     icon: Droplet,
     bgClass: "bg-[#F5F3FF]",
@@ -82,25 +86,45 @@ function AppHome() {
       </div>
 
       <div className="grid grid-cols-4 gap-2 mb-6">
-        {categories.map((c) => (
-          <Link
-            key={c.label}
-            to={c.to}
-            className={`flex flex-col items-center gap-2 rounded-[20px] ${c.bgClass} px-1.5 py-4 text-center transition-all duration-200 active:scale-[0.97]`}
-          >
-            <span
-              className={`flex size-14 items-center justify-center rounded-full ${c.iconBgClass} ${c.iconColorClass} shadow-sm`}
-            >
-              <c.icon className="size-7" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[13px] font-bold text-[#1a2f26] mb-1">{c.label}</span>
-              <span className="block text-[10px] leading-[1.2] text-gray-500 whitespace-pre-wrap">
-                {c.hint}
+        {categories.map((c) => {
+          const className = `relative flex flex-col items-center gap-2 rounded-[20px] ${c.bgClass} px-1.5 py-4 text-center transition-all duration-200 ${
+            c.soon ? "opacity-70" : "active:scale-[0.97]"
+          }`;
+
+          const body = (
+            <>
+              {c.soon && (
+                <span className="absolute right-1.5 top-1.5 rounded-full bg-[#0f4427] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white">
+                  Soon
+                </span>
+              )}
+              <span
+                className={`flex size-14 items-center justify-center rounded-full ${c.iconBgClass} ${c.iconColorClass} shadow-sm`}
+              >
+                <c.icon className="size-7" />
               </span>
-            </span>
-          </Link>
-        ))}
+              <span className="min-w-0">
+                <span className="mb-1 block text-[13px] font-bold text-[#1a2f26]">{c.label}</span>
+                <span className="block whitespace-pre-wrap text-[10px] leading-[1.2] text-gray-500">
+                  {c.hint}
+                </span>
+              </span>
+            </>
+          );
+
+          /* A service we cannot deliver yet is shown but not linked: tapping
+             "Health Tests" and landing on the medicine form would be a promise
+             we can't keep. This becomes a Link the day booking opens. */
+          return c.soon ? (
+            <div key={c.label} aria-disabled className={className}>
+              {body}
+            </div>
+          ) : (
+            <Link key={c.label} to={c.to} className={className}>
+              {body}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Hero Section */}
@@ -128,8 +152,8 @@ function AppHome() {
         </div>
 
         <div className="relative z-10 p-5 w-[65%]">
-          <div className="inline-block bg-green-700 text-white text-[10px] font-bold px-2 py-1 rounded mb-3">
-            NEW SERVICE
+          <div className="mb-3 inline-block rounded bg-[#8a5a00] px-2 py-1 text-[10px] font-bold text-white">
+            COMING SOON
           </div>
 
           <h2 className="text-2xl font-extrabold text-[#1a2f26] leading-tight mb-1">
@@ -166,10 +190,21 @@ function AppHome() {
             </li>
           </ul>
 
-          <button className="flex items-center gap-2 bg-[#0a3821] text-white text-xs font-bold py-3 px-4 rounded-xl w-full justify-center active:scale-[0.98] transition-transform shadow-md">
+          {/* Deliberately disabled rather than wired up: home collection is not
+              running yet, and a button that accepted a booking we cannot honour
+              is worse than one that plainly says so. Swap in the real handler
+              and drop `disabled` when the service opens. */}
+          <button
+            type="button"
+            disabled
+            className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#0a3821]/40 px-4 py-3 text-xs font-bold text-white shadow-md"
+          >
             <Calendar className="size-4" />
-            BOOK HOME COLLECTION →
+            BOOKING OPENS SOON
           </button>
+          <p className="mt-2 text-center text-[10px] font-medium text-gray-600">
+            We&rsquo;ll announce the date here once collection starts.
+          </p>
 
           <div className="flex items-center gap-1.5 mt-4">
             <CheckCircle2 className="size-4 text-green-700" />
