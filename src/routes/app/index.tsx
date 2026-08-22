@@ -95,12 +95,15 @@ function AppHome() {
     <div className="mx-auto max-w-3xl px-4 py-5 font-sans space-y-6">
       {/* Zomato / Swiggy Style App Location & Search Bar */}
       <div className="rounded-2xl bg-gradient-to-r from-[#0a2717] to-[#124227] p-4 text-white shadow-xl">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div className="flex items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+        {/* `truncate` needs min-w-0 the whole way up a flex chain, or the text
+            refuses to shrink and pushes the fee badge off the card instead —
+            a saved address is a full postal line, not "Jonai, Assam". */}
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/20 text-emerald-400">
               <MapPin className="size-4" />
             </span>
-            <div>
+            <div className="min-w-0">
               <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
                 Deliver To
               </div>
@@ -110,7 +113,7 @@ function AppHome() {
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2.5 py-1 text-[10px] font-extrabold text-amber-300 border border-amber-500/30">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-2.5 py-1 text-[10px] font-extrabold text-amber-300">
             <Percent className="size-3" />
             DELIVERY FROM ₹{MIN_DELIVERY_FEE}
           </span>
@@ -122,7 +125,9 @@ function AppHome() {
           className="flex items-center gap-2.5 rounded-xl bg-white/10 px-3.5 py-2.5 text-xs text-white/70 backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all"
         >
           <Search className="size-4 text-emerald-400 shrink-0" />
-          <span className="truncate">Search for biryani, momos, cake, medicines...</span>
+          <span className="min-w-0 truncate">
+            Search for biryani, momos, cake, medicines&hellip;
+          </span>
         </Link>
 
         {/* No promotion here, because there is no promotion to report. This
@@ -134,7 +139,7 @@ function AppHome() {
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 text-xs font-extrabold text-white">
               <Sparkles className="size-3.5 shrink-0 text-amber-400" />
-              <span className="truncate">Food from ₹{foodFrom} at Jonai kitchens</span>
+              <span className="min-w-0 truncate">Food from ₹{foodFrom} at Jonai kitchens</span>
             </div>
             <p className="mt-0.5 text-[10px] text-white/70">
               {launched

@@ -356,7 +356,7 @@ export function ZomatoTopBanner() {
             </div>
 
             {/* Top Bar on Banner */}
-            <div className="relative z-10 flex items-center justify-between gap-4">
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md ${activeSlide.badgeBg}`}
               >
@@ -509,7 +509,7 @@ export function ZomatoTopBanner() {
         </div>
 
         {/* Circular Category Avatars Container */}
-        <div className="flex items-center gap-4 overflow-x-auto pb-4 pt-1 scrollbar-none">
+        <div className="-mx-4 flex items-center gap-4 overflow-x-auto px-4 pb-4 pt-1 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {CATEGORIES.map((cat) => (
             <a
               key={cat.id}
@@ -530,7 +530,7 @@ export function ZomatoTopBanner() {
                 )}
 
                 {/* Offer Tag Badge */}
-                <span className="absolute -bottom-1.5 rounded-full bg-emerald-700 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm border border-emerald-500">
+                <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-emerald-500 bg-emerald-700 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm">
                   {cat.tag}
                 </span>
               </div>
@@ -550,7 +550,7 @@ export function ZomatoTopBanner() {
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700">
               <Zap className="size-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs font-extrabold text-foreground">15–25 Min Delivery</div>
               <div className="text-[10px] font-semibold text-muted-foreground">Fast in Jonai</div>
             </div>
@@ -560,7 +560,7 @@ export function ZomatoTopBanner() {
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700">
               <Percent className="size-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs font-extrabold text-foreground">
                 Delivery from ₹{MIN_DELIVERY_FEE}
               </div>
@@ -574,7 +574,7 @@ export function ZomatoTopBanner() {
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-700">
               <ShieldCheck className="size-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs font-extrabold text-foreground">100% Safe Packaging</div>
               <div className="text-[10px] font-semibold text-muted-foreground">
                 Hygienic & sealed
@@ -586,7 +586,7 @@ export function ZomatoTopBanner() {
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-700">
               <MessageCircle className="size-5 fill-green-600 text-green-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs font-extrabold text-foreground">WhatsApp Ordering</div>
               <div className="text-[10px] font-semibold text-muted-foreground">No app download</div>
             </div>
