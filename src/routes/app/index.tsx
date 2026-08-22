@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 
 import { useAccount } from "@/lib/account";
+import { MIN_DELIVERY_FEE } from "@/lib/menu";
+import { priceFrom, restaurantsIn } from "@/lib/restaurants";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { whatsappLink } from "@/lib/contact";
 
@@ -84,6 +86,11 @@ function AppHome() {
   const launched = useLaunched();
   const { profile } = useAccount();
 
+  /* Read off the menu rather than written into the copy: the banner used to
+     claim "50% OFF", which no partner offers and nothing in the code applies,
+     and a flat ₹5 fee on categories that charge ₹20 and ₹30. */
+  const foodFrom = Math.min(...restaurantsIn("food").map(priceFrom));
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-5 font-sans space-y-6">
       {/* Zomato / Swiggy Style App Location & Search Bar */}
@@ -97,13 +104,15 @@ function AppHome() {
               <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
                 Deliver To
               </div>
-              <div className="text-xs font-bold text-white">Jonai Main Town, Assam</div>
+              <div className="truncate text-xs font-bold text-white">
+                {profile?.address?.trim() || "Jonai, Assam"}
+              </div>
             </div>
           </div>
 
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2.5 py-1 text-[10px] font-extrabold text-amber-300 border border-amber-500/30">
             <Percent className="size-3" />
-            FLAT ₹5 FEE
+            DELIVERY FROM ₹{MIN_DELIVERY_FEE}
           </span>
         </div>
 
@@ -116,26 +125,45 @@ function AppHome() {
           <span className="truncate">Search for biryani, momos, cake, medicines...</span>
         </Link>
 
-        {/* Quick Food Offer Banner */}
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-emerald-950/60 p-3 border border-emerald-500/20">
-          <div>
+        {/* No promotion here, because there is no promotion to report. This
+            said "50% OFF at Biryani Bite & Local Partners"; no partner gives
+            that and no code applies it, so it would have been a discount the
+            customer discovers does not exist at checkout. It carries the real
+            starting price instead — the same rule Spotlight.tsx follows. */}
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-emerald-500/20 bg-emerald-950/60 p-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-1.5 text-xs font-extrabold text-white">
-              <Sparkles className="size-3.5 text-amber-400" />
-              <span>50% OFF at Biryani Bite & Local Partners</span>
+              <Sparkles className="size-3.5 shrink-0 text-amber-400" />
+              <span className="truncate">Food from ₹{foodFrom} at Jonai kitchens</span>
             </div>
             <p className="mt-0.5 text-[10px] text-white/70">
-              Fast 15–25 min doorstep delivery in Jonai town
+              {launched
+                ? "Fast 15–25 min doorstep delivery in Jonai town"
+                : `Browse now — ordering opens ${LAUNCH_DATE_LABEL}`}
             </p>
           </div>
-          <a
-            href={whatsappLink()}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-[11px] font-bold text-gray-950 shadow-md hover:bg-emerald-400 transition-colors"
-          >
-            <span>Order</span>
-            <ArrowRight className="size-3" />
-          </a>
+
+          {/* Ordering is gated everywhere else in the app until launch day, so
+              a live WhatsApp button here would be the one door left open. */}
+          {launched ? (
+            <a
+              href={whatsappLink()}
+              target="_blank"
+              rel="noreferrer"
+              className="flex shrink-0 items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-[11px] font-bold text-gray-950 shadow-md transition-colors hover:bg-emerald-400"
+            >
+              <span>Order</span>
+              <ArrowRight className="size-3" />
+            </a>
+          ) : (
+            <Link
+              to="/app/food"
+              className="flex shrink-0 items-center gap-1 rounded-lg bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-white/20"
+            >
+              <span>Menu</span>
+              <ArrowRight className="size-3" />
+            </Link>
+          )}
         </div>
       </div>
 

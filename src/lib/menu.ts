@@ -12,6 +12,13 @@ const DELIVERY_FEES: Record<string, number> = {
 
 const DEFAULT_DELIVERY_FEE = 20;
 
+/**
+ * The cheapest delivery on offer, derived rather than written down: the home
+ * screen advertises a "from ₹x" fee, and a hand-typed figure there drifted
+ * into claiming a flat ₹5 on categories that actually charge ₹20 and ₹30.
+ */
+export const MIN_DELIVERY_FEE = Math.min(...Object.values(DELIVERY_FEES));
+
 export function deliveryFee(categoryId: string): number {
   return DELIVERY_FEES[categoryId] ?? DEFAULT_DELIVERY_FEE;
 }
@@ -46,7 +53,6 @@ import momosImg from "@/assets/momos.png";
 import lollipopImg from "@/assets/lollipop.png";
 import chilliChickenImg from "@/assets/chilli_chicken.png";
 import rollImg from "@/assets/roll.png";
-import burgerImg from "@/assets/burger.png";
 import japaneseCheesecakeImg from "@/assets/japanese-cheesecake.jpg";
 import newYorkCheesecakeImg from "@/assets/new-york-cheesecake.jpg";
 import blueberryCheesecakeImg from "@/assets/blueberry-cheesecake.jpg";
@@ -237,7 +243,7 @@ export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
     price: 126,
     image: momosImg,
   },
-  { id: "dbh-burger", name: "Burger", price: 126, image: burgerImg },
+  { id: "dbh-burger", name: "Burger", price: 126 },
   {
     id: "dbh-chicken-lollipop-5",
     name: "Chicken Lollipop",

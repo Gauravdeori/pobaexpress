@@ -22,6 +22,8 @@ import burgerImg from "@/assets/burger.png";
 import momosImg from "@/assets/momos.png";
 import chowmeinImg from "@/assets/chowmein.png";
 import { whatsappLink } from "@/lib/contact";
+import { MIN_DELIVERY_FEE } from "@/lib/menu";
+import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 
 const JONAI_LOCATIONS = [
   "Jonai Main Market",
@@ -56,7 +58,7 @@ const CATEGORIES: CategoryItem[] = [
   {
     id: "biryani",
     name: "Biryani",
-    tag: "Up to 30% OFF",
+    tag: "From ₹59",
     image: biryaniImg,
     fallbackEmoji: "🍗",
     color: "from-amber-500/20 to-orange-500/10",
@@ -105,7 +107,7 @@ const CATEGORIES: CategoryItem[] = [
   {
     id: "medicine",
     name: "Medicines",
-    tag: "Flat ₹5 Delivery",
+    tag: `Delivery from ₹${MIN_DELIVERY_FEE}`,
     fallbackEmoji: "💊",
     color: "from-blue-500/20 to-sky-500/10",
     borderColor: "border-blue-500/30",
@@ -118,29 +120,35 @@ const HERO_SLIDES = [
     id: "poba-deal",
     badge: "POBA EXPRESS EXCLUSIVE",
     badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-    title: "Flat ₹5 Delivery Across Jonai!",
+    title: `Delivery from ₹${MIN_DELIVERY_FEE} across Jonai`,
     highlight: "Zero Commission. Best Prices.",
-    description: "Order fresh food, cakes, and medicines delivered right to your doorstep in 15–25 mins.",
+    description:
+      "Order fresh food, cakes, and medicines delivered right to your doorstep in 15–25 mins.",
     cta: "Order on WhatsApp",
     ctaLink: whatsappLink(),
     external: true,
-    code: "CODE: POBA5",
+    code: `OPENING ${LAUNCH_DATE_LABEL}`,
     gradient: "from-[#0a2717] via-[#113a23] to-[#0a2717]",
     accentColor: "#10b981",
     tagIcon: Percent,
-    features: ["No App Download Required", "Instant WhatsApp Order", "Flat ₹5 Delivery Fee"],
+    features: [
+      "No App Download Required",
+      "Instant WhatsApp Order",
+      `Delivery from ₹${MIN_DELIVERY_FEE}`,
+    ],
   },
   {
     id: "biryani-bite-deal",
-    badge: "50% OFF AT BIRYANI BITE",
+    badge: "BIRYANI BITE",
     badgeBg: "bg-amber-500/20 text-amber-300 border-amber-500/30",
     title: "Authentic Hyderabadi & Special Biryanis",
-    highlight: "Starting from ₹120 only",
-    description: "Richly spiced, fragrant biryanis prepared fresh by Biryani Bite with fast delivery.",
+    highlight: "Starting from ₹59",
+    description:
+      "Richly spiced, fragrant biryanis prepared fresh by Biryani Bite with fast delivery.",
     cta: "Explore Biryani Menu",
     ctaLink: "#order",
     external: false,
-    code: "RATING: ⭐ 4.8 (Top Rated)",
+    code: "COOKED TO ORDER",
     gradient: "from-[#2e1405] via-[#4a220a] to-[#2e1405]",
     accentColor: "#f97316",
     tagIcon: Sparkles,
@@ -168,7 +176,7 @@ const HERO_SLIDES = [
     badgeBg: "bg-blue-500/20 text-blue-300 border-blue-500/30",
     title: "Medicines & Healthcare Essentials",
     highlight: "Upload Prescription & Get Delivery",
-    description: "Prescription medicines and daily healthcare products delivered at flat ₹5 rate.",
+    description: "Prescription medicines and daily healthcare products delivered to your door.",
     cta: "Upload Prescription",
     ctaLink: "/app/medicine",
     external: false,
@@ -181,6 +189,7 @@ const HERO_SLIDES = [
 ];
 
 export function ZomatoTopBanner() {
+  const launched = useLaunched();
   const [selectedLocation, setSelectedLocation] = useState(JONAI_LOCATIONS[0]);
   const [locationOpen, setLocationOpen] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -239,9 +248,7 @@ export function ZomatoTopBanner() {
                     }`}
                   />
                 </div>
-                <div className="truncate text-xs font-bold text-foreground">
-                  {selectedLocation}
-                </div>
+                <div className="truncate text-xs font-bold text-foreground">{selectedLocation}</div>
               </div>
             </button>
 
@@ -306,7 +313,7 @@ export function ZomatoTopBanner() {
           {/* Quick Offer Tag */}
           <div className="hidden shrink-0 lg:flex items-center gap-2 rounded-xl bg-amber-500/10 px-3.5 py-2 text-amber-700 border border-amber-500/20">
             <Sparkles className="size-4 text-amber-600 animate-pulse" />
-            <span className="text-xs font-extrabold">Flat ₹5 Delivery</span>
+            <span className="text-xs font-extrabold">Delivery from ₹{MIN_DELIVERY_FEE}</span>
           </div>
         </div>
 
@@ -315,17 +322,21 @@ export function ZomatoTopBanner() {
           <span className="shrink-0 font-bold uppercase tracking-wider text-muted-foreground text-[10px]">
             Trending:
           </span>
-          {["Chicken Biryani", "Steamed Momos", "Black Forest Cake", "Dispy Pizza", "Paracetamol"].map(
-            (tag) => (
-              <a
-                key={tag}
-                href="#order"
-                className="shrink-0 rounded-full border border-border/60 bg-card/80 px-3 py-1 font-semibold text-foreground/80 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-800"
-              >
-                {tag}
-              </a>
-            )
-          )}
+          {[
+            "Chicken Biryani",
+            "Steamed Momos",
+            "Black Forest Cake",
+            "Dispy Pizza",
+            "Paracetamol",
+          ].map((tag) => (
+            <a
+              key={tag}
+              href="#order"
+              className="shrink-0 rounded-full border border-border/60 bg-card/80 px-3 py-1 font-semibold text-foreground/80 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-800"
+            >
+              {tag}
+            </a>
+          ))}
         </div>
       </div>
 
@@ -336,7 +347,9 @@ export function ZomatoTopBanner() {
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          <div className={`bg-gradient-to-br ${activeSlide.gradient} p-6 sm:p-8 lg:p-10 text-white min-h-[340px] flex flex-col justify-between relative transition-all duration-500`}>
+          <div
+            className={`bg-gradient-to-br ${activeSlide.gradient} p-6 sm:p-8 lg:p-10 text-white min-h-[340px] flex flex-col justify-between relative transition-all duration-500`}
+          >
             {/* Background Decorative Graphic */}
             <div className="absolute right-0 top-0 h-full w-1/2 opacity-20 pointer-events-none overflow-hidden">
               <div className="absolute -right-10 -top-10 size-96 rounded-full bg-white/10 blur-3xl" />
@@ -344,7 +357,9 @@ export function ZomatoTopBanner() {
 
             {/* Top Bar on Banner */}
             <div className="relative z-10 flex items-center justify-between gap-4">
-              <span className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md ${activeSlide.badgeBg}`}>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md ${activeSlide.badgeBg}`}
+              >
                 <activeSlide.tagIcon className="size-3.5" />
                 {activeSlide.badge}
               </span>
@@ -402,7 +417,15 @@ export function ZomatoTopBanner() {
             {/* Action Button & Carousel Controls */}
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
               <div>
-                {activeSlide.external ? (
+                {/* The WhatsApp button is the one door that was still open
+                    before launch day — the navbar, the hero, the sticky bar and
+                    the order form all close on `launched`, so this closes too
+                    rather than taking an order nobody is cooking for yet. */}
+                {activeSlide.external && !launched ? (
+                  <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-white/30 px-6 py-3 text-xs font-bold text-white">
+                    Ordering opens {LAUNCH_DATE_LABEL}
+                  </span>
+                ) : activeSlide.external ? (
                   <a
                     href={activeSlide.ctaLink}
                     target="_blank"
@@ -538,8 +561,12 @@ export function ZomatoTopBanner() {
               <Percent className="size-5" />
             </div>
             <div>
-              <div className="text-xs font-extrabold text-foreground">Flat ₹5 Delivery</div>
-              <div className="text-[10px] font-semibold text-muted-foreground">No hidden charges</div>
+              <div className="text-xs font-extrabold text-foreground">
+                Delivery from ₹{MIN_DELIVERY_FEE}
+              </div>
+              <div className="text-[10px] font-semibold text-muted-foreground">
+                No hidden charges
+              </div>
             </div>
           </div>
 
@@ -549,7 +576,9 @@ export function ZomatoTopBanner() {
             </div>
             <div>
               <div className="text-xs font-extrabold text-foreground">100% Safe Packaging</div>
-              <div className="text-[10px] font-semibold text-muted-foreground">Hygienic & sealed</div>
+              <div className="text-[10px] font-semibold text-muted-foreground">
+                Hygienic & sealed
+              </div>
             </div>
           </div>
 

@@ -1,5 +1,4 @@
 import biryaniImg from "@/assets/biryani.png";
-import burgerImg from "@/assets/burger.png";
 import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
 
@@ -81,7 +80,6 @@ export const RESTAURANTS: Restaurant[] = [
     name: "Dipjoy's Bite House",
     category: "food",
     cuisine: "Chowmein · Momo · Burger · Wraps",
-    image: burgerImg,
     eta: [15, 25],
     items: DIPJOY_BITE_HOUSE_MENU,
   },
