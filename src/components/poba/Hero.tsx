@@ -240,7 +240,10 @@ export function Hero() {
               className="pl-0"
               aria-label={`${index + 1} of ${labels.length}: ${labels[index]}`}
             >
-              <div className="mx-auto h-full max-w-[120rem] px-6 pb-20 pt-32 lg:px-12 lg:pb-32 lg:pt-40 2xl:px-20">
+              {/* Only pb here, and a small pt. The banner above already clears the
+                    fixed navbar with its own pt-24; carrying the old pt-32 as well
+                    opened a screen-and-a-half of empty cream between the two. */}
+              <div className="mx-auto h-full max-w-[120rem] px-6 pb-20 pt-6 lg:px-12 lg:pb-32 lg:pt-10 2xl:px-20">
                 {slide}
               </div>
             </CarouselItem>

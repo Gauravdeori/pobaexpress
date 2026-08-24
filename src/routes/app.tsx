@@ -32,7 +32,7 @@ const tabs = [
 function AppShell() {
   return (
     <CartProvider>
-      <div className="flex min-h-screen flex-col bg-secondary/40">
+      <div className="flex min-h-[100dvh] flex-col bg-secondary/40">
         <AppHeader />
         {/* Padded for the fixed tab bar plus the home indicator on phones that
             have one, so the last row is never sat under either. */}
@@ -47,7 +47,7 @@ function AppShell() {
 
 function AppHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4">
         <Link to="/app" className="flex items-center gap-2">
           <img

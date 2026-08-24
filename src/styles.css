@@ -132,3 +132,48 @@
 @utility bg-gradient-green {
   background-image: var(--gradient-green);
 }
+
+/* ---------------------------------------------------------------- native --- */
+
+/*
+ * What separates an installed app from a web page on a phone is mostly a short
+ * list of browser defaults that have no business in an app.
+ */
+@layer base {
+  html {
+    /* The grey box a tap paints over a link. Nothing native does this, and it
+       is the single loudest tell that a screen is a web page. */
+    -webkit-tap-highlight-color: transparent;
+    /* Stops the browser waiting ~300ms to see whether a tap was a double-tap
+       to zoom. Every control in this app is single-tap. */
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    /* Type rendered the way the OS renders it, rather than heavier. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Chrome — the header, the tab bar, buttons — should not select on a long
+     press the way a paragraph does. Content is left alone, because a customer
+     copying an address or a price is doing something reasonable. */
+  header,
+  nav,
+  button,
+  [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* An installed app has nowhere to pull down to, so the rubber-band and the
+     pull-to-refresh both read as glitches rather than gestures. Left alone in
+     a browser tab, where both are the platform's and not ours to remove. */
+  @media (display-mode: standalone) {
+    html,
+    body {
+      overscroll-behavior-y: none;
+    }
+  }
+}

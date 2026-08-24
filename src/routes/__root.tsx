@@ -78,7 +78,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // `viewport-fit=cover` is what makes `env(safe-area-inset-*)` return real
+      // numbers. Without it every safe-area padding in this app computes to 0,
+      // and the translucent iOS status bar below sits on top of the header.
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover",
+      },
       { title: siteTitle },
       { name: "description", content: siteDescription },
       { name: "author", content: "Poba Express" },
@@ -87,7 +93,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Poba Express" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      // `default`, not `black-translucent`. Translucent is the only value that
+      // draws the page under the status bar, and iOS pairs it with white status
+      // text — which on this app's cream header is white on cream. The bottom
+      // home-indicator inset still comes through, because that is viewport-fit.
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { property: "og:site_name", content: "Poba Express" },
       { property: "og:title", content: siteTitle },
       { property: "og:description", content: siteDescription },

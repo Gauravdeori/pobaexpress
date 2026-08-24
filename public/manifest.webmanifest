@@ -8,10 +8,14 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F8FAF8",
-  "theme_color": "#0B3D1B",
+  "theme_color": "#0d3119",
   "lang": "en-IN",
   "dir": "ltr",
-  "categories": ["food", "shopping", "lifestyle"],
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -48,5 +52,9 @@
       "short_name": "Medicine",
       "url": "/app/medicine"
     }
+  ],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
   ]
 }

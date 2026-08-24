@@ -7,9 +7,9 @@
  * served from cache and refreshed in the background.
  */
 
-// Bumped so installed clients drop the v1 shell, which cached "/" as the
-// start_url before the app moved to /app.
-const VERSION = "v2";
+// v3 rewrites how navigations are cached — see the fetch handler. Installed
+// clients holding a v2 shell have a cache keyed the wrong way, so it goes.
+const VERSION = "v3";
 const SHELL_CACHE = `poba-shell-${VERSION}`;
 const ASSET_CACHE = `poba-assets-${VERSION}`;
 
@@ -50,6 +50,17 @@ function isStaticAsset(url) {
   );
 }
 
+/**
+ * The page to show for a URL we have never cached.
+ *
+ * An app route falls back to the app shell rather than the marketing page,
+ * because someone who opened the installed app offline is not asking to read
+ * about the service.
+ */
+function offlineFallbackFor(url) {
+  return url.pathname.startsWith("/app") ? "/app" : "/";
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
@@ -62,14 +73,24 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(SHELL_CACHE).then((cache) => cache.put("/", copy));
+          // Cached under its own URL. This used to write every page to the
+          // key "/", so going offline served whichever page had been visited
+          // last, whatever address you asked for. Only 200s are kept: a 500
+          // cached here would be the offline copy of the site.
+          if (response.ok) {
+            const copy = response.clone();
+            void caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
-        .catch(
-          async () =>
-            (await caches.match(request)) ?? (await caches.match("/")) ?? Response.error(),
-        ),
+        .catch(async () => {
+          const cache = await caches.open(SHELL_CACHE);
+          return (
+            (await cache.match(request)) ??
+            (await cache.match(offlineFallbackFor(url))) ??
+            Response.error()
+          );
+        }),
     );
     return;
   }
