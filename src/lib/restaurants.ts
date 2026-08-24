@@ -1,9 +1,9 @@
-import biryaniImg from "@/assets/biryani.png";
+import chowmeinImg from "@/assets/chowmein.png";
 import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
 
 import {
-  BIRYANI_BITE_MENU,
+  BARMAN_MENU,
   DAJU_BAHADUR_MENU,
   DCAKERY_MENU,
   DIPJOY_BITE_HOUSE_MENU,
@@ -49,13 +49,14 @@ export type Restaurant = {
  */
 export const RESTAURANTS: Restaurant[] = [
   {
-    slug: "biryani-bite",
-    name: "Biryani Bite",
+    slug: "barman-restaurant",
+    name: "Barman Restaurant",
     category: "food",
-    cuisine: "Biryani · Maggi · Pasta",
-    image: biryaniImg,
+    cuisine: "Chowmein · Fried rice · Momos · Biryani",
+    image: chowmeinImg,
     eta: [15, 25],
-    items: BIRYANI_BITE_MENU,
+    hours: "Daily 11 AM – 10 PM",
+    items: BARMAN_MENU,
   },
   {
     slug: "prarthona",

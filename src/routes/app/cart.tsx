@@ -6,13 +6,18 @@ import { Button } from "@/components/ui/button";
 import { useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { rupees } from "@/lib/menu";
+import { useDeliveryQuote } from "@/lib/use-delivery";
 
 export const Route = createFileRoute("/app/cart")({
   component: CartScreen,
 });
 
 function CartScreen() {
-  const { cart, subtotal, fee, total, setQuantity, clear } = useCart();
+  const { cart, subtotal, setQuantity, clear } = useCart();
+  // The same quote checkout uses, so the total does not move between
+  // this screen and the one that takes the order.
+  const quote = useDeliveryQuote(cart.category);
+  const total = subtotal + quote.fee + quote.platformFee;
   const { user, loading: authLoading } = useAccount();
   const needsSignIn = !authLoading && !user;
 
@@ -85,7 +90,11 @@ function CartScreen() {
         </div>
         <div className="mt-1.5 flex justify-between text-muted-foreground">
           <span>Delivery</span>
-          <span>{rupees(fee)}</span>
+          <span>{rupees(quote.fee)}</span>
+        </div>
+        <div className="flex justify-between text-muted-foreground">
+          <span>Platform fee</span>
+          <span>{rupees(quote.platformFee)}</span>
         </div>
         <div className="mt-3 flex justify-between border-t border-border pt-3 text-base font-bold text-primary">
           <span>Total</span>

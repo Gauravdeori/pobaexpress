@@ -131,7 +131,7 @@ function AppHome() {
         </Link>
 
         {/* No promotion here, because there is no promotion to report. This
-            said "50% OFF at Biryani Bite & Local Partners"; no partner gives
+            said "50% OFF at <partner> & Local Partners"; no partner gives
             that and no code applies it, so it would have been a discount the
             customer discovers does not exist at checkout. It carries the real
             starting price instead — the same rule Spotlight.tsx follows. */}

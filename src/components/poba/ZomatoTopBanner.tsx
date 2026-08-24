@@ -138,13 +138,12 @@ const HERO_SLIDES = [
     ],
   },
   {
-    id: "biryani-bite-deal",
-    badge: "BIRYANI BITE",
+    id: "barman-deal",
+    badge: "BARMAN RESTAURANT",
     badgeBg: "bg-white/15 text-accent-light border-white/25",
-    title: "Authentic Hyderabadi & Special Biryanis",
-    highlight: "Starting from ₹59",
-    description:
-      "Richly spiced, fragrant biryanis prepared fresh by Biryani Bite with fast delivery.",
+    title: "Chowmein, momos and biryani",
+    highlight: "Starting from ₹79",
+    description: "Chowmein, fried rice, momos and biryani, cooked to order at Barman Restaurant.",
     cta: "Explore Biryani Menu",
     ctaLink: "#order",
     external: false,

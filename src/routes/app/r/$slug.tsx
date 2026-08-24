@@ -3,7 +3,8 @@ import { ArrowLeft, Clock, UtensilsCrossed } from "lucide-react";
 
 import { MenuList, Rating } from "@/components/app/Shared";
 import { useCart } from "@/lib/cart";
-import { deliveryFee, rupees } from "@/lib/menu";
+import { rupees } from "@/lib/menu";
+import { useDeliveryQuote } from "@/lib/use-delivery";
 import { getRestaurant, priceFrom } from "@/lib/restaurants";
 import { CartBar } from "@/components/app/CartBar";
 
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/app/r/$slug")({
 function RestaurantScreen() {
   const restaurant = Route.useLoaderData();
   const { cart, add, setQuantity } = useCart();
+  const quote = useDeliveryQuote(restaurant.category);
 
   const quantityOf = (id: string) => cart.lines.find((line) => line.id === id)?.quantity ?? 0;
   const mine = cart.source === restaurant.name;
@@ -65,7 +67,7 @@ function RestaurantScreen() {
               {restaurant.eta[0]}–{restaurant.eta[1]} min
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
-              {rupees(deliveryFee(restaurant.category))} delivery
+              {rupees(quote.fee)} delivery
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
               from {rupees(priceFrom(restaurant))}
@@ -73,6 +75,11 @@ function RestaurantScreen() {
             {/* Only the partners that keep short hours carry this, and it is
                 the one chip worth the accent — ordering at 9 PM from a shop
                 that shuts at 6 is the mistake worth preventing. */}
+            {quote.reason && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-accent">
+                {quote.reason}
+              </span>
+            )}
             {restaurant.hours && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-accent-foreground">
                 {restaurant.hours}

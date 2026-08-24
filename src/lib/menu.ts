@@ -13,6 +13,13 @@ const DELIVERY_FEES: Record<string, number> = {
 const DEFAULT_DELIVERY_FEE = 20;
 
 /**
+ * Flat, per order, on top of delivery — what it costs to run the thing rather
+ * than what it costs to ride it. Shown as its own line so it is never mistaken
+ * for the rider's fee, and never quietly folded into the food.
+ */
+export const PLATFORM_FEE = 3;
+
+/**
  * The cheapest delivery on offer, derived rather than written down: the home
  * screen advertises a "from ₹x" fee, and a hand-typed figure there drifted
  * into claiming a flat ₹5 on categories that actually charge ₹20 and ₹30.
@@ -64,33 +71,18 @@ import milletCakeLoafImg from "@/assets/millet-cake-loaf.jpg";
  * different prices — an unprefixed `chicken-chowmein-half` would collide in the
  * cart and in saved orders.
  */
-export const BIRYANI_BITE_MENU: MenuItem[] = [
+export const BARMAN_MENU: MenuItem[] = [
+  { id: "bm-chowmein", name: "Chowmein", price: 79, image: chowmeinImg },
+  { id: "bm-fried-rice", name: "Fried Rice", price: 79, image: friedRiceImg },
+  { id: "bm-momos", name: "Momos", price: 79, image: momosImg },
+  { id: "bm-biryani", name: "Biryani", price: 109, image: biryaniImg },
   {
-    id: "bb-chicken-biryani-quarter",
-    name: "Chicken Biryani",
-    variant: "Quarter",
-    price: 59,
-    image: biryaniImg,
+    id: "bm-chicken-lollipop",
+    name: "Chicken Lollipop",
+    variant: "5 pieces",
+    price: 159,
+    image: lollipopImg,
   },
-  {
-    id: "bb-chicken-biryani-half",
-    name: "Chicken Biryani",
-    variant: "Half",
-    price: 109,
-    image: biryaniImg,
-  },
-  {
-    id: "bb-chicken-biryani-full",
-    name: "Chicken Biryani",
-    variant: "Full",
-    price: 210,
-    image: biryaniImg,
-  },
-  { id: "bb-chicken-maggi", name: "Chicken Maggi", price: 59 },
-  { id: "bb-egg-maggi", name: "Egg Maggi", price: 49 },
-  { id: "bb-veg-maggi", name: "Veg Maggi", price: 49 },
-  { id: "bb-chicken-pasta", name: "Chicken Pasta", price: 59 },
-  { id: "bb-veg-pasta", name: "Veg Pasta", price: 49 },
 ];
 
 export const PRARTHONA_MENU: MenuItem[] = [
@@ -309,7 +301,7 @@ const MENU_SECTIONS: Record<string, MenuSection[]> = {
   // track of who is cooking it. Names must match `RESTAURANTS` in
   // restaurants.ts, which is what the cart records as its source.
   food: [
-    { restaurant: "Biryani Bite", items: BIRYANI_BITE_MENU },
+    { restaurant: "Barman Restaurant", items: BARMAN_MENU },
     { restaurant: "Prarthona Restaurant", items: PRARTHONA_MENU },
     { restaurant: "Daju Bahadur", items: DAJU_BAHADUR_MENU },
     { restaurant: "Dispy Bakery", items: DISPY_BAKERY_MENU },

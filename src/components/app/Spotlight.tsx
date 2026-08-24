@@ -32,13 +32,13 @@ type Spotlight = {
  * with it, because the list is built from what is actually there.
  *
  * The detail line spans the menu rather than naming one dish, because the
- * price under it is the shop's cheapest item. "Chicken biryani — from ₹49"
- * would be a lie about the biryani, which starts at ₹59; the ₹49 is a maggi.
+ * price under it is the shop's cheapest item. Naming a single dish beside a
+ * "from" price lies about that dish the moment something else is cheaper.
  */
 const COPY: Record<string, { headline: string; detail: string }> = {
-  "biryani-bite": {
+  "barman-restaurant": {
     headline: "Flavour that hits the spot",
-    detail: "Biryani, maggi and pasta",
+    detail: "Chowmein, fried rice, momos and biryani",
   },
   "dispy-bakery": {
     headline: "Homemade pizza, out of the oven",

@@ -13,7 +13,8 @@ import { useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/contact";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { mapsLink, type Coords } from "@/lib/location";
-import { deliveryFee, rupees } from "@/lib/menu";
+import { rupees } from "@/lib/menu";
+import { useDeliveryQuote } from "@/lib/use-delivery";
 import {
   clearMedicineRequest,
   readMedicineRequest,
@@ -21,6 +22,7 @@ import {
 } from "@/lib/medicine-request";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
 import { findOfferByCode, type Offer } from "@/lib/admin";
+import { notifyOrder } from "@/lib/notify";
 import { applyOffer, normaliseCode } from "@/lib/promo-rules";
 
 export const Route = createFileRoute("/app/checkout")({
@@ -101,7 +103,7 @@ function prescriptionLine(medicine: MedicineRequest): string {
 
 function CheckoutScreen() {
   const { kind } = Route.useSearch();
-  const { cart, subtotal, fee, total, clear } = useCart();
+  const { cart, subtotal, clear } = useCart();
   const { user, profile, loading: authLoading } = useAccount();
   const launched = useLaunched();
 
@@ -127,13 +129,14 @@ function CheckoutScreen() {
   const [error, setError] = useState<string | null>(null);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
 
-  // Medicine has no priced lines, so its total is settled on WhatsApp.
-  //
-  // The discount comes off the subtotal, never the delivery fee: the fee is
-  // what the rider is paid, and a code that ate into it would be the rider
-  // funding the offer.
+  // Delivery moves with the weather and the hour; the platform fee does not.
+  const quote = useDeliveryQuote(medicine ? "medicine" : cart.category);
+
+  // The discount comes off the subtotal, never the delivery or platform fee:
+  // the delivery fee is what the rider is paid, and a code that ate into it
+  // would be the rider funding the offer.
   const discount = medicine ? 0 : applyOffer(offer, subtotal, cart.category).discount;
-  const payable = medicine ? 0 : Math.max(0, total - discount);
+  const payable = medicine ? 0 : Math.max(0, subtotal + quote.fee + quote.platformFee - discount);
 
   const applyCode = async () => {
     const typed = normaliseCode(codeInput);
@@ -234,7 +237,7 @@ function CheckoutScreen() {
         address: address.trim(),
         lines: medicine ? [] : lines,
         subtotal: medicine ? 0 : subtotal,
-        deliveryFee: medicine ? deliveryFee("medicine") : fee,
+        deliveryFee: quote.fee,
         total: payable,
         extraRequest: medicine ? request.trim() : null,
         notes: notes.trim() || null,
@@ -247,6 +250,26 @@ function CheckoutScreen() {
       },
       user?.uid ?? null,
     );
+
+    // Told to the shop without waiting on it, and without letting a failure
+    // touch the order: the record is already written, and the customer's
+    // WhatsApp message is opened either way.
+    void notifyOrder({
+      data: {
+        customerName: name.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
+        locationUrl: coords ? mapsLink(coords) : null,
+        category: medicine ? "medicine" : cart.category,
+        lines: medicine ? [request.trim()] : lines.map((l) => `${l.label} x${l.quantity}`),
+        total: medicine ? "confirmed after the pharmacy quotes" : rupees(payable),
+        discountCode: offer?.code ?? null,
+        notes: notes.trim() || null,
+        prescriptionUrl: medicine ? medicineRequest.prescriptionUrl : null,
+      },
+    }).catch(() => {
+      // Already logged on the server. Nothing the customer can act on.
+    });
 
     if (user) {
       void saveProfile(user.uid, {
@@ -266,10 +289,11 @@ function CheckoutScreen() {
             .map((l) => `• ${l.label} x${l.quantity} — ${rupees(l.price * l.quantity)}`)
             .join("\n"),
       ``,
-      medicine ? `Delivery: ${rupees(deliveryFee("medicine"))}` : `Subtotal: ${rupees(subtotal)}`,
+      medicine ? `Delivery: ${rupees(quote.fee)}` : `Subtotal: ${rupees(subtotal)}`,
       !medicine && discount > 0 ? `Discount (${offer?.code}): -${rupees(discount)}` : ``,
-      medicine ? `` : `Delivery: ${rupees(fee)}`,
-      medicine ? `Total: confirmed after the pharmacy quotes` : `*Total: ${rupees(total)}*`,
+      medicine ? `` : `Delivery: ${rupees(quote.fee)}${quote.reason ? ` (${quote.reason})` : ""}`,
+      medicine ? `` : `Platform fee: ${rupees(quote.platformFee)}`,
+      medicine ? `Total: confirmed after the pharmacy quotes` : `*Total: ${rupees(payable)}*`,
       ``,
       `Payment: Cash on delivery`,
       ``,
@@ -350,8 +374,22 @@ function CheckoutScreen() {
               </div>
             ))}
             <div className="mt-2 flex justify-between text-muted-foreground">
-              <span>Delivery</span>
-              <span>{rupees(fee)}</span>
+              <span>
+                Delivery
+                {/* Said next to the number, not in a tooltip. A fee that is
+                    higher than usual with no reason given reads as a mistake
+                    or a trick. */}
+                {quote.reason && (
+                  <span className="ml-1.5 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
+                    {quote.reason}
+                  </span>
+                )}
+              </span>
+              <span>{rupees(quote.fee)}</span>
+            </div>
+            <div className="mt-2 flex justify-between text-muted-foreground">
+              <span>Platform fee</span>
+              <span>{rupees(quote.platformFee)}</span>
             </div>
             {discount > 0 && (
               <div className="mt-2 flex justify-between font-medium text-accent">
