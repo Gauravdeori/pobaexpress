@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { startAnalytics } from "../lib/firebase";
+import { UpdateBanner } from "../components/app/UpdateBanner";
 
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
@@ -186,48 +187,32 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Registered only in production: in dev the worker would serve stale assets
-  // and fight the HMR client.
+  // The worker is registered, kept current and swapped by useAppUpdate.
   //
-  // Skipping registration is not enough on its own. A worker installed by a
-  // production build — `vite preview`, or a deploy on the same host — outlives
-  // that build and keeps intercepting the origin, and its fetch handler serves
-  // anything ending in .js or .css cache-first. Point a dev server at that
-  // origin afterwards and the page loads the old build's chunks against the new
-  // modules, which crashes the app into the error boundary with nothing wrong
-  // in the source. So in dev, tear the worker down rather than ignore it.
+  // In dev it must not exist at all. Skipping registration is not enough: a
+  // worker installed by a production build — `vite preview`, or a deploy on
+  // the same host — outlives that build and keeps intercepting the origin,
+  // serving anything ending in .js or .css cache-first. Point a dev server at
+  // that origin afterwards and the page loads the old build's chunks against
+  // the new modules, which crashes the app with nothing wrong in the source.
+  // So in dev, tear it down rather than ignore it.
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
+    if (!("serviceWorker" in navigator) || import.meta.env.PROD) return;
 
-    if (!import.meta.env.PROD) {
-      void navigator.serviceWorker
-        .getRegistrations()
-        .then((registrations) => Promise.all(registrations.map((r) => r.unregister())))
-        .catch(() => {
-          // Nothing registered, or the browser refused — either way, no worker
-          // is going to interfere.
-        });
-      if (typeof caches !== "undefined") {
-        void caches
-          .keys()
-          .then((keys) =>
-            Promise.all(keys.filter((k) => k.startsWith("poba-")).map((k) => caches.delete(k))),
-          )
-          .catch(() => {});
-      }
-      return;
-    }
-
-    const register = () => {
-      navigator.serviceWorker.register("/sw.js").catch((error) => {
-        console.error("Service worker registration failed", error);
+    void navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((r) => r.unregister())))
+      .catch(() => {
+        // Nothing registered, or the browser refused — either way, no worker
+        // is going to interfere.
       });
-    };
-    // Wait for load so the worker never competes with the first render.
-    if (document.readyState === "complete") register();
-    else {
-      window.addEventListener("load", register, { once: true });
-      return () => window.removeEventListener("load", register);
+    if (typeof caches !== "undefined") {
+      void caches
+        .keys()
+        .then((keys) =>
+          Promise.all(keys.filter((k) => k.startsWith("poba-")).map((k) => caches.delete(k))),
+        )
+        .catch(() => {});
     }
   }, []);
 
@@ -239,6 +224,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      {/* At the root so it reaches the marketing page and the app alike, and
+          renders nothing at all until there is genuinely a new build waiting. */}
+      <UpdateBanner />
     </QueryClientProvider>
   );
 }

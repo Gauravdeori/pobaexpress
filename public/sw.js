@@ -22,9 +22,18 @@ self.addEventListener("install", (event) => {
     caches
       .open(SHELL_CACHE)
       // One missing entry must not fail the whole install.
-      .then((cache) => Promise.allSettled(SHELL_URLS.map((url) => cache.add(url))))
-      .then(() => self.skipWaiting()),
+      .then((cache) => Promise.allSettled(SHELL_URLS.map((url) => cache.add(url)))),
   );
+  // Deliberately no skipWaiting() here. Taking over immediately swaps the
+  // cache under a page that is still running the previous build's code, and
+  // the moment that page lazy-loads a chunk the new deploy no longer has, it
+  // dies. The new worker waits; the page swaps to it and reloads in one step,
+  // so code and assets always change together. See src/lib/app-update.ts.
+});
+
+// The page asking to be updated now.
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
