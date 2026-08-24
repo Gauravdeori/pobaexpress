@@ -39,6 +39,31 @@ function NotFoundComponent() {
   );
 }
 
+/**
+ * Tears down the service worker and every cache it owns, then reloads.
+ *
+ * The escape hatch for the one failure a customer cannot otherwise get out of:
+ * a worker holding a cache that no longer matches the deployed build serves
+ * that mismatch on every visit, including this error screen, and "try again"
+ * loads it straight back. Clearing site data is the only other cure and it
+ * lives four levels deep in browser settings.
+ */
+async function resetApp() {
+  try {
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((r) => r.unregister()));
+    }
+    if (typeof caches !== "undefined") {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+    }
+  } catch {
+    // Reload regardless: a partial teardown still beats the wedged state.
+  }
+  window.location.replace("/app");
+}
+
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
@@ -69,6 +94,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             Go home
           </a>
         </div>
+        <button
+          onClick={() => void resetApp()}
+          className="mt-6 text-xs font-medium text-muted-foreground underline"
+        >
+          Still broken? Reset the app
+        </button>
       </div>
     </div>
   );

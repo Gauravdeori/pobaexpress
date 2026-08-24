@@ -26,8 +26,16 @@ import {
   useAllOrders,
   useIsAdmin,
   useOffers,
+  type Offer,
   type OrderStatus,
 } from "@/lib/admin";
+import {
+  applyOffer,
+  normaliseCode,
+  offerSummary,
+  type DiscountKind,
+  type OfferTerms,
+} from "@/lib/promo-rules";
 import type { OrderRecord } from "@/lib/orders";
 
 export const Route = createFileRoute("/admin")({
@@ -319,8 +327,28 @@ function Offers() {
   const [headline, setHeadline] = useState("");
   const [detail, setDetail] = useState("");
   const [code, setCode] = useState("");
+  const [kind, setKind] = useState<DiscountKind>("percent");
+  const [value, setValue] = useState("10");
+  const [maxDiscount, setMaxDiscount] = useState("");
+  const [minSubtotal, setMinSubtotal] = useState("");
+  const [category, setCategory] = useState<Offer["category"]>("all");
+  const [expires, setExpires] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // What the customer will see on their bill, computed by the same function
+  // the checkout uses — so this preview cannot promise a figure the cart then
+  // refuses to give.
+  const terms: OfferTerms = {
+    kind,
+    value: Number(value) || 0,
+    maxDiscount: Number(maxDiscount) || 0,
+    minSubtotal: Number(minSubtotal) || 0,
+    category,
+    expiresAt: expires ? new Date(expires).getTime() : 0,
+    active: true,
+    code: code.trim() || null,
+  };
 
   const add = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -331,12 +359,22 @@ function Offers() {
       await createOffer({
         headline: headline.trim(),
         detail: detail.trim(),
-        code: code.trim() || null,
+        code: code.trim() ? normaliseCode(code) : null,
         active: true,
+        kind,
+        value: terms.value,
+        maxDiscount: terms.maxDiscount,
+        minSubtotal: terms.minSubtotal,
+        category,
+        expiresAt: terms.expiresAt,
       });
       setHeadline("");
       setDetail("");
       setCode("");
+      setValue("10");
+      setMaxDiscount("");
+      setMinSubtotal("");
+      setExpires("");
     } catch (cause) {
       console.error("Could not save the offer", cause);
       setError(cause instanceof Error ? cause.message : "Could not save the offer.");
@@ -373,6 +411,93 @@ function Offers() {
             className="h-12 rounded-2xl"
           />
         </div>
+
+        {/* The terms. Without these a code is a promise the bill does not
+            keep: the customer types it, nothing comes off, and the app has
+            lied to them. */}
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="text-sm">
+            <span className="font-medium text-primary">Discount type</span>
+            <select
+              value={kind}
+              onChange={(e) => setKind(e.target.value as DiscountKind)}
+              className="mt-1.5 h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm"
+            >
+              <option value="percent">Percent off</option>
+              <option value="flat">Flat ₹ off</option>
+            </select>
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-primary">
+              {kind === "percent" ? "Percent off" : "Rupees off"}
+            </span>
+            <Input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              inputMode="numeric"
+              className="mt-1.5 h-12 rounded-2xl"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-primary">Max discount ₹</span>
+            <Input
+              value={maxDiscount}
+              onChange={(e) => setMaxDiscount(e.target.value)}
+              inputMode="numeric"
+              placeholder="0 = no cap"
+              className="mt-1.5 h-12 rounded-2xl"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-primary">Minimum order ₹</span>
+            <Input
+              value={minSubtotal}
+              onChange={(e) => setMinSubtotal(e.target.value)}
+              inputMode="numeric"
+              placeholder="0 = any"
+              className="mt-1.5 h-12 rounded-2xl"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-primary">Applies to</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Offer["category"])}
+              className="mt-1.5 h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm"
+            >
+              <option value="all">Everything</option>
+              <option value="food">Food only</option>
+              <option value="cake">Cake only</option>
+              <option value="medicine">Medicine only</option>
+            </select>
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-primary">Expires (optional)</span>
+            <Input
+              type="date"
+              value={expires}
+              onChange={(e) => setExpires(e.target.value)}
+              className="mt-1.5 h-12 rounded-2xl"
+            />
+          </label>
+        </div>
+
+        {code.trim() && (
+          <div className="mt-4 rounded-2xl bg-secondary/70 p-3 text-sm">
+            <p className="font-semibold text-primary">
+              {normaliseCode(code)} — {offerSummary(terms)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              On a ₹500 food order that takes off{" "}
+              <span className="font-semibold text-primary">
+                {rupees(applyOffer(terms, 500, "food").discount)}
+              </span>
+              {applyOffer(terms, 500, "food").error
+                ? ` — ${applyOffer(terms, 500, "food").error}`
+                : "."}
+            </p>
+          </div>
+        )}
         {error && (
           <p role="alert" className="mt-3 text-sm font-medium text-destructive">
             {error}

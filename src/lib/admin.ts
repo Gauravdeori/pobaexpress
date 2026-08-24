@@ -16,6 +16,7 @@ import {
 import type { User } from "firebase/auth";
 
 import { db } from "./firebase";
+import { EMPTY_TERMS, normaliseCode, type OfferTerms } from "./promo-rules";
 import type { OrderDraft, OrderRecord } from "./orders";
 
 /**
@@ -126,28 +127,49 @@ export async function setOrderStatus(orderId: string, status: OrderStatus) {
 
 // ------------------------------------------------------------------ offers --
 
-export type Offer = {
+export type Offer = OfferTerms & {
   id: string;
   /** The line a customer reads first. */
   headline: string;
   /** The supporting line under it. */
   detail: string;
-  /** Optional code to quote when ordering. */
-  code: string | null;
-  /** Hidden from the site when false, without deleting the record. */
-  active: boolean;
   createdAt: Date | null;
 };
 
-export type OfferDraft = Pick<Offer, "headline" | "detail" | "code" | "active">;
+export type OfferDraft = Pick<
+  Offer,
+  | "headline"
+  | "detail"
+  | "code"
+  | "active"
+  | "kind"
+  | "value"
+  | "maxDiscount"
+  | "minSubtotal"
+  | "category"
+  | "expiresAt"
+>;
 
 function toOffer(id: string, data: Record<string, unknown>): Offer {
+  // Every term is defaulted: offers written before discounts existed have none
+  // of these fields, and a missing `value` read as NaN would price an order.
   return {
+    ...EMPTY_TERMS,
     id,
     headline: String(data.headline ?? ""),
     detail: String(data.detail ?? ""),
     code: (data.code as string | null) ?? null,
     active: data.active === true,
+    kind: data.kind === "flat" ? "flat" : "percent",
+    value: Number(data.value) || 0,
+    maxDiscount: Number(data.maxDiscount) || 0,
+    minSubtotal: Number(data.minSubtotal) || 0,
+    category: (["all", "food", "cake", "medicine"] as const).includes(
+      data.category as "all" | "food" | "cake" | "medicine",
+    )
+      ? (data.category as Offer["category"])
+      : "all",
+    expiresAt: Number(data.expiresAt) || 0,
     createdAt: (data.createdAt as Timestamp | undefined)?.toDate() ?? null,
   };
 }
@@ -212,4 +234,20 @@ export async function setOfferActive(offerId: string, active: boolean) {
 export async function deleteOffer(offerId: string) {
   if (!db) return;
   await deleteDoc(doc(db, "offers", offerId));
+}
+
+/**
+ * The active offer a customer's typed code refers to, if any.
+ *
+ * Read straight from the browser, which is safe to do because `offers` is
+ * public — it is what the banners are drawn from. The discount it produces is
+ * therefore only as trustworthy as the client, which is fine here and nowhere
+ * near enough for prepaid: every order is confirmed by a person on WhatsApp
+ * before anyone cooks, and that is where a tampered total would be caught.
+ */
+export async function findOfferByCode(code: string): Promise<Offer | null> {
+  const wanted = normaliseCode(code);
+  if (!wanted || !db) return null;
+  const offers = await listActiveOffers();
+  return offers.find((offer) => offer.code && normaliseCode(offer.code) === wanted) ?? null;
 }

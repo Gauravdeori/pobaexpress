@@ -56,6 +56,9 @@ export type OrderDraft = {
    * what settles where the rider knocks.
    */
   location: { latitude: number; longitude: number; accuracy: number; url: string } | null;
+  /** The code the customer used, and what it took off. Both null/0 without one. */
+  discountCode?: string | null;
+  discount?: number;
   /** Absent on orders placed through the marketing page's WhatsApp form. */
   payment?: Payment;
 };

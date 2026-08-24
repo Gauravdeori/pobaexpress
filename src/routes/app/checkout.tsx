@@ -20,6 +20,8 @@ import {
   type MedicineRequest,
 } from "@/lib/medicine-request";
 import { recordOrder, type OrderLine, type Payment } from "@/lib/orders";
+import { findOfferByCode, type Offer } from "@/lib/admin";
+import { applyOffer, normaliseCode } from "@/lib/promo-rules";
 
 export const Route = createFileRoute("/app/checkout")({
   // Returning the key unconditionally would make ?kind= required on every link
@@ -117,12 +119,43 @@ function CheckoutScreen() {
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [coords, setCoords] = useState<Coords | null>(null);
+  const [codeInput, setCodeInput] = useState("");
+  const [offer, setOffer] = useState<Offer | null>(null);
+  const [codeBusy, setCodeBusy] = useState(false);
+  const [codeError, setCodeError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
 
   // Medicine has no priced lines, so its total is settled on WhatsApp.
-  const payable = medicine ? 0 : total;
+  //
+  // The discount comes off the subtotal, never the delivery fee: the fee is
+  // what the rider is paid, and a code that ate into it would be the rider
+  // funding the offer.
+  const discount = medicine ? 0 : applyOffer(offer, subtotal, cart.category).discount;
+  const payable = medicine ? 0 : Math.max(0, total - discount);
+
+  const applyCode = async () => {
+    const typed = normaliseCode(codeInput);
+    if (!typed) return;
+    setCodeBusy(true);
+    setCodeError(null);
+    try {
+      const found = await findOfferByCode(typed);
+      const { error } = applyOffer(found, subtotal, cart.category);
+      if (error) {
+        setOffer(null);
+        setCodeError(error);
+      } else {
+        setOffer(found);
+      }
+    } catch (cause) {
+      console.error("Could not check that code", cause);
+      setCodeError("Could not check that code. Try again.");
+    } finally {
+      setCodeBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!medicine) return;
@@ -208,6 +241,8 @@ function CheckoutScreen() {
         prescriptionId: medicine ? medicineRequest.prescriptionId : null,
         prescriptionUrl: medicine ? medicineRequest.prescriptionUrl : null,
         location: coords ? { ...coords, url: mapsLink(coords) } : null,
+        discountCode: offer?.code ?? null,
+        discount,
         payment,
       },
       user?.uid ?? null,
@@ -232,6 +267,7 @@ function CheckoutScreen() {
             .join("\n"),
       ``,
       medicine ? `Delivery: ${rupees(deliveryFee("medicine"))}` : `Subtotal: ${rupees(subtotal)}`,
+      !medicine && discount > 0 ? `Discount (${offer?.code}): -${rupees(discount)}` : ``,
       medicine ? `` : `Delivery: ${rupees(fee)}`,
       medicine ? `Total: confirmed after the pharmacy quotes` : `*Total: ${rupees(total)}*`,
       ``,
@@ -317,13 +353,79 @@ function CheckoutScreen() {
               <span>Delivery</span>
               <span>{rupees(fee)}</span>
             </div>
+            {discount > 0 && (
+              <div className="mt-2 flex justify-between font-medium text-accent">
+                <span>Discount ({offer?.code})</span>
+                <span>−{rupees(discount)}</span>
+              </div>
+            )}
             <div className="mt-3 flex justify-between border-t border-border pt-3 text-base font-bold text-primary">
               <span>Total</span>
-              <span>{rupees(total)}</span>
+              <span>{rupees(payable)}</span>
             </div>
           </>
         )}
       </div>
+
+      {/* A code is only offered where there is a priced bill to take it off.
+          Medicine has no total until the pharmacy quotes one. */}
+      {!medicine && (
+        <div className="mt-3 rounded-2xl border border-border bg-card p-4">
+          {discount > 0 ? (
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Check className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-primary">{offer?.code} applied</p>
+                <p className="text-xs text-muted-foreground">{rupees(discount)} off this order</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setOffer(null);
+                  setCodeInput("");
+                  setCodeError(null);
+                }}
+                className="shrink-0 text-xs font-semibold text-muted-foreground underline"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <>
+              <Label htmlFor="co-code">Have a code?</Label>
+              <div className="mt-1.5 flex gap-2">
+                <Input
+                  id="co-code"
+                  value={codeInput}
+                  onChange={(e) => {
+                    setCodeInput(e.target.value);
+                    setCodeError(null);
+                  }}
+                  placeholder="POBA20"
+                  autoCapitalize="characters"
+                  className="h-11 flex-1 uppercase"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 shrink-0 rounded-xl px-5"
+                  disabled={codeBusy || !codeInput.trim()}
+                  onClick={() => void applyCode()}
+                >
+                  {codeBusy ? "Checking…" : "Apply"}
+                </Button>
+              </div>
+              {codeError && (
+                <p role="alert" className="mt-2 text-xs font-medium text-destructive">
+                  {codeError}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Details */}
       <div className="mt-5 grid gap-4">
