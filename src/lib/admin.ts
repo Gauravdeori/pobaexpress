@@ -75,8 +75,30 @@ export function useIsAdmin(user: User | null) {
 
 // ------------------------------------------------------------------ orders --
 
-export const ORDER_STATUSES = ["new", "confirmed", "delivered", "cancelled"] as const;
+/**
+ * The life of an order, in the order it happens.
+ *
+ * The customer's screen has always been able to render "Being prepared" and
+ * "On the way" — this list is what an admin could actually set, and it was
+ * missing both, so those two states could never be reached. Adding them here
+ * and to firestore.rules is what makes the screen tell the truth.
+ */
+export const ORDER_FLOW = ["new", "confirmed", "preparing", "on-the-way", "delivered"] as const;
+
+/** Every state, including the one that is not part of the happy path. */
+export const ORDER_STATUSES = [...ORDER_FLOW, "cancelled"] as const;
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+/** What the button that advances an order says, per current state. */
+export const NEXT_STEP: Partial<Record<OrderStatus, { to: OrderStatus; label: string }>> = {
+  new: { to: "confirmed", label: "Accept order" },
+  confirmed: { to: "preparing", label: "Start preparing" },
+  preparing: { to: "on-the-way", label: "Out for delivery" },
+  "on-the-way": { to: "delivered", label: "Mark delivered" },
+};
+
+/** Quick ETA choices, in minutes. Anything else is typed in. */
+export const ETA_PRESETS = [15, 20, 30, 45, 60] as const;
 
 /**
  * Every order, newest first, kept live.
@@ -105,12 +127,14 @@ export function useAllOrders(enabled: boolean) {
             const data = entry.data() as OrderDraft & {
               status?: string;
               createdAt?: Timestamp;
+              etaAt?: number;
             };
             return {
               ...data,
               id: entry.id,
               status: data.status ?? "new",
               placedAt: data.createdAt?.toDate() ?? null,
+              etaAt: typeof data.etaAt === "number" ? data.etaAt : null,
             };
           }),
         );
@@ -129,10 +153,47 @@ export function useAllOrders(enabled: boolean) {
   return { orders, error, loading };
 }
 
-/** Rules allow an admin to change status and nothing else on an order. */
+/** Rules allow an admin to change status, the ETA, and nothing else. */
 export async function setOrderStatus(orderId: string, status: OrderStatus) {
   if (!db) return;
   await updateDoc(doc(db, "orders", orderId), { status, updatedAt: serverTimestamp() });
+}
+
+/**
+ * "About 30 minutes", stored as the moment that lands on.
+ *
+ * Pass null to clear it — an order that has arrived should stop advertising a
+ * time it no longer has, and so should one that was cancelled.
+ */
+export async function setOrderEta(orderId: string, minutesFromNow: number | null) {
+  if (!db) return;
+  await updateDoc(doc(db, "orders", orderId), {
+    etaAt: minutesFromNow === null ? null : Date.now() + minutesFromNow * 60_000,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+/**
+ * Advance an order and give it a time in one write.
+ *
+ * One write rather than two because they are one decision: "out for delivery,
+ * twenty minutes" should not be able to half-succeed and leave a rider on the
+ * road with yesterday's estimate showing.
+ */
+export async function setOrderProgress(
+  orderId: string,
+  status: OrderStatus,
+  minutesFromNow?: number | null,
+) {
+  if (!db) return;
+  const patch: Record<string, unknown> = { status, updatedAt: serverTimestamp() };
+  // Delivered and cancelled orders are done moving, so any estimate on them is
+  // stale by definition.
+  if (status === "delivered" || status === "cancelled") patch.etaAt = null;
+  else if (minutesFromNow !== undefined) {
+    patch.etaAt = minutesFromNow === null ? null : Date.now() + minutesFromNow * 60_000;
+  }
+  await updateDoc(doc(db, "orders", orderId), patch);
 }
 
 // ------------------------------------------------------------------ offers --

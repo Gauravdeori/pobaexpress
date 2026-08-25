@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  Bike,
+  Check,
   ClipboardList,
   Loader2,
   Lock,
@@ -9,8 +11,11 @@ import {
   Phone,
   Plus,
   Tag,
+  Timer,
   Rocket,
+  ShoppingBag,
   Trash2,
+  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -21,11 +26,13 @@ import { rupees } from "@/lib/menu";
 import { timeUntil } from "@/lib/launch";
 import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
 import {
+  ETA_PRESETS,
+  NEXT_STEP,
   ORDER_STATUSES,
   createOffer,
   deleteOffer,
   setOfferActive,
-  setOrderStatus,
+  setOrderProgress,
   useAllOrders,
   useIsAdmin,
   useOffers,
@@ -52,9 +59,28 @@ export const Route = createFileRoute("/admin")({
 const STATUS_STYLES: Record<string, string> = {
   new: "bg-accent/10 text-accent",
   confirmed: "bg-blue-500/10 text-blue-700",
+  preparing: "bg-amber-500/10 text-amber-700",
+  "on-the-way": "bg-violet-500/10 text-violet-700",
   delivered: "bg-primary/10 text-primary",
   cancelled: "bg-destructive/10 text-destructive",
 };
+
+const STATUS_LABELS: Record<string, string> = {
+  new: "new",
+  confirmed: "accepted",
+  preparing: "preparing",
+  "on-the-way": "on the way",
+  delivered: "delivered",
+  cancelled: "cancelled",
+};
+
+/** "in about 25 min", or that it is overdue, from a stored arrival time. */
+function etaLabel(etaAt: number): string {
+  const minutes = Math.round((etaAt - Date.now()) / 60_000);
+  if (minutes < -1) return `${Math.abs(minutes)} min overdue`;
+  if (minutes <= 1) return "due now";
+  return `in about ${minutes} min`;
+}
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -67,13 +93,24 @@ function Shell({ children }: { children: React.ReactNode }) {
             </div>
             Poba Express admin
           </span>
-          <Link
-            to="/"
-            className="flex min-h-9 items-center gap-2 rounded-full border border-border/50 bg-card px-4 text-sm font-medium text-muted-foreground shadow-sm transition-all hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
-          >
-            <ArrowLeft className="size-4" />
-            Back to site
-          </Link>
+          <div className="flex items-center gap-2">
+            {/* An admin who got here from the app's account screen wants to go
+                back to the app, not to the marketing page. Both, then. */}
+            <Link
+              to="/app"
+              className="flex min-h-9 items-center gap-2 rounded-full border border-border/50 bg-card px-4 text-sm font-medium text-muted-foreground shadow-sm transition-all hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
+            >
+              <ShoppingBag className="size-4" />
+              Order in the app
+            </Link>
+            <Link
+              to="/"
+              className="flex min-h-9 items-center gap-2 rounded-full border border-border/50 bg-card px-4 text-sm font-medium text-muted-foreground shadow-sm transition-all hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
+            >
+              <ArrowLeft className="size-4" />
+              Site
+            </Link>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-5 py-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
@@ -227,10 +264,10 @@ function Orders() {
   const { orders, error, loading } = useAllOrders(true);
   const [busy, setBusy] = useState<string | null>(null);
 
-  const change = async (id: string, status: OrderStatus) => {
+  const change = async (id: string, status: OrderStatus, eta?: number | null) => {
     setBusy(id);
     try {
-      await setOrderStatus(id, status);
+      await setOrderProgress(id, status, eta);
     } catch (cause) {
       console.error("Could not update the order", cause);
     } finally {
@@ -282,8 +319,11 @@ function OrderCard({
 }: {
   order: OrderRecord;
   busy: boolean;
-  onChange: (id: string, status: OrderStatus) => void;
+  onChange: (id: string, status: OrderStatus, eta?: number | null) => void;
 }) {
+  const next = NEXT_STEP[order.status as OrderStatus];
+  const settled = order.status === "delivered" || order.status === "cancelled";
+
   return (
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -363,27 +403,97 @@ function OrderCard({
         </a>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-        <span
-          className={cn(
-            "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide",
-            STATUS_STYLES[order.status] ?? "bg-secondary text-muted-foreground",
-          )}
-        >
-          {order.status}
-        </span>
-        <span className="text-xs text-muted-foreground">move to</span>
-        {ORDER_STATUSES.filter((s) => s !== order.status).map((status) => (
-          <button
-            key={status}
-            type="button"
-            disabled={busy}
-            onClick={() => onChange(order.id, status)}
-            className="min-h-9 rounded-full border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+      <div className="mt-4 space-y-3 border-t border-border pt-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide",
+              STATUS_STYLES[order.status] ?? "bg-secondary text-muted-foreground",
+            )}
           >
-            {status}
-          </button>
-        ))}
+            {STATUS_LABELS[order.status] ?? order.status}
+          </span>
+
+          {order.etaAt !== null && !settled && (
+            <span className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">
+              <Timer className="size-3.5" />
+              {etaLabel(order.etaAt)}
+            </span>
+          )}
+
+          {/* The one button that matters, sized like it: accept, then start,
+              then out, then done. Everything else on this card is a detour. */}
+          {next && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onChange(order.id, next.to)}
+              className="ml-auto inline-flex min-h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-xs font-bold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {next.to === "on-the-way" ? (
+                <Bike className="size-3.5" />
+              ) : (
+                <Check className="size-3.5" />
+              )}
+              {next.label}
+            </button>
+          )}
+        </div>
+
+        {/* Estimated arrival. Hidden once the order is delivered or cancelled,
+            where a time is no longer a promise about anything. */}
+        {!settled && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Timer className="size-3.5" />
+              Arriving in
+            </span>
+            {ETA_PRESETS.map((minutes) => (
+              <button
+                key={minutes}
+                type="button"
+                disabled={busy}
+                onClick={() => onChange(order.id, order.status as OrderStatus, minutes)}
+                className="min-h-9 rounded-full border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+              >
+                {minutes} min
+              </button>
+            ))}
+            {order.etaAt !== null && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => onChange(order.id, order.status as OrderStatus, null)}
+                className="min-h-9 rounded-full px-2 text-xs font-medium text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
+              >
+                clear
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">or move to</span>
+          {ORDER_STATUSES.filter((status) => status !== order.status && status !== next?.to).map(
+            (status) => (
+              <button
+                key={status}
+                type="button"
+                disabled={busy}
+                onClick={() => onChange(order.id, status)}
+                className={cn(
+                  "min-h-9 rounded-full border border-border px-3 text-xs font-medium transition-colors disabled:opacity-50",
+                  status === "cancelled"
+                    ? "text-muted-foreground hover:border-destructive hover:text-destructive"
+                    : "text-muted-foreground hover:border-accent hover:text-accent",
+                )}
+              >
+                {status === "cancelled" && <X className="mr-1 inline size-3" />}
+                {STATUS_LABELS[status] ?? status}
+              </button>
+            ),
+          )}
+        </div>
       </div>
     </>
   );

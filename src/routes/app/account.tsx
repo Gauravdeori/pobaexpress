@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { LogOut, Mail } from "lucide-react";
+import { ClipboardList, LogOut, Mail, ShieldCheck } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   signUpWithPassword,
   useAccount,
 } from "@/lib/account";
+import { useIsAdmin } from "@/lib/admin";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { PHONE_DISPLAY, PHONE_HREF, WHATSAPP_DISPLAY, whatsappLink } from "@/lib/contact";
 
@@ -23,6 +24,10 @@ export const Route = createFileRoute("/app/account")({
 
 function AccountScreen() {
   const { user, profile, loading } = useAccount();
+  // An admin is an ordinary customer here — same cart, same checkout, same
+  // history. The only difference is that the back office is one tap away
+  // instead of a URL they have to remember.
+  const { isAdmin } = useIsAdmin(user);
   const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,6 +70,26 @@ function AccountScreen() {
               Saved address: <span className="text-primary">{profile.address}</span>
             </p>
           )}
+          {isAdmin && (
+            <div className="mt-4 rounded-2xl border border-accent/30 bg-accent/5 p-3">
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-accent">
+                <ShieldCheck className="size-3.5" />
+                Admin
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                You can order from this account like anyone else. The console is for accepting
+                orders, setting an arrival time and moving them along.
+              </p>
+              <Link
+                to="/admin"
+                className="mt-3 flex h-11 items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
+              >
+                <ClipboardList className="size-4" />
+                Open the admin console
+              </Link>
+            </div>
+          )}
+
           <Button
             variant="outline"
             className="mt-4 h-11 w-full rounded-2xl"

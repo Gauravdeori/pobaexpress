@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Clock, LogIn, MapPin, Package, Paperclip } from "lucide-react";
+import { Bike, Clock, LogIn, MapPin, Package, Paperclip, Timer } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,24 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
+/**
+ * The estimated arrival, in words, or null when there is nothing to say.
+ *
+ * Recomputed on render rather than stored as text, because "in 25 minutes"
+ * written half an hour ago is worse than no estimate at all. Past the estimate
+ * it says so plainly instead of counting up: a customer who can see the app
+ * knows it is late, and pretending otherwise is how an app stops being read.
+ */
+function etaLabel(etaAt: number | null, status: string): string | null {
+  if (etaAt === null) return null;
+  if (status === "delivered" || status === "cancelled") return null;
+
+  const minutes = Math.round((etaAt - Date.now()) / 60_000);
+  if (minutes < -1) return "Running late — we'll be with you as soon as we can";
+  if (minutes <= 1) return "Arriving any moment";
+  return `Arriving in about ${minutes} min`;
+}
+
 function placedLabel(date: Date | null): string {
   if (!date) return "Just now";
   return date.toLocaleString("en-IN", {
@@ -59,6 +77,7 @@ function placedLabel(date: Date | null): string {
 function OrderCard({ order }: { order: OrderRecord }) {
   const title =
     order.category === "medicine" ? "Medicine" : order.category === "cake" ? "Cake" : "Food";
+  const eta = etaLabel(order.etaAt, order.status);
 
   return (
     <li className="rounded-2xl border border-border bg-card p-4">
@@ -72,6 +91,17 @@ function OrderCard({ order }: { order: OrderRecord }) {
         </div>
         <StatusPill status={order.status} />
       </div>
+
+      {eta && (
+        <p className="mt-3 flex items-center gap-2 rounded-xl bg-accent/10 px-3 py-2 text-xs font-bold text-accent">
+          {order.status === "on-the-way" ? (
+            <Bike className="size-3.5 shrink-0" />
+          ) : (
+            <Timer className="size-3.5 shrink-0" />
+          )}
+          {eta}
+        </p>
+      )}
 
       {order.lines.length > 0 && (
         <ul className="mt-3 grid gap-1 border-t border-border pt-3 text-sm">

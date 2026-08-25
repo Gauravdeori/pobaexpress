@@ -74,6 +74,17 @@ export type OrderRecord = OrderDraft & {
   status: string;
   /** Null for the moment between the write and the server stamping it. */
   placedAt: Date | null;
+  /**
+   * When the rider is expected, as epoch milliseconds, or null until an admin
+   * says.
+   *
+   * An absolute moment rather than "30 minutes", because a duration is only
+   * true at the instant it is written: a customer who opens the screen twenty
+   * minutes later would read the same thirty minutes again and be told the
+   * wrong thing twice. Stored as a plain number so the update rule can check
+   * its type without a Timestamp import.
+   */
+  etaAt: number | null;
 };
 
 /**
@@ -93,12 +104,17 @@ export async function listOrders(uid: string): Promise<OrderRecord[]> {
 
   return snapshot.docs
     .map((entry) => {
-      const data = entry.data() as OrderDraft & { status?: string; createdAt?: Timestamp };
+      const data = entry.data() as OrderDraft & {
+        status?: string;
+        createdAt?: Timestamp;
+        etaAt?: number;
+      };
       return {
         ...data,
         id: entry.id,
         status: data.status ?? "new",
         placedAt: data.createdAt?.toDate() ?? null,
+        etaAt: typeof data.etaAt === "number" ? data.etaAt : null,
       };
     })
     .sort((a, b) => (b.placedAt?.getTime() ?? 0) - (a.placedAt?.getTime() ?? 0));
@@ -111,6 +127,10 @@ export async function recordOrder(draft: OrderDraft, uid: string | null): Promis
       ...draft,
       userId: uid,
       status: "new",
+      // Written as null rather than left off, so the admin's first update is a
+      // change to an existing field instead of adding one the rule would have
+      // to allow separately.
+      etaAt: null,
       createdAt: serverTimestamp(),
     });
   } catch (error) {
