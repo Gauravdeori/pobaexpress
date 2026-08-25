@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
  *
  * Fixed to IST (+05:30) rather than the visitor's timezone, so everyone counts
  * down to the same moment. Change the time here to launch at a business hour
- * instead of midnight — for example `2026-08-25T09:00:00+05:30`.
+ * instead of midnight — for example `2026-08-27T09:00:00+05:30`.
  *
  * These two are the only place the date is written down; the countdown, the
  * order form, the sticky bar and the checkout all read them, so they can never
  * disagree about the day.
  */
-export const LAUNCH_AT = new Date("2026-08-25T00:00:00+05:30");
+export const LAUNCH_AT = new Date("2026-08-27T00:00:00+05:30");
 
 /** Shown alongside the countdown. Must name the same day as `LAUNCH_AT`. */
-export const LAUNCH_DATE_LABEL = "25 August 2026";
+export const LAUNCH_DATE_LABEL = "27 August 2026";
 
 /**
  * Opens ordering now, whatever the date says. TEMPORARY — for testing the
