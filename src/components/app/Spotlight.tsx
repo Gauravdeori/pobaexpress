@@ -36,10 +36,6 @@ type Spotlight = {
  * "from" price lies about that dish the moment something else is cheaper.
  */
 const COPY: Record<string, { headline: string; detail: string }> = {
-  "barman-restaurant": {
-    headline: "Flavour that hits the spot",
-    detail: "Chowmein, fried rice, momos and biryani",
-  },
   "dispy-bakery": {
     headline: "Homemade pizza, out of the oven",
     detail: "Veg, sweetcorn, paneer and chicken",

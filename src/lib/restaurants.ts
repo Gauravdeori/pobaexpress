@@ -3,7 +3,6 @@ import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
 
 import {
-  BARMAN_MENU,
   DAJU_BAHADUR_MENU,
   DCAKERY_MENU,
   DIPJOY_BITE_HOUSE_MENU,
@@ -48,16 +47,6 @@ export type Restaurant = {
  * quotes, so it has to match the section headings in menu.ts exactly.
  */
 export const RESTAURANTS: Restaurant[] = [
-  {
-    slug: "barman-restaurant",
-    name: "Barman Restaurant",
-    category: "food",
-    cuisine: "Chowmein · Fried rice · Momos · Biryani",
-    image: chowmeinImg,
-    eta: [15, 25],
-    hours: "Daily 11 AM – 10 PM",
-    items: BARMAN_MENU,
-  },
   {
     slug: "prarthona",
     name: "Prarthona Restaurant",

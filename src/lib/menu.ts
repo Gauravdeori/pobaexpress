@@ -71,20 +71,6 @@ import milletCakeLoafImg from "@/assets/millet-cake-loaf.jpg";
  * different prices — an unprefixed `chicken-chowmein-half` would collide in the
  * cart and in saved orders.
  */
-export const BARMAN_MENU: MenuItem[] = [
-  { id: "bm-chowmein", name: "Chowmein", price: 79, image: chowmeinImg },
-  { id: "bm-fried-rice", name: "Fried Rice", price: 79, image: friedRiceImg },
-  { id: "bm-momos", name: "Momos", price: 79, image: momosImg },
-  { id: "bm-biryani", name: "Biryani", price: 109, image: biryaniImg },
-  {
-    id: "bm-chicken-lollipop",
-    name: "Chicken Lollipop",
-    variant: "5 pieces",
-    price: 159,
-    image: lollipopImg,
-  },
-];
-
 export const PRARTHONA_MENU: MenuItem[] = [
   { id: "pr-veg-fried-rice", name: "Veg Fried Rice", price: 67, image: friedRiceImg },
   { id: "pr-egg-fried-rice", name: "Egg Fried Rice", price: 78, image: friedRiceImg },
@@ -301,7 +287,6 @@ const MENU_SECTIONS: Record<string, MenuSection[]> = {
   // track of who is cooking it. Names must match `RESTAURANTS` in
   // restaurants.ts, which is what the cart records as its source.
   food: [
-    { restaurant: "Barman Restaurant", items: BARMAN_MENU },
     { restaurant: "Prarthona Restaurant", items: PRARTHONA_MENU },
     { restaurant: "Daju Bahadur", items: DAJU_BAHADUR_MENU },
     { restaurant: "Dispy Bakery", items: DISPY_BAKERY_MENU },
