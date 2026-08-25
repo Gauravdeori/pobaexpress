@@ -34,7 +34,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           // FORCE OVERRIDE: Delete ALL caches immediately to fix the user's issue
-          keys.map((key) => caches.delete(key))
+          keys.map((key) => caches.delete(key)),
         ),
       )
       .then(() => self.clients.claim()),

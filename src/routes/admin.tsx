@@ -85,8 +85,9 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 function Admin() {
   const { user, loading: authLoading } = useAccount();
-  const { isAdmin, checking } = useIsAdmin(user);
+  const { isAdmin, checking, denied } = useIsAdmin(user);
   const [tab, setTab] = useState<"orders" | "offers" | "launch">("orders");
+  const [copied, setCopied] = useState(false);
 
   if (authLoading || checking) {
     return (
@@ -114,17 +115,67 @@ function Admin() {
   if (!isAdmin) {
     return (
       <Shell>
-        <h1 className="text-2xl font-bold text-primary">Not an admin account</h1>
+        <h1 className="text-2xl font-bold text-primary">
+          {denied ? "Access check refused" : "Not an admin account"}
+        </h1>
         <p className="mt-2 max-w-prose text-muted-foreground">
           You&apos;re signed in as{" "}
-          <span className="font-medium text-primary">{accountLabel(user)}</span>, which isn&apos;t
-          on the admin list.
+          <span className="font-medium text-primary">{accountLabel(user)}</span>
+          {denied
+            ? ", but Firestore refused the permission check itself — which usually means the rules in this repo have not been deployed yet."
+            : ", which isn't on the admin list."}
         </p>
-        <p className="mt-4 max-w-prose text-sm text-muted-foreground">
-          To grant access, create a document in Firestore at{" "}
-          <code className="rounded bg-secondary px-1.5 py-0.5 text-primary">admins/{user.uid}</code>{" "}
-          — the fields don&apos;t matter, only that it exists.
-        </p>
+
+        {denied ? (
+          <div className="mt-5 rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold text-primary">Deploy the rules first</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              From the project folder, then reload this page:
+            </p>
+            <code className="mt-3 block overflow-x-auto rounded-xl bg-secondary px-3 py-2 text-xs text-primary">
+              npx firebase deploy --only firestore:rules
+            </code>
+          </div>
+        ) : (
+          <div className="mt-5 rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold text-primary">To grant yourself access</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+              <li>
+                Firebase console → Firestore Database → <b>Start collection</b>, id{" "}
+                <code className="rounded bg-secondary px-1 text-primary">admins</code>
+              </li>
+              <li>
+                Document ID: the id below, copied exactly. Fields don&apos;t matter — add any one,
+                or none.
+              </li>
+              <li>Save, then reload this page.</li>
+            </ol>
+
+            {/* Copyable, because this is the whole point of the screen and a
+                28-character id cannot be selected out of a paragraph on a
+                phone, which is the device the shop is run from. */}
+            <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Your account id
+            </p>
+            <div className="mt-1.5 flex items-center gap-2">
+              <code className="min-w-0 flex-1 overflow-x-auto rounded-xl bg-secondary px-3 py-2 font-mono text-xs text-primary">
+                {user.uid}
+              </code>
+              <Button
+                variant="outline"
+                className="h-10 shrink-0 rounded-xl px-4"
+                onClick={() => {
+                  void navigator.clipboard.writeText(user.uid).then(
+                    () => setCopied(true),
+                    () => setCopied(false),
+                  );
+                }}
+              >
+                {copied ? "Copied" : "Copy"}
+              </Button>
+            </div>
+          </div>
+        )}
       </Shell>
     );
   }

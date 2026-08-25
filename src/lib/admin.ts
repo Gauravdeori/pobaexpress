@@ -35,6 +35,11 @@ import type { OrderDraft, OrderRecord } from "./orders";
 export function useIsAdmin(user: User | null) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
+  // "Not on the list" and "the rules refused the question" both end with the
+  // door shut, and they used to be indistinguishable — so a rules file that
+  // was never deployed looked exactly like a missing document, and you could
+  // spend a long time creating the document again.
+  const [denied, setDenied] = useState(false);
 
   useEffect(() => {
     if (!db || !user) {
@@ -44,20 +49,18 @@ export function useIsAdmin(user: User | null) {
     }
     let cancelled = false;
     setChecking(true);
-    
-    console.log("--- ADMIN CHECK DEBUG ---");
-    console.log("Checking UID:", `"${user.uid}"`);
-    console.log("Expected Document Path: admins/" + user.uid);
-    
+    setDenied(false);
+
     getDoc(doc(db, "admins", user.uid))
       .then((snapshot) => {
-        console.log("Document fetch successful. Does it exist?", snapshot.exists());
         if (!cancelled) setIsAdmin(snapshot.exists());
       })
-      .catch((err) => {
-        console.error("Document fetch failed with error:", err.message);
-        // A denied read means not an admin, which is the same outcome.
-        if (!cancelled) setIsAdmin(false);
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setIsAdmin(false);
+        const code = (error as { code?: string })?.code ?? "";
+        setDenied(code === "permission-denied");
+        console.error("Admin check failed", error);
       })
       .finally(() => {
         if (!cancelled) setChecking(false);
@@ -67,7 +70,7 @@ export function useIsAdmin(user: User | null) {
     };
   }, [user]);
 
-  return { isAdmin, checking };
+  return { isAdmin, checking, denied };
 }
 
 // ------------------------------------------------------------------ orders --
