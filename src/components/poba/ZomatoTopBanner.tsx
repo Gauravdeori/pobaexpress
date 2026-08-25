@@ -816,21 +816,37 @@ export function ZomatoTopBanner() {
       {/* 4. PERKS & TRUST STRIP */}
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+          <div className="group relative overflow-hidden flex items-center gap-3 rounded-2xl border border-border/80 bg-gradient-to-br from-emerald-950/40 via-card to-card p-3 shadow-soft transition-all duration-300 hover:border-emerald-500/40">
+            <svg
+              className="pointer-events-none absolute -right-2 -bottom-2 size-16 text-emerald-500/10 transition-transform duration-300 group-hover:scale-110"
+              viewBox="0 0 100 100"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M10 50 Q50 20 90 50" strokeWidth="4" strokeDasharray="6 6" />
+              <path d="M30 80 L70 20" strokeWidth="3" />
+            </svg>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 shadow-sm group-hover:bg-emerald-500 group-hover:text-emerald-950 transition-colors">
               <Zap className="size-5" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 z-10">
               <div className="text-xs font-extrabold text-foreground">15–25 Min Delivery</div>
               <div className="text-[10px] font-semibold text-muted-foreground">Fast in Jonai</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+          <div className="group relative overflow-hidden flex items-center gap-3 rounded-2xl border border-border/80 bg-gradient-to-br from-amber-950/40 via-card to-card p-3 shadow-soft transition-all duration-300 hover:border-amber-500/40">
+            <svg
+              className="pointer-events-none absolute -right-2 -bottom-2 size-16 text-amber-500/10 transition-transform duration-300 group-hover:scale-110"
+              viewBox="0 0 100 100"
+              fill="currentColor"
+            >
+              <circle cx="50" cy="50" r="30" opacity="0.2" />
+            </svg>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 shadow-sm group-hover:bg-amber-500 group-hover:text-amber-950 transition-colors">
               <Percent className="size-5" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 z-10">
               <div className="text-xs font-extrabold text-foreground">
                 Delivery from ₹{MIN_DELIVERY_FEE}
               </div>
@@ -840,11 +856,19 @@ export function ZomatoTopBanner() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+          <div className="group relative overflow-hidden flex items-center gap-3 rounded-2xl border border-border/80 bg-gradient-to-br from-cyan-950/40 via-card to-card p-3 shadow-soft transition-all duration-300 hover:border-cyan-500/40">
+            <svg
+              className="pointer-events-none absolute -right-2 -bottom-2 size-16 text-cyan-500/10 transition-transform duration-300 group-hover:scale-110"
+              viewBox="0 0 100 100"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M50 10 L85 25 V55 Q50 90 50 90 Q50 90 15 55 V25 Z" strokeWidth="3" />
+            </svg>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400 shadow-sm group-hover:bg-cyan-500 group-hover:text-cyan-950 transition-colors">
               <ShieldCheck className="size-5" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 z-10">
               <div className="text-xs font-extrabold text-foreground">100% Safe Packaging</div>
               <div className="text-[10px] font-semibold text-muted-foreground">
                 Hygienic & sealed
@@ -852,14 +876,21 @@ export function ZomatoTopBanner() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-              <MessageCircle className="size-5 fill-green-600 text-green-600" />
+          <div className="group relative overflow-hidden flex items-center gap-3 rounded-2xl border border-border/80 bg-gradient-to-br from-rose-950/40 via-card to-card p-3 shadow-soft transition-all duration-300 hover:border-rose-500/40">
+            <svg
+              className="pointer-events-none absolute -right-2 -bottom-2 size-16 text-rose-500/10 transition-transform duration-300 group-hover:scale-110"
+              viewBox="0 0 100 100"
+              fill="currentColor"
+            >
+              <path d="M50 0 L63 37 L100 50 L63 63 L50 100 L37 63 L0 50 L37 37 Z" opacity="0.2" />
+            </svg>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 shadow-sm group-hover:bg-rose-500 group-hover:text-rose-950 transition-colors">
+              <Sparkles className="size-5" />
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-extrabold text-foreground">Order in the App</div>
+            <div className="min-w-0 z-10">
+              <div className="text-xs font-extrabold text-foreground">Zero Commission</div>
               <div className="text-[10px] font-semibold text-muted-foreground">
-                Ready in a few taps
+                Direct shop price
               </div>
             </div>
           </div>
