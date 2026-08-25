@@ -21,6 +21,8 @@ import biryaniImg from "@/assets/biryani.png";
 import burgerImg from "@/assets/burger.png";
 import momosImg from "@/assets/momos.png";
 import chowmeinImg from "@/assets/chowmein.png";
+import cakeCategoryImg from "@/assets/cake_category.jpg";
+import medicineCategoryImg from "@/assets/medicine_category.jpg";
 import { whatsappLink } from "@/lib/contact";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
@@ -79,6 +81,7 @@ const CATEGORIES: CategoryItem[] = [
     id: "cakes",
     name: "Cakes",
     tag: "Fresh Baked",
+    image: cakeCategoryImg,
     fallbackEmoji: "🎂",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
@@ -108,6 +111,7 @@ const CATEGORIES: CategoryItem[] = [
     id: "medicine",
     name: "Medicines",
     tag: `Delivery from ₹${MIN_DELIVERY_FEE}`,
+    image: medicineCategoryImg,
     fallbackEmoji: "💊",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
@@ -225,7 +229,7 @@ export function ZomatoTopBanner() {
   const activeSlide = HERO_SLIDES[currentSlide];
 
   return (
-    <div className="w-full space-y-6 pt-24 pb-8">
+    <div className="w-full space-y-6 pt-4 pb-8">
       {/* 1. TOP ZOMATO/SWIGGY STYLE LOCATION & SEARCH BAR */}
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-xl backdrop-blur-xl md:flex-row md:items-center md:justify-between">
@@ -523,7 +527,7 @@ export function ZomatoTopBanner() {
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="size-14 sm:size-16 object-contain drop-shadow-md transition-transform group-hover:rotate-6"
+                    className="size-full rounded-full object-cover transition-transform group-hover:scale-110"
                   />
                 ) : (
                   <span className="text-3xl sm:text-4xl drop-shadow-md">{cat.fallbackEmoji}</span>

@@ -1,6 +1,8 @@
 import chowmeinImg from "@/assets/chowmein.png";
 import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
+import dispyBakeryImg from "@/assets/dispy_bakery.jpg";
+import dipjoyImg from "@/assets/dipjoys_bite_house.jpg";
 
 import {
   DAJU_BAHADUR_MENU,
@@ -70,6 +72,7 @@ export const RESTAURANTS: Restaurant[] = [
     name: "Dipjoy's Bite House",
     category: "food",
     cuisine: "Chowmein · Momo · Burger · Wraps",
+    image: dipjoyImg,
     eta: [15, 25],
     items: DIPJOY_BITE_HOUSE_MENU,
   },
@@ -78,6 +81,7 @@ export const RESTAURANTS: Restaurant[] = [
     name: "Dispy Bakery",
     category: "food",
     cuisine: "Homemade pizza · Regular, medium, large",
+    image: dispyBakeryImg,
     eta: [15, 25],
     hours: "Daily 1 PM – 6 PM",
     items: DISPY_BAKERY_MENU,

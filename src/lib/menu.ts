@@ -60,11 +60,21 @@ import momosImg from "@/assets/momos.png";
 import lollipopImg from "@/assets/lollipop.png";
 import chilliChickenImg from "@/assets/chilli_chicken.png";
 import rollImg from "@/assets/roll.png";
+import pizzaImg from "@/assets/pizza.jpg";
+import burgerImg from "@/assets/burger2.jpg";
+import pastaImg from "@/assets/pasta.jpg";
+import maggiImg from "@/assets/maggi.jpg";
+import frenchFriesImg from "@/assets/french-fries.jpg";
+import chilliMushroomImg from "@/assets/chilli-mushroom.jpg";
+import chocolateCakeImg from "@/assets/chocolate-cake.jpg";
+import tiramisuImg from "@/assets/tiramisu.jpg";
 import japaneseCheesecakeImg from "@/assets/japanese-cheesecake.jpg";
 import newYorkCheesecakeImg from "@/assets/new-york-cheesecake.jpg";
 import blueberryCheesecakeImg from "@/assets/blueberry-cheesecake.jpg";
 import burntBasqueCheesecakeImg from "@/assets/burnt-basque-cheesecake.jpg";
 import milletCakeLoafImg from "@/assets/millet-cake-loaf.jpg";
+import butterscotchCakeImg from "@/assets/butterscotch-cake.jpg";
+import carrotCakeImg from "@/assets/carrot-cake.jpg";
 
 /**
  * Item ids are prefixed per kitchen because two partners sell the same dish at
@@ -83,9 +93,9 @@ export const PRARTHONA_MENU: MenuItem[] = [
   { id: "pr-veg-roll", name: "Veg Roll", price: 68, image: rollImg },
   { id: "pr-chicken-roll", name: "Chicken Roll", price: 88, image: rollImg },
   { id: "pr-egg-roll", name: "Egg Roll", price: 78, image: rollImg },
-  { id: "pr-french-fries", name: "French Fries", price: 58 },
-  { id: "pr-pasta", name: "Pasta", price: 88 },
-  { id: "pr-maggi", name: "Maggi", price: 88 },
+  { id: "pr-french-fries", name: "French Fries", price: 58, image: frenchFriesImg },
+  { id: "pr-pasta", name: "Pasta", price: 88, image: pastaImg },
+  { id: "pr-maggi", name: "Maggi", price: 88, image: maggiImg },
   { id: "pr-chicken-lollipop", name: "Chicken Lollipop", price: 108, image: lollipopImg },
   { id: "pr-chilli-chicken", name: "Chilli Chicken", price: 145, image: chilliChickenImg },
   { id: "pr-chicken-dry-fry", name: "Chicken Dry Fry", price: 109, image: chilliChickenImg },
@@ -168,18 +178,72 @@ export const DAJU_BAHADUR_MENU: MenuItem[] = [
 
 /** R / M / L on the shop's board, spelled out so a size is never guessed at. */
 export const DISPY_BAKERY_MENU: MenuItem[] = [
-  { id: "dp-veg-cheese-regular", name: "Veg Cheese Pizza", variant: "Regular", price: 179 },
-  { id: "dp-veg-cheese-medium", name: "Veg Cheese Pizza", variant: "Medium", price: 249 },
-  { id: "dp-veg-cheese-large", name: "Veg Cheese Pizza", variant: "Large", price: 360 },
-  { id: "dp-sweetcorn-regular", name: "Sweetcorn Pizza", variant: "Regular", price: 199 },
-  { id: "dp-sweetcorn-medium", name: "Sweetcorn Pizza", variant: "Medium", price: 269 },
-  { id: "dp-sweetcorn-large", name: "Sweetcorn Pizza", variant: "Large", price: 389 },
-  { id: "dp-paneer-regular", name: "Paneer Pizza", variant: "Regular", price: 205 },
-  { id: "dp-paneer-medium", name: "Paneer Pizza", variant: "Medium", price: 279 },
-  { id: "dp-paneer-large", name: "Paneer Pizza", variant: "Large", price: 405 },
-  { id: "dp-chicken-regular", name: "Chicken Pizza", variant: "Regular", price: 208 },
-  { id: "dp-chicken-medium", name: "Chicken Pizza", variant: "Medium", price: 310 },
-  { id: "dp-chicken-large", name: "Chicken Pizza", variant: "Large", price: 469 },
+  {
+    id: "dp-veg-cheese-regular",
+    name: "Veg Cheese Pizza",
+    variant: "Regular",
+    price: 179,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-veg-cheese-medium",
+    name: "Veg Cheese Pizza",
+    variant: "Medium",
+    price: 249,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-veg-cheese-large",
+    name: "Veg Cheese Pizza",
+    variant: "Large",
+    price: 360,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-sweetcorn-regular",
+    name: "Sweetcorn Pizza",
+    variant: "Regular",
+    price: 199,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-sweetcorn-medium",
+    name: "Sweetcorn Pizza",
+    variant: "Medium",
+    price: 269,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-sweetcorn-large",
+    name: "Sweetcorn Pizza",
+    variant: "Large",
+    price: 389,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-paneer-regular",
+    name: "Paneer Pizza",
+    variant: "Regular",
+    price: 205,
+    image: pizzaImg,
+  },
+  { id: "dp-paneer-medium", name: "Paneer Pizza", variant: "Medium", price: 279, image: pizzaImg },
+  { id: "dp-paneer-large", name: "Paneer Pizza", variant: "Large", price: 405, image: pizzaImg },
+  {
+    id: "dp-chicken-regular",
+    name: "Chicken Pizza",
+    variant: "Regular",
+    price: 208,
+    image: pizzaImg,
+  },
+  {
+    id: "dp-chicken-medium",
+    name: "Chicken Pizza",
+    variant: "Medium",
+    price: 310,
+    image: pizzaImg,
+  },
+  { id: "dp-chicken-large", name: "Chicken Pizza", variant: "Large", price: 469, image: pizzaImg },
 ];
 
 /**
@@ -191,8 +255,8 @@ export const DISPY_BAKERY_MENU: MenuItem[] = [
  * vegetarian dishes would misdescribe them to the customers who care most.
  */
 export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
-  { id: "dbh-chilli-mushroom", name: "Chilli Mushroom", price: 96 },
-  { id: "dbh-chilli-paneer", name: "Chilli Paneer", price: 96 },
+  { id: "dbh-chilli-mushroom", name: "Chilli Mushroom", price: 96, image: chilliMushroomImg },
+  { id: "dbh-chilli-paneer", name: "Chilli Paneer", price: 96, image: chilliMushroomImg },
   {
     id: "dbh-chicken-chowmein-half",
     name: "Chicken Chowmein",
@@ -221,7 +285,7 @@ export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
     price: 126,
     image: momosImg,
   },
-  { id: "dbh-burger", name: "Burger", price: 126 },
+  { id: "dbh-burger", name: "Burger", price: 126, image: burgerImg },
   {
     id: "dbh-chicken-lollipop-5",
     name: "Chicken Lollipop",
@@ -230,8 +294,20 @@ export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
     image: lollipopImg,
   },
   { id: "dbh-chicken-wrap", name: "Chicken Wrap", price: 126, image: rollImg },
-  { id: "dbh-french-fries-half", name: "French Fries", variant: "Half plate", price: 66 },
-  { id: "dbh-french-fries-full", name: "French Fries", variant: "Full plate", price: 126 },
+  {
+    id: "dbh-french-fries-half",
+    name: "French Fries",
+    variant: "Half plate",
+    price: 66,
+    image: frenchFriesImg,
+  },
+  {
+    id: "dbh-french-fries-full",
+    name: "French Fries",
+    variant: "Full plate",
+    price: 126,
+    image: frenchFriesImg,
+  },
 ];
 
 /**
@@ -242,10 +318,10 @@ export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
  * the bakery never gave.
  */
 export const DCAKERY_MENU: MenuItem[] = [
-  { id: "dc-chocolate", name: "Chocolate Cake", price: 630 },
-  { id: "dc-black-forest", name: "Black Forest Cake", price: 540 },
-  { id: "dc-butterscotch", name: "Butterscotch Cake", price: 500 },
-  { id: "dc-vanilla", name: "Vanilla Cake", price: 440 },
+  { id: "dc-chocolate", name: "Chocolate Cake", price: 630, image: chocolateCakeImg },
+  { id: "dc-black-forest", name: "Black Forest Cake", price: 540, image: chocolateCakeImg },
+  { id: "dc-butterscotch", name: "Butterscotch Cake", price: 500, image: butterscotchCakeImg },
+  { id: "dc-vanilla", name: "Vanilla Cake", price: 440, image: newYorkCheesecakeImg },
   {
     id: "dc-japanese-cheesecake",
     name: "Japanese Cheesecake",
@@ -270,9 +346,15 @@ export const DCAKERY_MENU: MenuItem[] = [
     price: 730,
     image: burntBasqueCheesecakeImg,
   },
-  { id: "dc-rice-cake-loaf", name: "Rice Cake Loaf", price: 300 },
+  { id: "dc-rice-cake-loaf", name: "Rice Cake Loaf", price: 300, image: carrotCakeImg },
   { id: "dc-millet-cake-loaf", name: "Millet Cake Loaf", price: 330, image: milletCakeLoafImg },
-  { id: "dc-tiramisu-mini-tub", name: "Tiramisu", variant: "Mini tub", price: 240 },
+  {
+    id: "dc-tiramisu-mini-tub",
+    name: "Tiramisu",
+    variant: "Mini tub",
+    price: 240,
+    image: tiramisuImg,
+  },
 ];
 
 /**
