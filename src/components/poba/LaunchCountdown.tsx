@@ -99,11 +99,23 @@ export function LaunchCountdown() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: "some" }}
           transition={{ duration: 0.5 }}
-          className="mt-9 flex flex-wrap justify-center gap-3"
+          className="mt-9 flex flex-wrap justify-center items-center gap-3"
         >
+          <Button
+            type="button"
+            variant="onGreen"
+            size="xl"
+            onClick={() => window.dispatchEvent(new CustomEvent("poba:trigger_live_modal"))}
+            className="bg-emerald-400 text-emerald-950 hover:bg-emerald-300 font-extrabold shadow-xl gap-2 transition-all hover:scale-105"
+          >
+            <PartyPopper className="size-5" />
+            <span>Launch Now</span>
+          </Button>
+
           <Button variant="onGreen" size="xl" asChild>
             <a href="#order">{launched ? "Order Now" : "See the menu & prices"}</a>
           </Button>
+
           <Button variant="ghostOnGreen" size="xl" asChild>
             <a href="#partners">Partner With Us</a>
           </Button>

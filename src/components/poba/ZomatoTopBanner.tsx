@@ -697,11 +697,16 @@ export function ZomatoTopBanner() {
 
             {/* Action Button & Carousel Controls */}
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
-              <div>
-                {/* The WhatsApp button is the one door that was still open
-                    before launch day — the navbar, the hero, the sticky bar and
-                    the order form all close on `launched`, so this closes too
-                    rather than taking an order nobody is cooking for yet. */}
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent("poba:trigger_live_modal"))}
+                  className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-3 text-xs font-extrabold text-emerald-950 shadow-xl transition-all hover:bg-emerald-300 active:scale-95"
+                >
+                  <Sparkles className="size-4 fill-emerald-950" />
+                  <span>Launch Now</span>
+                </button>
+
                 {activeSlide.external && !launched ? (
                   <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-white/30 px-6 py-3 text-xs font-bold text-white">
                     Ordering opens {LAUNCH_DATE_LABEL}

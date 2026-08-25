@@ -14,6 +14,7 @@ import { CallToAction } from "@/components/poba/CallToAction";
 import { Footer } from "@/components/poba/Footer";
 import { MobileOrderBar } from "@/components/poba/MobileOrderBar";
 import { PartnerSheet } from "@/components/poba/PartnerSheet";
+import { LiveAnnouncementModal } from "@/components/poba/LiveAnnouncementModal";
 
 const title = "Poba Express — Jonai's Own Delivery Service";
 const description =
@@ -36,16 +37,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   const navigate = useNavigate();
 
-  // Someone who installed the app and opened it lands on its start_url, but a
-  // launcher icon created before that changed — or a tap on an old link —
-  // still arrives here. In a standalone window the marketing page is the wrong
-  // thing to show, so hand them straight to the app. Replace, not push, so Back
-  // doesn't bounce them between the two.
-  //
-  // Deliberately client-side and deliberately conditional: the redirect that
-  // used to sit in `beforeLoad` fired for everyone, so the website could not be
-  // reached at all — a browser visit landed in the app shell instead of the
-  // landing page.
   useEffect(() => {
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
@@ -74,6 +65,7 @@ function Index() {
       <Footer />
       <MobileOrderBar />
       <PartnerSheet />
+      <LiveAnnouncementModal />
     </div>
   );
 }
