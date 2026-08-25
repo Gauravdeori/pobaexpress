@@ -9,6 +9,7 @@ import { Services } from "@/components/poba/Services";
 import { About } from "@/components/poba/About";
 import { WhyChooseUs } from "@/components/poba/WhyChooseUs";
 import { OrderCta } from "@/components/poba/OrderCta";
+import { OrderForm } from "@/components/poba/OrderForm";
 import { CallToAction } from "@/components/poba/CallToAction";
 import { Footer } from "@/components/poba/Footer";
 import { MobileOrderBar } from "@/components/poba/MobileOrderBar";
@@ -62,6 +63,7 @@ function Index() {
       <main>
         <Hero />
         <OrderCta />
+        <OrderForm />
         <LaunchCountdown />
         <Restaurants />
         <Services />

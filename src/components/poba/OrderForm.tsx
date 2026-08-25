@@ -371,9 +371,9 @@ export function OrderForm() {
     <section id="order" className="relative py-24 lg:py-32">
       <div className="mx-auto max-w-5xl px-5 lg:px-8">
         <SectionHeading
-          eyebrow="Place an Order"
+          eyebrow="Or Order Here"
           title="Tell Us What You Need — We'll Bring It"
-          subtitle="Pick a category, fill in a few details and send it straight to our WhatsApp. Sign in to place your order."
+          subtitle="No install needed. Pick a category, fill in a few details and order straight from this page. Sign in to place your order."
         />
 
         {/* The form is taller than the viewport once a menu is open, so it
@@ -682,11 +682,11 @@ export function OrderForm() {
                     ? "Sign in to Order"
                     : sending
                       ? "Uploading photo…"
-                      : "Order Now on WhatsApp"}
+                      : "Place My Order"}
               </Button>
               <p className="text-xs text-muted-foreground">
                 {launched ? (
-                  "Your details open in WhatsApp ready to send — we confirm within minutes."
+                  "We open WhatsApp with your order ready to send, then confirm it within minutes — the same way the app does."
                 ) : (
                   <>
                     We start delivering on {LAUNCH_DATE_LABEL}. Have a look at the menu and prices —

@@ -64,7 +64,7 @@ export function MobileOrderBar() {
             className="flex h-14 items-center justify-center gap-2.5 rounded-full bg-gradient-accent text-base font-semibold text-accent-foreground shadow-lift"
           >
             <ShoppingBag className="size-5" />
-            {launched ? "Download the app now to order" : "See the menu & prices"}
+            {launched ? "Order Now" : "See the menu & prices"}
           </a>
           <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
             {launched

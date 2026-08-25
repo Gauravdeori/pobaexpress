@@ -11,17 +11,15 @@ import { InstallHelpDialog } from "./InstallHelpDialog";
 import { Reveal, SectionHeading } from "./Reveal";
 
 /**
- * The order section, which is now a way into the app rather than a form.
+ * The app panel: install it, or open it in this browser.
  *
- * It used to be a WhatsApp order composer, from before there was an app to
- * order in. Two ordering paths meant two sets of prices, two carts and two
- * things to keep in step, and the page was still advertising the older one.
- * `OrderForm` is left in the tree rather than deleted, so putting it back is
- * one import.
+ * Sits directly above `OrderForm` rather than in place of it. The app is the
+ * better experience and gets the headline, but ordering from the page itself
+ * stays available for anyone who would rather not install anything, so the two
+ * read as a choice instead of a detour.
  *
- * `#order` is kept as the id: the navbar, the hero buttons, the phone bar and
- * the closing panel all point here, and the phone bar hides itself when this
- * section is on screen.
+ * `#order` belongs to the form, which is what the navbar, the hero buttons,
+ * the phone bar and the closing panel point at.
  */
 
 const reasons = [
@@ -43,12 +41,12 @@ export function OrderCta() {
   }, [promptInstall]);
 
   return (
-    <section id="order" className="relative py-24 lg:py-32">
+    <section id="get-the-app" className="relative pt-24 lg:pt-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <SectionHeading
           eyebrow="Order Now"
-          title="Ordering happens in the app"
-          subtitle="Food, cake and medicine from your favourite Jonai shops — a few taps, and it's on its way."
+          title="Download the app now to order"
+          subtitle="Food, cake and medicine from your favourite Jonai shops — a few taps, and it's on its way. Prefer not to install? The order form below works just as well."
         />
 
         <Reveal className="mt-14">
@@ -105,11 +103,7 @@ export function OrderCta() {
                     to="/app"
                     className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-white/25 px-8 text-base font-semibold text-primary-foreground transition-colors duration-300 hover:bg-white/10"
                   >
-                    {installed
-                      ? "Open the app"
-                      : launched
-                        ? "Order in your browser"
-                        : "Browse the menu"}
+                    {installed ? "Open the app" : "Browse the menu"}
                     <ArrowRight className="size-4" />
                   </Link>
                 </div>
