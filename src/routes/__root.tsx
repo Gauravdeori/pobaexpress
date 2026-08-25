@@ -16,7 +16,7 @@ import { UpdateBanner } from "../components/app/UpdateBanner";
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
 const siteDescription =
-  "Food, cake and medicine delivery in Jonai, Assam. Install the free Poba Express app or order on WhatsApp — delivery from ₹5.";
+  "Food, cake and medicine delivery in Jonai, Assam. Download the free Poba Express app to order — delivery from ₹5.";
 
 function NotFoundComponent() {
   return (

@@ -218,7 +218,11 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-background from-30% via-background/70 via-62% to-transparent to-88% lg:bg-gradient-to-r lg:from-28% lg:via-background/55 lg:via-52% lg:to-78%" />
       </div>
 
-      <div className="relative z-10">
+      {/* The navbar is fixed and h-24, so the banner has to start below it or
+          the nav links land on top of the location and search row. The padding
+          lives here rather than in ZomatoTopBanner because the app screen
+          renders the same banner under a header of its own height. */}
+      <div className="relative z-10 pt-24">
         <ZomatoTopBanner />
       </div>
 

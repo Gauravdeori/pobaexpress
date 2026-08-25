@@ -64,11 +64,11 @@ export function MobileOrderBar() {
             className="flex h-14 items-center justify-center gap-2.5 rounded-full bg-gradient-accent text-base font-semibold text-accent-foreground shadow-lift"
           >
             <ShoppingBag className="size-5" />
-            {launched ? "Order Now on WhatsApp" : "See the menu & prices"}
+            {launched ? "Download the app now to order" : "See the menu & prices"}
           </a>
           <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
             {launched
-              ? "Food from ₹39 · delivery from ₹5 · order in the app or on WhatsApp"
+              ? "Food from ₹39 · delivery from ₹5 · order in a few taps"
               : `Ordering opens ${LAUNCH_DATE_LABEL} · food from ₹39`}
           </p>
         </motion.div>

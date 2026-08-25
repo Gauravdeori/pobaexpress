@@ -16,7 +16,7 @@ import { PartnerSheet } from "@/components/poba/PartnerSheet";
 
 const title = "Poba Express — Jonai's Own Delivery Service";
 const description =
-  "Food, cake and medicine delivery in Jonai, Assam. Install the free Poba Express app or order on WhatsApp.";
+  "Food, cake and medicine delivery in Jonai, Assam. Download the free Poba Express app to order.";
 
 export const Route = createFileRoute("/")({
   head: () => ({

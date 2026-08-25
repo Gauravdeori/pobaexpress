@@ -25,7 +25,6 @@ import pizzaImg from "@/assets/pizza.jpg";
 import chocolateCakeImg from "@/assets/chocolate-cake.jpg";
 import cakeCategoryImg from "@/assets/cake_category.jpg";
 import medicineCategoryImg from "@/assets/medicine_category.jpg";
-import { whatsappLink } from "@/lib/contact";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 
@@ -130,9 +129,9 @@ const HERO_SLIDES = [
     highlight: `Zero Commission • Delivery from ₹${MIN_DELIVERY_FEE}`,
     description:
       "Order hot meals, sizzling momos, fresh birthday cakes, and urgent medicines delivered in 15–25 mins.",
-    cta: "Order on WhatsApp",
-    ctaLink: whatsappLink(),
-    external: true,
+    cta: "Download the App to Order",
+    ctaLink: "/app",
+    external: false,
     code: `OPENING ${LAUNCH_DATE_LABEL}`,
     gradient: "from-[#082817] via-[#0f4427] to-[#1a6b3e]",
     accentColor: "#10b981",
@@ -141,7 +140,7 @@ const HERO_SLIDES = [
     heroSecondary: momosImg,
     heroBadge: "HOT & FRESH",
     offerPill: "FLAT ₹5 DELIVERY",
-    features: ["Free Poba Express App", "Instant WhatsApp Order", "Live Doorstep Tracking"],
+    features: ["Free Poba Express App", "Order in a Few Taps", "Live Doorstep Tracking"],
   },
   {
     id: "prarthona-deal",
@@ -192,7 +191,7 @@ const HERO_SLIDES = [
     title: "Prescriptions & Healthcare Essentials",
     highlight: "Doorstep Pharmacy in 20 Mins",
     description:
-      "Send your prescription over WhatsApp. We pick up from verified Jonai pharmacies & deliver safely.",
+      "Send your prescription from the app. We pick up from verified Jonai pharmacies & deliver safely.",
     cta: "Order Medicines",
     ctaLink: "/app/medicine",
     external: false,
@@ -665,8 +664,10 @@ export function ZomatoTopBanner() {
               <MessageCircle className="size-5 fill-green-600 text-green-600" />
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-extrabold text-foreground">WhatsApp Ordering</div>
-              <div className="text-[10px] font-semibold text-muted-foreground">Or use the app</div>
+              <div className="text-xs font-extrabold text-foreground">Order in the App</div>
+              <div className="text-[10px] font-semibold text-muted-foreground">
+                Ready in a few taps
+              </div>
             </div>
           </div>
         </div>

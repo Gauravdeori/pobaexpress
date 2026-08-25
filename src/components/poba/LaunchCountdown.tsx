@@ -63,7 +63,7 @@ export function LaunchCountdown() {
 
         <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           {launched
-            ? "Food, cake and medicine delivered across Jonai. Order in the Poba Express app, or send it straight over WhatsApp."
+            ? "Food, cake and medicine delivered across Jonai. Download the Poba Express app now to order."
             : "We're getting our riders and partner kitchens ready. Browse the menu and prices now — ordering switches on by itself that morning."}
         </p>
 
