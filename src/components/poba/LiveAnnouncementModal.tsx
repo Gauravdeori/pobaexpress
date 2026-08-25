@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLaunched } from "@/lib/launch";
+import biryaniImg from "@/assets/biryani.png";
+import momosImg from "@/assets/momos.png";
+import cakeCategoryImg from "@/assets/cake_category.jpg";
+import medicineCategoryImg from "@/assets/medicine_category.jpg";
 
 export function LiveAnnouncementModal() {
   const [open, setOpen] = useState(false);
@@ -126,12 +130,40 @@ export function LiveAnnouncementModal() {
               </span>
             </div>
 
+            {/* Visual Collage Showcase */}
+            <div className="relative z-10 mt-4 flex items-center justify-center gap-2 overflow-hidden rounded-2xl border border-white/15 bg-black/30 p-2 backdrop-blur-md">
+              <div className="relative h-20 w-1/4 overflow-hidden rounded-xl">
+                <img src={biryaniImg} alt="Biryani" className="size-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-extrabold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                  Biryani
+                </span>
+              </div>
+              <div className="relative h-20 w-1/4 overflow-hidden rounded-xl">
+                <img src={momosImg} alt="Momos" className="size-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-extrabold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                  Momos
+                </span>
+              </div>
+              <div className="relative h-20 w-1/4 overflow-hidden rounded-xl">
+                <img src={cakeCategoryImg} alt="Cakes" className="size-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-extrabold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                  Cakes
+                </span>
+              </div>
+              <div className="relative h-20 w-1/4 overflow-hidden rounded-xl">
+                <img src={medicineCategoryImg} alt="Medicines" className="size-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-extrabold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                  Medicines
+                </span>
+              </div>
+            </div>
+
             {/* Modal Heading */}
-            <div className="relative z-10 mt-5">
+            <div className="relative z-10 mt-4">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
                 Poba Express is <span className="text-emerald-400">Live Now</span> in Jonai! 🎉
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-white/85 leading-relaxed font-medium">
+              <p className="mt-2.5 text-sm sm:text-base text-white/85 leading-relaxed font-medium">
                 Jonai&apos;s very own doorstep delivery service is now open! Order hot biryani,
                 sizzling momos, fresh birthday cakes, and urgent medicines delivered to your door in
                 15–25 minutes.
