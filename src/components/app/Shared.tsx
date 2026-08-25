@@ -65,66 +65,89 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
     <Link
       to="/app/r/$slug"
       params={{ slug: restaurant.slug }}
-      className="flex flex-col gap-3 rounded-3xl border border-border/40 bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.98]"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/80 bg-card shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] active:scale-[0.99]"
     >
-      <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl bg-secondary">
+      {/* Cover Image Container */}
+      <div className="relative aspect-[16/8] sm:aspect-[21/9] w-full overflow-hidden bg-muted">
         {restaurant.image ? (
-          <img src={restaurant.image} alt="" aria-hidden className="size-full object-cover" />
+          <img
+            src={restaurant.image}
+            alt={restaurant.name}
+            aria-hidden
+            className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
         ) : (
           <span className="flex size-full items-center justify-center bg-accent/10 text-accent">
-            <UtensilsCrossed className="size-8" />
+            <UtensilsCrossed className="size-10" />
           </span>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+        {/* Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+
+        {/* Top Badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+          <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-[11px] font-extrabold tracking-wide text-amber-300 backdrop-blur-md border border-amber-400/20 shadow-md">
+            <span>🔥</span>
+            <span>ITEMS FROM {rupees(priceFrom(restaurant))}</span>
+          </span>
+
+          {restaurant.hours && (
+            <span className="rounded-full bg-emerald-950/80 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 backdrop-blur-md border border-emerald-400/30">
+              {restaurant.hours}
+            </span>
+          )}
+        </div>
+
+        {/* Bottom Details on Image */}
         <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
           <div className="min-w-0">
-            <h3 className="truncate text-xl font-extrabold text-white drop-shadow-md">
+            <h3 className="truncate text-xl sm:text-2xl font-black text-white drop-shadow-md">
               {restaurant.name}
             </h3>
-            <p className="truncate text-sm font-medium text-white/90 drop-shadow-sm">
+            <p className="truncate text-xs sm:text-sm font-medium text-white/90 drop-shadow-sm">
               {restaurant.cuisine}
             </p>
           </div>
-          <Rating restaurant={restaurant} />
+
+          <div className="flex shrink-0 items-center gap-1 rounded-xl bg-emerald-600 px-2.5 py-1 text-xs font-black text-white shadow-lg">
+            <Star className="size-3.5 fill-white text-white" />
+            <span>{restaurant.rating?.toFixed(1) || "4.3"}</span>
+          </div>
         </div>
       </div>
-      <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground px-1">
-        <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1 rounded-md bg-secondary/80 px-2 py-1 text-foreground">
-            <Star className="size-3 fill-accent text-accent" />
-            {restaurant.rating?.toFixed(1) || "New"}
+
+      {/* Bottom Info Strip */}
+      <div className="flex items-center justify-between bg-card/60 p-3.5 text-xs font-semibold text-muted-foreground backdrop-blur-md">
+        <div className="flex items-center gap-2 text-foreground/80">
+          <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            {restaurant.eta[0]}–{restaurant.eta[1]} MINS
           </span>
-          <span>•</span>
-          <span>
-            {restaurant.eta[0]}–{restaurant.eta[1]} mins
-          </span>
-          <span>•</span>
-          <span>₹{priceFrom(restaurant)} for one</span>
+          <span className="text-muted-foreground/40">•</span>
+          <span>From {rupees(priceFrom(restaurant))}</span>
+          <span className="text-muted-foreground/40">•</span>
+          <span className="text-accent font-bold">Safe & Hygienic</span>
         </div>
+
+        <span className="font-extrabold text-accent group-hover:underline">View Menu →</span>
       </div>
     </Link>
   );
 }
 
-/**
- * The card shape used in a horizontal rail: photo on top, details under.
- *
- * A different shape from `RestaurantCard` rather than the same one turned
- * sideways — a rail card is scanned in passing and wants the photo doing the
- * work, while the list row is read.
- */
 export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
   return (
     <Link
       to="/app/r/$slug"
       params={{ slug: restaurant.slug }}
-      className="group flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-all duration-200 hover:border-accent active:scale-[0.98] sm:w-52"
+      className="group relative flex w-48 sm:w-56 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg active:scale-[0.98]"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-secondary">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         {restaurant.image ? (
           <img
             src={restaurant.image}
-            alt=""
+            alt={restaurant.name}
             aria-hidden
             className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -133,21 +156,35 @@ export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
             <UtensilsCrossed className="size-8" />
           </span>
         )}
-        {restaurant.hours && (
-          <span className="absolute bottom-2 left-2 rounded-full bg-primary/90 px-2 py-1 text-[10px] font-bold text-primary-foreground backdrop-blur-sm">
-            {restaurant.hours}
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+
+        {/* Promo Ribbon on Image */}
+        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+          <span className="truncate rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-black tracking-wide text-white backdrop-blur-md">
+            FROM {rupees(priceFrom(restaurant))}
           </span>
-        )}
-      </div>
-      <div className="min-w-0 p-3">
-        <div className="flex items-center gap-2">
-          <h3 className="truncate text-sm font-semibold text-primary">{restaurant.name}</h3>
-          <Rating restaurant={restaurant} />
+          <span className="flex items-center gap-0.5 rounded-md bg-emerald-600 px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow-sm">
+            <Star className="size-2.5 fill-white" />
+            {restaurant.rating?.toFixed(1) || "4.3"}
+          </span>
         </div>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">{restaurant.cuisine}</p>
-        <p className="mt-1.5 text-xs font-medium text-muted-foreground">
-          {restaurant.eta[0]}–{restaurant.eta[1]} min · from {rupees(priceFrom(restaurant))}
+      </div>
+
+      <div className="min-w-0 p-3">
+        <h3 className="truncate text-sm font-extrabold text-foreground group-hover:text-accent transition-colors">
+          {restaurant.name}
+        </h3>
+        <p className="mt-0.5 truncate text-[11px] font-medium text-muted-foreground">
+          {restaurant.cuisine}
         </p>
+        <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-muted-foreground border-t border-border/40 pt-2">
+          <span className="text-emerald-600 font-bold flex items-center gap-1">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
+            {restaurant.eta[0]}–{restaurant.eta[1]} min
+          </span>
+          <span className="text-foreground/80 font-bold">Doorstep</span>
+        </div>
       </div>
     </Link>
   );

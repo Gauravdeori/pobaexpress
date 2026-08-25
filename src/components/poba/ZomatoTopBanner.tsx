@@ -21,6 +21,8 @@ import biryaniImg from "@/assets/biryani.png";
 import burgerImg from "@/assets/burger.png";
 import momosImg from "@/assets/momos.png";
 import chowmeinImg from "@/assets/chowmein.png";
+import pizzaImg from "@/assets/pizza.jpg";
+import chocolateCakeImg from "@/assets/chocolate-cake.jpg";
 import cakeCategoryImg from "@/assets/cake_category.jpg";
 import medicineCategoryImg from "@/assets/medicine_category.jpg";
 import { whatsappLink } from "@/lib/contact";
@@ -123,72 +125,86 @@ const HERO_SLIDES = [
   {
     id: "poba-deal",
     badge: "POBA EXPRESS EXCLUSIVE",
-    badgeBg: "bg-white/15 text-accent-light border-white/25",
-    title: `Delivery from ₹${MIN_DELIVERY_FEE} across Jonai`,
-    highlight: "Zero Commission. Best Prices.",
+    badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
+    title: `Fast Doorstep Delivery in Jonai`,
+    highlight: `Zero Commission • Delivery from ₹${MIN_DELIVERY_FEE}`,
     description:
-      "Order fresh food, cakes, and medicines delivered right to your doorstep in 15–25 mins.",
+      "Order hot meals, sizzling momos, fresh birthday cakes, and urgent medicines delivered in 15–25 mins.",
     cta: "Order on WhatsApp",
     ctaLink: whatsappLink(),
     external: true,
     code: `OPENING ${LAUNCH_DATE_LABEL}`,
-    gradient: "from-[#0a2717] via-[#113a23] to-[#0a2717]",
-    accentColor: "var(--accent)",
+    gradient: "from-[#082817] via-[#0f4427] to-[#1a6b3e]",
+    accentColor: "#10b981",
     tagIcon: Percent,
-    features: [
-      "No App Download Required",
-      "Instant WhatsApp Order",
-      `Delivery from ₹${MIN_DELIVERY_FEE}`,
-    ],
+    heroImage: biryaniImg,
+    heroSecondary: momosImg,
+    heroBadge: "HOT & FRESH",
+    offerPill: "FLAT ₹5 DELIVERY",
+    features: ["No App Download Required", "Instant WhatsApp Order", "Live Doorstep Tracking"],
   },
   {
     id: "prarthona-deal",
     badge: "PRARTHONA RESTAURANT",
-    badgeBg: "bg-white/15 text-accent-light border-white/25",
-    title: "Momos, chow and everything after",
-    highlight: "Starting from ₹58",
+    badgeBg: "bg-amber-500/20 text-amber-300 border-amber-400/30",
+    title: "Momos, Chow & Sizzling Delights",
+    highlight: "Dishes Starting from ₹58",
     description:
-      "Fried rice, chowmein, rolls, momos and chilli chicken, cooked to order at Prarthona.",
-    cta: "Explore the menu",
+      "Authentic fried rice, chowmein, crispy chicken rolls, and spicy chilli chicken cooked fresh to order.",
+    cta: "Explore Prarthona Menu",
     ctaLink: "/app/r/prarthona",
     external: false,
-    code: "COOKED TO ORDER",
-    gradient: "from-[#0a2717] via-[#113a23] to-[#0a2717]",
-    accentColor: "var(--accent)",
+    code: "FRESH & HOT",
+    gradient: "from-[#2b1004] via-[#4d2008] to-[#7c340d]",
+    accentColor: "#f59e0b",
     tagIcon: Sparkles,
-    features: ["⚡ Delivery in 15–25 mins", "🥟 Momos, rolls & chow", "🔥 Fresh & hot"],
+    heroImage: chowmeinImg,
+    heroSecondary: momosImg,
+    heroBadge: "TOP RATED",
+    offerPill: "FROM ₹58",
+    features: ["⚡ 15–25 Min Delivery", "🥟 Steamed & Fried Momos", "🔥 Cooked Fresh"],
   },
   {
     id: "dcakery-deal",
-    badge: "DCAKERY BAKERY",
-    badgeBg: "bg-white/15 text-accent-light border-white/25",
-    title: "Fresh Custom Cakes & Cheesecakes",
-    highlight: "Delivered in 30 Mins",
-    description: "Birthday cakes, New York cheesecakes, and artisanal loaves baked with love.",
-    cta: "Order Fresh Cake",
+    badge: "DCAKERY ARTISANAL BAKERY",
+    badgeBg: "bg-rose-500/20 text-rose-300 border-rose-400/30",
+    title: "Fresh Cakes & NY Cheesecakes",
+    highlight: "Custom Birthday Cakes in 30 Mins",
+    description:
+      "Indulgent Chocolate Truffle, Butterscotch, New York Cheesecakes & freshly baked dessert loaves.",
+    cta: "Order Bakery Cakes",
     ctaLink: "/app/cake",
     external: false,
-    code: "EXPRESS CAKE DELIVERY",
-    gradient: "from-[#0a2717] via-[#113a23] to-[#0a2717]",
-    accentColor: "var(--accent)",
+    code: "ARTISAN BAKERY",
+    gradient: "from-[#280517] via-[#4a0d2d] to-[#781849]",
+    accentColor: "#f43f5e",
     tagIcon: Cake,
-    features: ["🎂 Custom Birthday Designs", "🧀 NY Cheesecakes", "⚡ Delivered Safe"],
+    heroImage: chocolateCakeImg,
+    heroSecondary: cakeCategoryImg,
+    heroBadge: "100% EGGLESS AVAILABLE",
+    offerPill: "FRESH BAKED",
+    features: ["🎂 Custom Messages", "🧀 Authentic Cheesecakes", "⚡ Safe Packaging"],
   },
   {
     id: "medicine-deal",
     badge: "24/7 MEDICINE DELIVERY",
-    badgeBg: "bg-white/15 text-accent-light border-white/25",
-    title: "Medicines & Healthcare Essentials",
-    highlight: "Upload Prescription & Get Delivery",
-    description: "Prescription medicines and daily healthcare products delivered to your door.",
-    cta: "Upload Prescription",
+    badgeBg: "bg-cyan-500/20 text-cyan-300 border-cyan-400/30",
+    title: "Prescriptions & Healthcare Essentials",
+    highlight: "Doorstep Pharmacy in 20 Mins",
+    description:
+      "Send your prescription over WhatsApp. We pick up from verified Jonai pharmacies & deliver safely.",
+    cta: "Order Medicines",
     ctaLink: "/app/medicine",
     external: false,
-    code: "SAFE & HYGIENIC",
-    gradient: "from-[#0a2717] via-[#113a23] to-[#0a2717]",
-    accentColor: "var(--accent)",
+    code: "VERIFIED PHARMACY",
+    gradient: "from-[#04202b] via-[#093d52] to-[#106282]",
+    accentColor: "#06b6d4",
     tagIcon: Pill,
-    features: ["💊 Genuine Pharmacy Stock", "📋 Prescription Order", "⚡ Urgent Delivery"],
+    heroImage: medicineCategoryImg,
+    heroSecondary: undefined,
+    heroBadge: "GENUINE MEDS",
+    offerPill: "RAPID DISPATCH",
+    features: ["💊 Verified Pharmacies", "📋 Prescription Upload", "⚡ Contactless Delivery"],
   },
 ];
 
@@ -354,67 +370,125 @@ export function ZomatoTopBanner() {
           <div
             className={`bg-gradient-to-br ${activeSlide.gradient} p-6 sm:p-8 lg:p-10 text-white min-h-[340px] flex flex-col justify-between relative transition-all duration-500`}
           >
-            {/* Background Decorative Graphic */}
-            <div className="absolute right-0 top-0 h-full w-1/2 opacity-20 pointer-events-none overflow-hidden">
-              <div className="absolute -right-10 -top-10 size-96 rounded-full bg-white/10 blur-3xl" />
-            </div>
+            {/* Background Decorative Mesh Glow */}
+            <div className="pointer-events-none absolute -right-20 -top-20 size-[450px] rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute bottom-0 right-1/4 size-72 rounded-full bg-black/20 blur-2xl" />
 
             {/* Top Bar on Banner */}
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
               <span
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md ${activeSlide.badgeBg}`}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md shadow-sm ${activeSlide.badgeBg}`}
               >
                 <activeSlide.tagIcon className="size-3.5" />
                 {activeSlide.badge}
               </span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold tracking-wide text-white/90 backdrop-blur-sm border border-white/10">
+              <span className="rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold tracking-wide text-white backdrop-blur-md border border-white/20 shadow-sm">
                 {activeSlide.code}
               </span>
             </div>
 
-            {/* Main Content */}
-            <div className="relative z-10 my-4 max-w-2xl">
-              <motion.h2
-                key={activeSlide.title}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white leading-tight"
-              >
-                {activeSlide.title}
-              </motion.h2>
+            {/* Main Content Grid: Left Text & Right Image Showcase */}
+            <div className="relative z-10 my-4 grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
+              {/* Left Column: Copy & Details */}
+              <div className="lg:col-span-7">
+                <motion.h2
+                  key={activeSlide.title}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl text-white leading-[1.15]"
+                >
+                  {activeSlide.title}
+                </motion.h2>
 
-              <motion.p
-                key={activeSlide.highlight}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-                className="mt-2 text-lg font-bold text-accent-light sm:text-xl"
-              >
-                {activeSlide.highlight}
-              </motion.p>
-
-              <motion.p
-                key={activeSlide.description}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                className="mt-3 text-sm text-white/80 max-w-lg leading-relaxed"
-              >
-                {activeSlide.description}
-              </motion.p>
-
-              {/* Feature Chips */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {activeSlide.features.map((feat) => (
-                  <span
-                    key={feat}
-                    className="inline-flex items-center gap-1 rounded-lg bg-black/30 px-2.5 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm border border-white/10"
-                  >
-                    <CheckCircle2 className="size-3 text-accent-light" />
-                    {feat}
+                <motion.div
+                  key={activeSlide.highlight}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="mt-2.5 flex items-center gap-2"
+                >
+                  <span className="inline-block rounded-md bg-white/20 px-2.5 py-0.5 text-sm font-black uppercase tracking-wide text-white border border-white/20 backdrop-blur-sm">
+                    {activeSlide.offerPill}
                   </span>
-                ))}
+                  <p className="text-base font-bold text-white/95 sm:text-lg">
+                    {activeSlide.highlight}
+                  </p>
+                </motion.div>
+
+                <motion.p
+                  key={activeSlide.description}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="mt-3 text-xs sm:text-sm text-white/85 max-w-lg leading-relaxed font-medium"
+                >
+                  {activeSlide.description}
+                </motion.p>
+
+                {/* Feature Chips */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {activeSlide.features.map((feat) => (
+                    <span
+                      key={feat}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-black/35 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur-md border border-white/10 shadow-sm"
+                    >
+                      <CheckCircle2 className="size-3 text-white" />
+                      {feat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Hero Visual Showcase */}
+              <div className="relative flex items-center justify-center lg:col-span-5 lg:justify-end">
+                <motion.div
+                  key={activeSlide.id + "-image"}
+                  initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.5, type: "spring", stiffness: 120 }}
+                  className="relative group flex items-center justify-center"
+                >
+                  {/* Floating Halo Glow */}
+                  <div className="absolute -inset-4 rounded-full bg-white/20 blur-2xl animate-pulse" />
+
+                  {/* Main Hero Image in Floating Platter / Glass Frame */}
+                  <div className="relative size-48 sm:size-56 lg:size-64 overflow-hidden rounded-3xl border-2 border-white/30 bg-white/10 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-md">
+                    <img
+                      src={activeSlide.heroImage}
+                      alt={activeSlide.title}
+                      className="size-full rounded-2xl object-cover transition-transform duration-500 hover:scale-105"
+                    />
+
+                    {/* Floating Floating Ribbon Badge */}
+                    <div className="absolute top-4 right-4 rounded-full bg-black/70 px-3 py-1 text-[10px] font-extrabold tracking-wider text-amber-300 backdrop-blur-md border border-amber-400/30 shadow-lg">
+                      {activeSlide.heroBadge}
+                    </div>
+
+                    {/* Bottom Gradient Overlay on Image */}
+                    <div className="absolute inset-x-2 bottom-2 rounded-b-2xl bg-gradient-to-t from-black/80 via-black/30 to-transparent p-2.5 text-center">
+                      <span className="text-[11px] font-extrabold uppercase tracking-wide text-white">
+                        Fast 15-25 min delivery
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Secondary Floating Mini Avatar if present */}
+                  {activeSlide.heroSecondary && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="absolute -bottom-3 -left-3 size-20 sm:size-24 rounded-2xl border-2 border-white/40 bg-black/60 p-1.5 shadow-2xl backdrop-blur-lg hidden sm:block"
+                    >
+                      <img
+                        src={activeSlide.heroSecondary}
+                        alt=""
+                        className="size-full rounded-xl object-cover"
+                      />
+                    </motion.div>
+                  )}
+                </motion.div>
               </div>
             </div>
 
