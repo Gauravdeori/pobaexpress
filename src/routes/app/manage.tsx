@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
+import { LiveAnnouncementModal } from "@/components/poba/LiveAnnouncementModal";
 import { useAccount } from "@/lib/account";
 import {
   ETA_PRESETS,
@@ -306,9 +307,12 @@ function GoLivePanel() {
     setError(null);
     try {
       await saveLaunchSettings({ ...settings, openNow });
-      // Every screen seeds itself from the cached settings on mount, so a
-      // reload is the honest way to make the whole app agree at once.
-      window.location.reload();
+      // No reload: settings are watched, so this screen and every open
+      // customer's turn over on the same snapshot. Announce it to whatever
+      // is listening on this page, since the person who just opened the shop
+      // should see the thing their customers are about to see.
+      if (openNow === true) window.dispatchEvent(new CustomEvent("poba:trigger_live_modal"));
+      setBusy(false);
     } catch (cause) {
       console.error("Could not change the launch switch", cause);
       setError(cause instanceof Error ? cause.message : "Could not save.");
@@ -621,6 +625,10 @@ function ManageScreen() {
       >
         Offers and launch settings
       </Link>
+
+      {/* Mounted so the person who presses Launch now sees the announcement
+          their customers are seeing, rather than having to go and check. */}
+      <LiveAnnouncementModal />
     </div>
   );
 }

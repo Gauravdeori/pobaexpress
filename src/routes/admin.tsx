@@ -12,6 +12,8 @@ import {
   Plus,
   Tag,
   Timer,
+  PartyPopper,
+  Eye,
   Rocket,
   ShoppingBag,
   Trash2,
@@ -25,6 +27,7 @@ import { useAccount, accountLabel } from "@/lib/account";
 import { rupees } from "@/lib/menu";
 import { timeUntil } from "@/lib/launch";
 import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
+import { LiveAnnouncementModal } from "@/components/poba/LiveAnnouncementModal";
 import {
   ETA_PRESETS,
   NEXT_STEP,
@@ -256,6 +259,7 @@ function Admin() {
       <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
         {tab === "orders" ? <Orders /> : tab === "offers" ? <Offers /> : <LaunchControl />}
       </div>
+      <LiveAnnouncementModal />
     </Shell>
   );
 }
@@ -790,23 +794,43 @@ function LaunchControl() {
   const launchAt = new Date(when).getTime();
   const preview = timeUntil({ openNow, launchAt: launchAt || settings.launchAt, label });
 
-  const save = async () => {
+  const save = async (overrideOpenNow?: boolean | null) => {
     setSaving(true);
     setError(null);
     setSaved(false);
+    const targetOpenNow = overrideOpenNow !== undefined ? overrideOpenNow : openNow;
     try {
       await saveLaunchSettings({
-        openNow,
+        openNow: targetOpenNow,
         launchAt: launchAt || settings.launchAt,
         label: label.trim() || settings.label,
       });
+      if (overrideOpenNow !== undefined) {
+        setOpenNow(overrideOpenNow);
+      }
       setSaved(true);
+      // On the Save button as well as the shortcut, because "Live now" then
+      // Save is the same decision as tapping Launch now and has to do the same
+      // thing. Settings are watched, so the site itself has already turned
+      // over by the time this fires.
+      if (targetOpenNow === true) {
+        window.dispatchEvent(new CustomEvent("poba:trigger_live_modal"));
+      }
     } catch (cause) {
       console.error("Could not save launch settings", cause);
       setError(cause instanceof Error ? cause.message : "Could not save.");
     } finally {
       setSaving(false);
     }
+  };
+
+  /** Straight to open, skipping the state buttons. `save` raises the modal. */
+  const triggerLaunchAndModal = async () => {
+    await save(true);
+  };
+
+  const previewModal = () => {
+    window.dispatchEvent(new CustomEvent("poba:trigger_live_modal"));
   };
 
   const states: Array<[boolean | null, string, string]> = [
@@ -821,8 +845,50 @@ function LaunchControl() {
 
   return (
     <div className="space-y-6">
+      {/* Quick Launch & Pop-up Action Card */}
+      <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-card to-card p-6 shadow-xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              <PartyPopper className="size-3.5" />
+              Official Launch Action
+            </span>
+            <h2 className="mt-2 text-xl font-extrabold text-foreground">Launch Site & Pop-up</h2>
+            <p className="mt-1 text-sm text-muted-foreground max-w-lg">
+              Tap <strong className="text-foreground">&quot;Launch Now&quot;</strong> to make Poba
+              Express live immediately and trigger the launch celebration pop-up modal.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Button
+              type="button"
+              variant="accent"
+              size="lg"
+              disabled={saving}
+              onClick={() => void triggerLaunchAndModal()}
+              className="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold shadow-lg h-12 rounded-2xl gap-2 px-6"
+            >
+              <Rocket className="size-5 fill-emerald-950" />
+              <span>Launch Now & Show Pop-up</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={previewModal}
+              className="h-12 rounded-2xl gap-2 border-border/80 text-foreground hover:bg-accent/10"
+            >
+              <Eye className="size-4" />
+              <span>Preview Pop-up</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <h2 className="font-semibold text-primary">Ordering</h2>
+        <h2 className="font-semibold text-primary">Ordering Mode</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           This is the switch the whole site reads — the countdown, the order form, the sticky bar
           and the checkout. Nothing needs a deploy.
@@ -869,9 +935,6 @@ function LaunchControl() {
             />
           </label>
         </div>
-        {/* The label is typed by hand and the date is picked, so the two can
-            disagree. Say so rather than letting the countdown print one day
-            while opening on another. */}
         <p className="mt-3 text-xs text-muted-foreground">
           {preview.done
             ? "Right now: ordering is OPEN."
@@ -893,7 +956,7 @@ function LaunchControl() {
         disabled={saving}
         onClick={() => void save()}
       >
-        {saving ? "Saving…" : saved ? "Saved" : "Save"}
+        {saving ? "Saving…" : saved ? "Saved" : "Save Settings"}
       </Button>
     </div>
   );
