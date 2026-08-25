@@ -1,97 +1,41 @@
-import { useEffect, useState } from "react";
-import { Download, Share } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Download } from "lucide-react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-/** Chrome's install prompt event, which TypeScript's DOM lib doesn't define. */
-type InstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-};
-
-function isStandalone() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    // iOS reports installed apps here rather than through display-mode.
-    (navigator as Navigator & { standalone?: boolean }).standalone === true
-  );
-}
-
-function isIosSafari() {
-  const ua = navigator.userAgent;
-  return /iPad|iPhone|iPod/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
-}
+import { useInstallPrompt } from "@/lib/install";
+import { InstallHelpDialog } from "./InstallHelpDialog";
 
 /**
  * "Install app" for the header. Renders nothing unless the browser actually
  * offers installation, so it never advertises something that cannot happen.
  *
- * Chrome and Edge fire `beforeinstallprompt`, which we hold and replay on
- * click. iOS Safari has no such API — installing there is a manual Share →
- * Add to Home Screen, so it gets instructions instead.
+ * That restraint is right for a header, where the button sits beside the nav
+ * with no room to explain itself. The strip at the top of the page and the
+ * order section take the opposite line, because there the invitation is the
+ * point — see `InstallBanner`.
  */
 export function InstallButton({
   className,
   children,
 }: { className?: string; children?: React.ReactNode } = {}) {
-  const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
-  const [showIosHelp, setShowIosHelp] = useState(false);
-  const [ios, setIos] = useState(false);
-  const [hidden, setHidden] = useState(true);
+  const { installed, ios, canPrompt, promptInstall } = useInstallPrompt();
+  const [showHelp, setShowHelp] = useState(false);
+  const [accepted, setAccepted] = useState(false);
 
-  useEffect(() => {
-    // Already installed: nothing to offer.
-    if (isStandalone()) return;
-    setIos(isIosSafari());
-    setHidden(false);
-
-    const onBeforeInstall = (event: Event) => {
-      // Stop Chrome's own mini-infobar so this button is the single entry point.
-      event.preventDefault();
-      setPromptEvent(event as InstallPromptEvent);
-    };
-    const onInstalled = () => {
-      setPromptEvent(null);
-      setHidden(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", onBeforeInstall);
-    window.addEventListener("appinstalled", onInstalled);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
-      window.removeEventListener("appinstalled", onInstalled);
-    };
-  }, []);
+  const handleClick = useCallback(async () => {
+    const outcome = await promptInstall();
+    // iOS Safari has no install API, so it gets the Share steps instead.
+    if (outcome === "unavailable") setShowHelp(true);
+    if (outcome === "accepted") setAccepted(true);
+  }, [promptInstall]);
 
   // Nothing to offer: installed already, or a browser that cannot install.
-  if (hidden || (!promptEvent && !ios)) return null;
-
-  const handleClick = async () => {
-    if (ios && !promptEvent) {
-      setShowIosHelp(true);
-      return;
-    }
-    if (!promptEvent) return;
-    await promptEvent.prompt();
-    const { outcome } = await promptEvent.userChoice;
-    // The event is single-use, so drop it either way.
-    setPromptEvent(null);
-    if (outcome === "accepted") setHidden(true);
-  };
+  if (installed || accepted || (!canPrompt && !ios)) return null;
 
   return (
     <>
       <button
         type="button"
-        onClick={handleClick}
+        onClick={() => void handleClick()}
         aria-label="Install the Poba Express app"
         className={
           className ||
@@ -106,52 +50,7 @@ export function InstallButton({
         )}
       </button>
 
-      <Dialog open={showIosHelp} onOpenChange={setShowIosHelp}>
-        <DialogContent className="rounded-3xl sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Poba Express to your Home Screen</DialogTitle>
-            <DialogDescription>
-              iPhone and iPad install apps from the browser menu rather than a button.
-            </DialogDescription>
-          </DialogHeader>
-          <ol className="mt-1 space-y-3 text-sm text-muted-foreground">
-            <li className="flex gap-3">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent">
-                1
-              </span>
-              <span>
-                Tap the <Share className="inline size-4 align-text-bottom text-primary" /> Share
-                button in Safari&apos;s toolbar.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent">
-                2
-              </span>
-              <span>
-                Scroll down and choose{" "}
-                <span className="font-medium text-primary">Add to Home Screen</span>.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent">
-                3
-              </span>
-              <span>
-                Tap <span className="font-medium text-primary">Add</span>. Poba Express appears on
-                your Home Screen like any other app.
-              </span>
-            </li>
-          </ol>
-          <Button
-            variant="accent"
-            className="mt-2 h-12 w-full rounded-2xl"
-            onClick={() => setShowIosHelp(false)}
-          >
-            Got it
-          </Button>
-        </DialogContent>
-      </Dialog>
+      <InstallHelpDialog open={showHelp} onOpenChange={setShowHelp} ios={ios} />
     </>
   );
 }
