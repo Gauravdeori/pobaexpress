@@ -91,7 +91,7 @@ const CATEGORIES: CategoryItem[] = [
   {
     id: "burgers",
     name: "Burgers",
-    tag: "Dipjoy's Special",
+    tag: "Fast Food Fav",
     image: burgerImg,
     fallbackEmoji: "🍔",
     color: "from-accent/15 to-accent/5",

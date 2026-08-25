@@ -75,6 +75,11 @@ import burntBasqueCheesecakeImg from "@/assets/burnt-basque-cheesecake.jpg";
 import milletCakeLoafImg from "@/assets/millet-cake-loaf.jpg";
 import butterscotchCakeImg from "@/assets/butterscotch-cake.jpg";
 import carrotCakeImg from "@/assets/carrot-cake.jpg";
+import bcBiriyaniImg from "@/assets/bc_biriyani.jpg";
+import bcAndaMagazImg from "@/assets/bc_anda_magaz.jpg";
+import bcSpaRollImg from "@/assets/bc_spa_roll.jpg";
+import bcChowminImg from "@/assets/bc_chowmin.jpg";
+import bcMaggieImg from "@/assets/bc_maggie.jpg";
 
 /**
  * Item ids are prefixed per kitchen because two partners sell the same dish at
@@ -254,60 +259,12 @@ export const DISPY_BAKERY_MENU: MenuItem[] = [
  * chilli picture in the repo is of chicken, and putting it on the two
  * vegetarian dishes would misdescribe them to the customers who care most.
  */
-export const DIPJOY_BITE_HOUSE_MENU: MenuItem[] = [
-  { id: "dbh-chilli-mushroom", name: "Chilli Mushroom", price: 96, image: chilliMushroomImg },
-  { id: "dbh-chilli-paneer", name: "Chilli Paneer", price: 96, image: chilliMushroomImg },
-  {
-    id: "dbh-chicken-chowmein-half",
-    name: "Chicken Chowmein",
-    variant: "Half plate",
-    price: 66,
-    image: chowmeinImg,
-  },
-  {
-    id: "dbh-chicken-chowmein-full",
-    name: "Chicken Chowmein",
-    variant: "Full plate",
-    price: 126,
-    image: chowmeinImg,
-  },
-  {
-    id: "dbh-chicken-momo-half",
-    name: "Chicken Momo",
-    variant: "Half plate",
-    price: 66,
-    image: momosImg,
-  },
-  {
-    id: "dbh-chicken-momo-full",
-    name: "Chicken Momo",
-    variant: "Full plate",
-    price: 126,
-    image: momosImg,
-  },
-  { id: "dbh-burger", name: "Burger", price: 126, image: burgerImg },
-  {
-    id: "dbh-chicken-lollipop-5",
-    name: "Chicken Lollipop",
-    variant: "5 pieces",
-    price: 126,
-    image: lollipopImg,
-  },
-  { id: "dbh-chicken-wrap", name: "Chicken Wrap", price: 126, image: rollImg },
-  {
-    id: "dbh-french-fries-half",
-    name: "French Fries",
-    variant: "Half plate",
-    price: 66,
-    image: frenchFriesImg,
-  },
-  {
-    id: "dbh-french-fries-full",
-    name: "French Fries",
-    variant: "Full plate",
-    price: 126,
-    image: frenchFriesImg,
-  },
+export const BIRIYANI_CORNER_MENU: MenuItem[] = [
+  { id: "bc-biriyani", name: "Biriyani", price: 116, image: bcBiriyaniImg },
+  { id: "bc-anda-magaz", name: "Anda Magaz", price: 76, image: bcAndaMagazImg },
+  { id: "bc-spa-roll", name: "Spa Roll", price: 66, image: bcSpaRollImg },
+  { id: "bc-chowmin", name: "Chowmin", price: 66, image: bcChowminImg },
+  { id: "bc-maggie", name: "Maggie", price: 56, image: bcMaggieImg },
 ];
 
 /**
@@ -369,6 +326,7 @@ const MENU_SECTIONS: Record<string, MenuSection[]> = {
   // track of who is cooking it. Names must match `RESTAURANTS` in
   // restaurants.ts, which is what the cart records as its source.
   food: [
+    { restaurant: "Biriyani Corner", items: BIRIYANI_CORNER_MENU },
     { restaurant: "Prarthona Restaurant", items: PRARTHONA_MENU },
     { restaurant: "Daju Bahadur", items: DAJU_BAHADUR_MENU },
     { restaurant: "Dispy Bakery", items: DISPY_BAKERY_MENU },

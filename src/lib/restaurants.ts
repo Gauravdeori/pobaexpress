@@ -2,12 +2,12 @@ import chowmeinImg from "@/assets/chowmein.png";
 import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
 import dispyBakeryImg from "@/assets/dispy_bakery.jpg";
-import dipjoyImg from "@/assets/dipjoys_bite_house.jpg";
+import biriyaniCornerImg from "@/assets/biriyani_corner_cover.jpg";
 
 import {
+  BIRIYANI_CORNER_MENU,
   DAJU_BAHADUR_MENU,
   DCAKERY_MENU,
-  DIPJOY_BITE_HOUSE_MENU,
   DISPY_BAKERY_MENU,
   PRARTHONA_MENU,
   type MenuItem,
@@ -68,13 +68,13 @@ export const RESTAURANTS: Restaurant[] = [
     items: DAJU_BAHADUR_MENU,
   },
   {
-    slug: "dipjoys-bite-house",
-    name: "Dipjoy's Bite House",
+    slug: "biriyani-corner",
+    name: "Biriyani Corner",
     category: "food",
-    cuisine: "Chowmein · Momo · Burger · Wraps",
-    image: dipjoyImg,
+    cuisine: "Biriyani · Anda Magaz · Spa Roll · Chowmin · Maggie",
+    image: biriyaniCornerImg,
     eta: [15, 25],
-    items: DIPJOY_BITE_HOUSE_MENU,
+    items: BIRIYANI_CORNER_MENU,
   },
   {
     slug: "dispy-bakery",
