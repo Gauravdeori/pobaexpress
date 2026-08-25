@@ -13,6 +13,7 @@ import { InstallButton } from "./InstallButton";
 const links = [
   { label: "Home", href: "#home" },
   { label: "Order", href: "#order" },
+  { label: "Restaurants", href: "#restaurants" },
   { label: "Services", href: "#services" },
   { label: "About", href: "#about" },
   { label: "Partners", href: "#partners" },
