@@ -62,6 +62,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /settings/{key} {
+      // Everyone reads this: it is what tells a visitor whether the shop is
+      // open, and that answer cannot be behind a sign-in. Only an admin
+      // writes it — the alternative is a customer opening the shop.
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Anything not matched above is denied.
   }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -9,6 +9,7 @@ import {
   Phone,
   Plus,
   Tag,
+  Rocket,
   Trash2,
 } from "lucide-react";
 
@@ -17,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useAccount, accountLabel } from "@/lib/account";
 import { rupees } from "@/lib/menu";
+import { timeUntil } from "@/lib/launch";
+import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
 import {
   ORDER_STATUSES,
   createOffer,
@@ -79,7 +82,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Admin() {
   const { user, loading: authLoading } = useAccount();
   const { isAdmin, checking } = useIsAdmin(user);
-  const [tab, setTab] = useState<"orders" | "offers">("orders");
+  const [tab, setTab] = useState<"orders" | "offers" | "launch">("orders");
 
   if (authLoading || checking) {
     return (
@@ -132,6 +135,7 @@ function Admin() {
           [
             ["orders", "Orders", ClipboardList],
             ["offers", "Offers", Tag],
+            ["launch", "Launch", Rocket],
           ] as const
         ).map(([key, label, Icon]) => (
           <button
@@ -151,7 +155,9 @@ function Admin() {
         ))}
       </div>
 
-      <div className="mt-8">{tab === "orders" ? <Orders /> : <Offers />}</div>
+      <div className="mt-8">
+        {tab === "orders" ? <Orders /> : tab === "offers" ? <Offers /> : <LaunchControl />}
+      </div>
     </Shell>
   );
 }
@@ -571,6 +577,149 @@ function Offers() {
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Turns a stored millisecond timestamp into the value a datetime-local wants. */
+function toLocalInput(ms: number): string {
+  const d = new Date(ms);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
+    d.getMinutes(),
+  )}`;
+}
+
+/**
+ * Opening day, without a deploy.
+ *
+ * Three states rather than a switch, because "open" and "closed" are not the
+ * whole story: most of the time the honest answer is "go by the date", and an
+ * override is something you turn on deliberately and turn off again.
+ */
+function LaunchControl() {
+  const settings = useLaunchSettings();
+  const [openNow, setOpenNow] = useState<boolean | null>(settings.openNow);
+  const [when, setWhen] = useState(() => toLocalInput(settings.launchAt));
+  const [label, setLabel] = useState(settings.label);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // The settings arrive after the first render; adopt them once.
+  const [adopted, setAdopted] = useState(false);
+  useEffect(() => {
+    if (adopted) return;
+    setOpenNow(settings.openNow);
+    setWhen(toLocalInput(settings.launchAt));
+    setLabel(settings.label);
+    setAdopted(true);
+  }, [settings, adopted]);
+
+  const launchAt = new Date(when).getTime();
+  const preview = timeUntil({ openNow, launchAt: launchAt || settings.launchAt, label });
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    setSaved(false);
+    try {
+      await saveLaunchSettings({
+        openNow,
+        launchAt: launchAt || settings.launchAt,
+        label: label.trim() || settings.label,
+      });
+      setSaved(true);
+    } catch (cause) {
+      console.error("Could not save launch settings", cause);
+      setError(cause instanceof Error ? cause.message : "Could not save.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const states: Array<[boolean | null, string, string]> = [
+    [null, "Go by the date", "Ordering opens by itself at the moment below."],
+    [true, "Open now", "Takes orders immediately, whatever the date says."],
+    [false, "Hold closed", "Refuses orders even after the date has passed."],
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="font-semibold text-primary">Ordering</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          This is the switch the whole site reads — the countdown, the order form, the sticky bar
+          and the checkout. Nothing needs a deploy.
+        </p>
+
+        <div className="mt-4 grid gap-2.5">
+          {states.map(([value, title, hint]) => (
+            <button
+              key={String(value)}
+              type="button"
+              onClick={() => setOpenNow(value)}
+              aria-pressed={openNow === value}
+              className={cn(
+                "rounded-2xl border p-4 text-left transition-colors",
+                openNow === value ? "border-accent bg-accent/5" : "border-border bg-background",
+              )}
+            >
+              <span className="block text-sm font-semibold text-primary">{title}</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="font-semibold text-primary">Launch date</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm">
+            <span className="font-medium text-primary">Opens at</span>
+            <Input
+              type="datetime-local"
+              value={when}
+              onChange={(e) => setWhen(e.target.value)}
+              className="mt-1.5 h-12 rounded-2xl"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium text-primary">Shown as</span>
+            <Input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="27 August 2026"
+              className="mt-1.5 h-12 rounded-2xl"
+            />
+          </label>
+        </div>
+        {/* The label is typed by hand and the date is picked, so the two can
+            disagree. Say so rather than letting the countdown print one day
+            while opening on another. */}
+        <p className="mt-3 text-xs text-muted-foreground">
+          {preview.done
+            ? "Right now: ordering is OPEN."
+            : openNow === false
+              ? "Right now: ordering is held CLOSED."
+              : `Right now: opens in ${preview.days}d ${preview.hours}h ${preview.minutes}m — countdown reads “${label}”.`}
+        </p>
+      </div>
+
+      {error && (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {error}
+        </p>
+      )}
+
+      <Button
+        variant="accent"
+        className="h-12 rounded-2xl"
+        disabled={saving}
+        onClick={() => void save()}
+      >
+        {saving ? "Saving…" : saved ? "Saved" : "Save"}
+      </Button>
     </div>
   );
 }

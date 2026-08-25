@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { PartyPopper, Rocket } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { LAUNCH_DATE_LABEL, timeUntilLaunch, type Remaining } from "@/lib/launch";
+import { useTimeUntilLaunch } from "@/lib/launch";
 
 const UNITS = [
   { key: "days", label: "Days" },
@@ -28,17 +28,9 @@ export function LaunchCountdown() {
   // from disagreeing about the seconds. Once we are open there is no clock left
   // to disagree about, so seed it and let the server render the real state
   // instead of a "launching soon" shell the first paint has to take back.
-  const [remaining, setRemaining] = useState<Remaining | null>(() => {
-    const now = timeUntilLaunch();
-    return now.done ? now : null;
-  });
-
-  useEffect(() => {
-    const tick = () => setRemaining(timeUntilLaunch());
-    tick();
-    const timer = setInterval(tick, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // Follows the admin panel, so opening early there also stops this counting.
+  // Named apart from the per-unit `label` below, which the map shadows.
+  const { remaining, label: launchLabel } = useTimeUntilLaunch();
 
   const launched = remaining?.done ?? false;
 
@@ -64,7 +56,7 @@ export function LaunchCountdown() {
             </>
           ) : (
             <>
-              Deliveries begin <span className="text-accent-light">{LAUNCH_DATE_LABEL}</span>
+              Deliveries begin <span className="text-accent-light">{launchLabel}</span>
             </>
           )}
         </h2>
