@@ -1,9 +1,12 @@
 /**
- * Launch date for Poba Express deliveries.
+ * The day the countdown points at.
  *
  * Fixed to IST (+05:30) rather than the visitor's timezone, so everyone counts
- * down to the same moment. Change the time here to launch at a business hour
- * instead of midnight — for example `2026-08-27T09:00:00+05:30`.
+ * down to the same moment.
+ *
+ * This is when the countdown reaches zero — it is NOT when the shop opens.
+ * Opening is `openNow`, set from the admin panel by someone who can see that
+ * the kitchens are lit and a rider is awake. See `timeUntil`.
  *
  * These two are the only place the date is written down; the countdown, the
  * order form, the sticky bar and the checkout all read them, so they can never
@@ -33,7 +36,12 @@ export const OPEN_FOR_TESTING = false;
  * import Firestore — and can therefore be checked without one.
  */
 export type LaunchSettings = {
-  /** Overrides the date entirely. Null means "go by `launchAt`". */
+  /**
+   * Whether the shop is open. True is the only thing that opens it.
+   *
+   * Null means "not decided yet": the countdown runs, and when it reaches zero
+   * the site waits rather than opening itself. False holds it shut regardless.
+   */
   openNow: boolean | null;
   /** Milliseconds since epoch. */
   launchAt: number;
@@ -53,8 +61,17 @@ export type Remaining = {
   hours: number;
   minutes: number;
   seconds: number;
-  /** True once the launch moment has passed. */
+  /** True once we are actually open for orders. */
   done: boolean;
+  /**
+   * The countdown has run out, but nobody has opened the shop yet.
+   *
+   * The date is a promise to customers, not a trigger. Reaching it at midnight
+   * with no rider awake and no kitchen lit would take real orders nobody is
+   * cooking for, so the clock only ever finishes counting — going live is a
+   * button someone presses when the shop is genuinely ready.
+   */
+  awaitingGoLive: boolean;
 };
 
 /**
@@ -65,21 +82,26 @@ export type Remaining = {
  * checked without a database.
  */
 export function timeUntil(settings: LaunchSettings, now: number = Date.now()): Remaining {
-  const OPEN = { days: 0, hours: 0, minutes: 0, seconds: 0, done: true };
+  const OPEN = { days: 0, hours: 0, minutes: 0, seconds: 0, done: true, awaitingGoLive: false };
+  const CLOSED = { days: 0, hours: 0, minutes: 0, seconds: 0, done: false, awaitingGoLive: false };
 
   // The build-time escape hatch still wins, because it exists for testing a
   // build in isolation and must not depend on anything over the network.
   if (OPEN_FOR_TESTING) return OPEN;
-  // An explicit switch in the admin panel beats the clock in both directions:
-  // open early because the kitchens are ready, or close again because they
-  // are not.
+
+  // Going live is a decision, and this is the only thing that makes it. The
+  // date below moves the countdown, never the switch.
   if (settings.openNow === true) return OPEN;
-  if (settings.openNow === false) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0, done: false };
-  }
+  if (settings.openNow === false) return CLOSED;
 
   const ms = settings.launchAt - now;
-  if (ms <= 0) return OPEN;
+  if (ms <= 0) {
+    // Counted all the way down and still nobody has opened the shop. Closed,
+    // and saying so — this used to open by itself at midnight, which is how a
+    // service starts taking orders while everyone who could cook them is
+    // asleep.
+    return { ...CLOSED, awaitingGoLive: true };
+  }
 
   const totalSeconds = Math.floor(ms / 1000);
   return {
@@ -88,5 +110,6 @@ export function timeUntil(settings: LaunchSettings, now: number = Date.now()): R
     minutes: Math.floor((totalSeconds % 3600) / 60),
     seconds: totalSeconds % 60,
     done: false,
+    awaitingGoLive: false,
   };
 }

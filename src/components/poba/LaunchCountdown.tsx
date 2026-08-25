@@ -33,6 +33,9 @@ export function LaunchCountdown() {
   const { remaining, label: launchLabel } = useTimeUntilLaunch();
 
   const launched = remaining?.done ?? false;
+  // Counted down, not yet opened. Distinct from "launching soon", because the
+  // date has passed and saying otherwise would read as a stale page.
+  const waiting = remaining?.awaitingGoLive ?? false;
 
   return (
     <section
@@ -46,13 +49,13 @@ export function LaunchCountdown() {
       <div className="relative mx-auto max-w-4xl px-5 text-center lg:px-8">
         <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground backdrop-blur-sm">
           {launched ? <PartyPopper className="size-4" /> : <Rocket className="size-4" />}
-          {launched ? "We're live" : "Launching soon"}
+          {launched ? "We're live" : waiting ? "Opening any moment" : "Launching soon"}
         </span>
 
         <h2 className="mt-5 text-3xl font-bold text-primary-foreground sm:text-4xl lg:text-5xl">
           {launched ? (
             <>
-              Poba Express is <span className="text-accent-light">now delivering</span>
+              Poba Express is <span className="text-accent-light">live now</span>
             </>
           ) : (
             <>
@@ -64,7 +67,9 @@ export function LaunchCountdown() {
         <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           {launched
             ? "Food, cake and medicine delivered across Jonai. Download the Poba Express app now to order."
-            : "We're getting our riders and partner kitchens ready. Browse the menu and prices now — ordering switches on by itself that morning."}
+            : waiting
+              ? "The day is here. We're doing the last checks and opening ordering shortly — install the app now so you're ready the moment we do."
+              : "We're getting our riders and partner kitchens ready. Browse the menu and prices now."}
         </p>
 
         {!launched && (

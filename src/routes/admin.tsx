@@ -810,9 +810,13 @@ function LaunchControl() {
   };
 
   const states: Array<[boolean | null, string, string]> = [
-    [null, "Go by the date", "Ordering opens by itself at the moment below."],
-    [true, "Open now", "Takes orders immediately, whatever the date says."],
-    [false, "Hold closed", "Refuses orders even after the date has passed."],
+    [
+      null,
+      "Count down, don't open",
+      "Runs the countdown to the date below and then waits for you. Nothing opens by itself.",
+    ],
+    [true, "Live now", "Takes orders immediately, whatever the date says."],
+    [false, "Hold closed", "Refuses orders and shows no countdown."],
   ];
 
   return (

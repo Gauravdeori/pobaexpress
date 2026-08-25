@@ -11,6 +11,7 @@ import {
   query,
   serverTimestamp,
   updateDoc,
+  writeBatch,
   type Timestamp,
 } from "firebase/firestore";
 import type { User } from "firebase/auth";
@@ -194,6 +195,45 @@ export async function setOrderProgress(
     patch.etaAt = minutesFromNow === null ? null : Date.now() + minutesFromNow * 60_000;
   }
   await updateDoc(doc(db, "orders", orderId), patch);
+}
+
+/** Delete one order. Irreversible, and it takes the customer's copy with it. */
+export async function deleteOrder(orderId: string) {
+  if (!db) return;
+  await deleteDoc(doc(db, "orders", orderId));
+}
+
+/** Firestore refuses a batch past this, so the work is cut into chunks. */
+const BATCH_LIMIT = 500;
+
+/**
+ * Clear the order book, or just the part of it that is finished.
+ *
+ * `finishedOnly` is the one to reach for: delivered and cancelled orders are
+ * done being useful to anyone, while a live order still has a customer
+ * watching its status. Deleting the lot is offered because it was asked for,
+ * but it is the second option in the console and it asks first.
+ *
+ * Returns how many rows went, so the console can say so rather than just
+ * emptying the screen.
+ */
+export async function deleteOrders(finishedOnly: boolean): Promise<number> {
+  if (!db) return 0;
+
+  const snapshot = await getDocs(collection(db, "orders"));
+  const doomed = snapshot.docs.filter((entry) => {
+    if (!finishedOnly) return true;
+    const status = (entry.data() as { status?: string }).status ?? "new";
+    return status === "delivered" || status === "cancelled";
+  });
+
+  for (let index = 0; index < doomed.length; index += BATCH_LIMIT) {
+    const batch = writeBatch(db);
+    for (const entry of doomed.slice(index, index + BATCH_LIMIT)) batch.delete(entry.ref);
+    await batch.commit();
+  }
+
+  return doomed.length;
 }
 
 // ------------------------------------------------------------------ offers --

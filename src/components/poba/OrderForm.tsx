@@ -707,7 +707,7 @@ export function OrderForm() {
                 ) : (
                   <>
                     We start delivering on {LAUNCH_DATE_LABEL}. Have a look at the menu and prices —
-                    ordering switches on by itself that morning.
+                    ordering opens as soon as the kitchens are ready that day.
                   </>
                 )}
               </p>

@@ -1,6 +1,19 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bike, Check, ClipboardList, Loader2, Lock, MapPin, Phone, Timer, X } from "lucide-react";
+import {
+  Bike,
+  Check,
+  ClipboardList,
+  Loader2,
+  Lock,
+  MapPin,
+  Phone,
+  Rocket,
+  Timer,
+  Trash2,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { useAccount } from "@/lib/account";
@@ -8,11 +21,14 @@ import {
   ETA_PRESETS,
   NEXT_STEP,
   ORDER_STATUSES,
+  deleteOrders,
   setOrderProgress,
   useAllOrders,
   useIsAdmin,
   type OrderStatus,
 } from "@/lib/admin";
+import { useTimeUntilLaunch } from "@/lib/launch";
+import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
 import { rupees } from "@/lib/menu";
 import type { OrderRecord } from "@/lib/orders";
 import { cn } from "@/lib/utils";
@@ -268,6 +284,207 @@ function OrderCard({
   );
 }
 
+/**
+ * "Launch now", for the person who can see the kitchen.
+ *
+ * The countdown reaching zero no longer opens anything (see `timeUntil`), so
+ * this is the switch. One tap while closed, one tap to close again — no form
+ * and no save button, because the moment you want it is the moment you are
+ * standing in the shop deciding.
+ */
+function GoLivePanel() {
+  const settings = useLaunchSettings();
+  const { remaining } = useTimeUntilLaunch();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const live = remaining?.done ?? false;
+  const waiting = remaining?.awaitingGoLive ?? false;
+
+  const set = async (openNow: boolean | null) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await saveLaunchSettings({ ...settings, openNow });
+      // Every screen seeds itself from the cached settings on mount, so a
+      // reload is the honest way to make the whole app agree at once.
+      window.location.reload();
+    } catch (cause) {
+      console.error("Could not change the launch switch", cause);
+      setError(cause instanceof Error ? cause.message : "Could not save.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "mb-4 rounded-2xl border p-4",
+        live ? "border-accent/40 bg-accent/5" : "border-amber-500/30 bg-amber-500/5",
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span className="relative flex size-2.5 shrink-0">
+          {live && (
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-70" />
+          )}
+          <span
+            className={cn(
+              "relative inline-flex size-2.5 rounded-full",
+              live ? "bg-accent" : "bg-amber-500",
+            )}
+          />
+        </span>
+        <p className="text-sm font-bold text-primary">
+          {live ? "Poba Express is live" : waiting ? "Ready to launch" : "Not open yet"}
+        </p>
+      </div>
+
+      <p className="mt-1 text-xs text-muted-foreground">
+        {live
+          ? "The site says you are live and orders are going through."
+          : waiting
+            ? "The countdown has finished. Nothing opens until you tap below."
+            : "The countdown is still running. You can open early whenever the kitchens are ready."}
+      </p>
+
+      {!live ? (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void set(true)}
+          className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-bold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="size-4 animate-spin" /> : <Rocket className="size-4" />}
+          Launch now
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void set(false)}
+          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm font-semibold text-muted-foreground transition-colors hover:border-destructive hover:text-destructive disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="size-4 animate-spin" /> : <X className="size-4" />}
+          Stop taking orders
+        </button>
+      )}
+
+      {error && <p className="mt-2 text-xs font-medium text-destructive">{error}</p>}
+    </div>
+  );
+}
+
+/**
+ * Clearing the order book.
+ *
+ * Two buttons rather than one, and the safe one first: delivered and cancelled
+ * orders are finished with, while a live order still has a customer watching
+ * its status. Both confirm, because this collection is also what the customer
+ * reads under their own Orders tab — deleting here deletes their copy, and
+ * there is no undo.
+ */
+function ClearOrders({ total, finished }: { total: number; finished: number }) {
+  const [confirming, setConfirming] = useState<"finished" | "all" | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async (finishedOnly: boolean) => {
+    setBusy(true);
+    setError(null);
+    try {
+      setDone(await deleteOrders(finishedOnly));
+      setConfirming(null);
+    } catch (cause) {
+      console.error("Could not clear orders", cause);
+      setError(cause instanceof Error ? cause.message : "Could not clear orders.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (total === 0) return null;
+
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-card p-4">
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+        Clear the order book
+      </p>
+
+      {done !== null && (
+        <p className="mt-2 rounded-xl bg-accent/10 p-2.5 text-xs font-semibold text-accent">
+          Deleted {done} order{done === 1 ? "" : "s"}.
+        </p>
+      )}
+      {error && <p className="mt-2 text-xs font-medium text-destructive">{error}</p>}
+
+      {confirming ? (
+        <div className="mt-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3">
+          <p className="flex gap-2 text-xs font-semibold text-destructive">
+            <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
+            <span>
+              {confirming === "all"
+                ? `Delete all ${total} orders, including any still in progress?`
+                : `Delete ${finished} finished order${finished === 1 ? "" : "s"}?`}{" "}
+              This also removes them from the customers&apos; own order history, and it cannot be
+              undone.
+            </span>
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void run(confirming === "finished")}
+              className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-destructive text-xs font-bold text-white disabled:opacity-50"
+            >
+              {busy ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="size-3.5" />
+              )}
+              Yes, delete
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirming(null)}
+              className="h-10 flex-1 rounded-xl border border-border text-xs font-semibold text-muted-foreground disabled:opacity-50"
+            >
+              Keep them
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 flex flex-col gap-2">
+          <button
+            type="button"
+            disabled={finished === 0}
+            onClick={() => {
+              setDone(null);
+              setConfirming("finished");
+            }}
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-40"
+          >
+            <Trash2 className="size-3.5" />
+            Delete finished orders ({finished})
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setDone(null);
+              setConfirming("all");
+            }}
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl text-xs font-semibold text-muted-foreground transition-colors hover:text-destructive"
+          >
+            Delete all orders ({total})
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ManageScreen() {
   const { user, loading: authLoading } = useAccount();
   const { isAdmin, checking, denied } = useIsAdmin(user);
@@ -337,6 +554,8 @@ function ManageScreen() {
     <div className="mx-auto max-w-3xl px-4 py-5">
       <ScreenHeading title="Orders" />
 
+      <GoLivePanel />
+
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-primary">
           {newCount > 0 ? (
@@ -388,9 +607,17 @@ function ManageScreen() {
         </ul>
       )}
 
+      <ClearOrders
+        total={orders.length}
+        finished={
+          orders.filter((order) => order.status === "delivered" || order.status === "cancelled")
+            .length
+        }
+      />
+
       <Link
         to="/admin"
-        className="mt-6 flex h-11 items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm font-semibold text-muted-foreground"
+        className="mt-4 flex h-11 items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm font-semibold text-muted-foreground"
       >
         Offers and launch settings
       </Link>

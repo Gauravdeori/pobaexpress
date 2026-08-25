@@ -60,8 +60,14 @@ service cloud.firestore {
                     && (request.resource.data.etaAt == null
                         || request.resource.data.etaAt is number);
 
-      // Orders are a record. Cancel one; don't erase it.
-      allow delete: if false;
+      // Only an admin, and never the customer whose order it is: a customer
+      // who could delete their own row could erase the record of a bill they
+      // are disputing.
+      //
+      // This does erase the customer's copy too — the history under their
+      // Orders tab is this same collection — so the console asks before it
+      // does it, and offers clearing the finished ones on their own.
+      allow delete: if isAdmin();
     }
 
     match /offers/{offerId} {

@@ -15,6 +15,7 @@ import { partners, PartnerSlide } from "./HeroSlides";
 import { useLaunched } from "@/lib/launch";
 import { cn } from "@/lib/utils";
 
+import { LiveBanner } from "./LiveBanner";
 import { ZomatoTopBanner } from "./ZomatoTopBanner";
 
 /** Three promises, each with a supporting line, as a row under the buttons. */
@@ -223,6 +224,10 @@ export function Hero() {
           lives here rather than in ZomatoTopBanner because the app screen
           renders the same banner under a header of its own height. */}
       <div className="relative z-10 pt-24">
+        {/* Above everything else on the page: whether the shop is open is what
+            a visitor came to find out, and the countdown that says so sits far
+            enough down that someone who does not scroll never reads it. */}
+        <LiveBanner />
         <ZomatoTopBanner />
       </div>
 
