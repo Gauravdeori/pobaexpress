@@ -1,6 +1,8 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Home, Package, ShoppingBag, UserRound } from "lucide-react";
+import { ClipboardList, Home, Package, ShoppingBag, UserRound } from "lucide-react";
 
+import { useAccount } from "@/lib/account";
+import { useIsAdmin } from "@/lib/admin";
 import { CartProvider, useCart } from "@/lib/cart";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,20 @@ const tabs = [
   { to: "/app/orders", label: "Orders", icon: Package, exact: false },
   { to: "/app/account", label: "Account", icon: UserRound, exact: false },
 ];
+
+/**
+ * The counter tab, for staff only.
+ *
+ * Appended rather than woven in, so a customer's tab bar is byte-for-byte what
+ * it was. Whoever is taking orders is holding the installed app, and the whole
+ * point is that they never have to leave it to work.
+ */
+const MANAGE_TAB = {
+  to: "/app/manage",
+  label: "Counter",
+  icon: ClipboardList,
+  exact: false,
+} as const;
 
 function AppShell() {
   return (
@@ -68,12 +84,19 @@ function AppHeader() {
 
 function TabBar() {
   const { count } = useCart();
+  const { user } = useAccount();
+  const { isAdmin } = useIsAdmin(user);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // The check answers false until it has run, so the tab appears rather than
+  // disappears — a bar that loses a tab under the thumb is how a mis-tap
+  // happens.
+  const visible = isAdmin ? [...tabs, MANAGE_TAB] : tabs;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl">
       <ul className="mx-auto flex max-w-3xl items-stretch pb-[env(safe-area-inset-bottom)]">
-        {tabs.map((tab) => {
+        {visible.map((tab) => {
           const active = tab.exact ? pathname === tab.to : pathname.startsWith(tab.to);
           return (
             <li key={tab.to} className="flex-1">

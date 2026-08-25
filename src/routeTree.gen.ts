@@ -21,6 +21,7 @@ import { Route as AppCakeRouteImport } from './routes/app/cake'
 import { Route as AppCartRouteImport } from './routes/app/cart'
 import { Route as AppCheckoutRouteImport } from './routes/app/checkout'
 import { Route as AppFoodRouteImport } from './routes/app/food'
+import { Route as AppManageRouteImport } from './routes/app/manage'
 import { Route as AppMedicineRouteImport } from './routes/app/medicine'
 import { Route as AppOrdersRouteImport } from './routes/app/orders'
 import { Route as AppRSlugRouteImport } from './routes/app/r/$slug'
@@ -85,6 +86,11 @@ const AppFoodRoute = AppFoodRouteImport.update({
   path: '/food',
   getParentRoute: () => AppRoute,
 } as any)
+const AppManageRoute = AppManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMedicineRoute = AppMedicineRouteImport.update({
   id: '/medicine',
   path: '/medicine',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/app/cart': typeof AppCartRoute
   '/app/checkout': typeof AppCheckoutRoute
   '/app/food': typeof AppFoodRoute
+  '/app/manage': typeof AppManageRoute
   '/app/medicine': typeof AppMedicineRoute
   '/app/orders': typeof AppOrdersRoute
   '/app/': typeof AppIndexRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/app/cart': typeof AppCartRoute
   '/app/checkout': typeof AppCheckoutRoute
   '/app/food': typeof AppFoodRoute
+  '/app/manage': typeof AppManageRoute
   '/app/medicine': typeof AppMedicineRoute
   '/app/orders': typeof AppOrdersRoute
   '/app': typeof AppIndexRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/app/cart': typeof AppCartRoute
   '/app/checkout': typeof AppCheckoutRoute
   '/app/food': typeof AppFoodRoute
+  '/app/manage': typeof AppManageRoute
   '/app/medicine': typeof AppMedicineRoute
   '/app/orders': typeof AppOrdersRoute
   '/app/': typeof AppIndexRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/app/cart'
     | '/app/checkout'
     | '/app/food'
+    | '/app/manage'
     | '/app/medicine'
     | '/app/orders'
     | '/app/'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/app/cart'
     | '/app/checkout'
     | '/app/food'
+    | '/app/manage'
     | '/app/medicine'
     | '/app/orders'
     | '/app'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/app/cart'
     | '/app/checkout'
     | '/app/food'
+    | '/app/manage'
     | '/app/medicine'
     | '/app/orders'
     | '/app/'
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFoodRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/manage': {
+      id: '/app/manage'
+      path: '/manage'
+      fullPath: '/app/manage'
+      preLoaderRoute: typeof AppManageRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/medicine': {
       id: '/app/medicine'
       path: '/medicine'
@@ -330,6 +349,7 @@ interface AppRouteChildren {
   AppCartRoute: typeof AppCartRoute
   AppCheckoutRoute: typeof AppCheckoutRoute
   AppFoodRoute: typeof AppFoodRoute
+  AppManageRoute: typeof AppManageRoute
   AppMedicineRoute: typeof AppMedicineRoute
   AppOrdersRoute: typeof AppOrdersRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -342,6 +362,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCartRoute: AppCartRoute,
   AppCheckoutRoute: AppCheckoutRoute,
   AppFoodRoute: AppFoodRoute,
+  AppManageRoute: AppManageRoute,
   AppMedicineRoute: AppMedicineRoute,
   AppOrdersRoute: AppOrdersRoute,
   AppIndexRoute: AppIndexRoute,

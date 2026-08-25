@@ -77,15 +77,25 @@ function AccountScreen() {
                 Admin
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                You can order from this account like anyone else. The console is for accepting
-                orders, setting an arrival time and moving them along.
+                You can order from this account like anyone else. Incoming orders are under the
+                Counter tab — accept them, set an arrival time and move them along without leaving
+                the app.
               </p>
               <Link
-                to="/admin"
+                to="/app/manage"
                 className="mt-3 flex h-11 items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
               >
                 <ClipboardList className="size-4" />
-                Open the admin console
+                Open the counter
+              </Link>
+              {/* The desk console is still where offers and the launch date
+                  are written; this screen only carries the minute-to-minute
+                  half of the job. */}
+              <Link
+                to="/admin"
+                className="mt-2 flex h-10 items-center justify-center rounded-2xl border border-border bg-card text-xs font-semibold text-muted-foreground"
+              >
+                Offers and launch settings
               </Link>
             </div>
           )}
