@@ -148,8 +148,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       // iOS only accepts a raster image here; an SVG silently falls back to a
       // screenshot of the page.
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },

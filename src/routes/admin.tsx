@@ -58,23 +58,27 @@ const STATUS_STYLES: Record<string, string> = {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border bg-card">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+      <header className="sticky top-0 z-10 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-5">
           <span className="flex items-center gap-2 font-semibold text-primary">
-            <Lock className="size-4 text-accent" />
+            <div className="flex size-8 items-center justify-center rounded-full bg-accent/10">
+              <Lock className="size-4 text-accent" />
+            </div>
             Poba Express admin
           </span>
           <Link
             to="/"
-            className="flex min-h-11 items-center gap-2 text-sm font-medium text-accent hover:opacity-80"
+            className="flex min-h-9 items-center gap-2 rounded-full border border-border/50 bg-card px-4 text-sm font-medium text-muted-foreground shadow-sm transition-all hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
           >
             <ArrowLeft className="size-4" />
             Back to site
           </Link>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-5 py-10">{children}</main>
+      <main className="mx-auto max-w-5xl px-5 py-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+        {children}
+      </main>
     </div>
   );
 }
@@ -127,10 +131,16 @@ function Admin() {
 
   return (
     <Shell>
-      <h1 className="text-2xl font-bold text-primary sm:text-3xl">Admin</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Signed in as {accountLabel(user)}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">Admin</h1>
+          <p className="mt-1 text-sm text-muted-foreground flex items-center gap-1.5">
+            Signed in as <span className="font-medium text-foreground">{accountLabel(user)}</span>
+          </p>
+        </div>
+      </div>
 
-      <div className="mt-6 flex gap-2">
+      <div className="mt-8 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         {(
           [
             ["orders", "Orders", ClipboardList],
@@ -143,10 +153,10 @@ function Admin() {
             type="button"
             onClick={() => setTab(key)}
             className={cn(
-              "flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
+              "flex min-h-11 items-center gap-2.5 rounded-full px-5 text-sm font-medium transition-all",
               tab === key
-                ? "border-transparent bg-accent text-accent-foreground"
-                : "border-border bg-card text-muted-foreground hover:text-primary",
+                ? "bg-primary text-primary-foreground shadow-md ring-4 ring-primary/10"
+                : "border border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/5 hover:text-foreground",
             )}
           >
             <Icon className="size-4" />
@@ -155,7 +165,7 @@ function Admin() {
         ))}
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
         {tab === "orders" ? <Orders /> : tab === "offers" ? <Offers /> : <LaunchControl />}
       </div>
     </Shell>

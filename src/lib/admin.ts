@@ -44,11 +44,18 @@ export function useIsAdmin(user: User | null) {
     }
     let cancelled = false;
     setChecking(true);
+    
+    console.log("--- ADMIN CHECK DEBUG ---");
+    console.log("Checking UID:", `"${user.uid}"`);
+    console.log("Expected Document Path: admins/" + user.uid);
+    
     getDoc(doc(db, "admins", user.uid))
       .then((snapshot) => {
+        console.log("Document fetch successful. Does it exist?", snapshot.exists());
         if (!cancelled) setIsAdmin(snapshot.exists());
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Document fetch failed with error:", err.message);
         // A denied read means not an admin, which is the same outcome.
         if (!cancelled) setIsAdmin(false);
       })
