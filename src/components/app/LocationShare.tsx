@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Crosshair, MapPin, X } from "lucide-react";
+import { Crosshair, MapPin, TriangleAlert, X } from "lucide-react";
 
 import {
   accuracyLabel,
@@ -8,6 +8,7 @@ import {
   mapsLink,
   type Coords,
 } from "@/lib/location";
+import { AREA_SUMMARY, checkArea, outsideAreaMessage } from "@/lib/delivery-area";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,6 +33,9 @@ export function LocationShare({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Kept apart from `error`: a pin outside the area is a note about where the
+  // order is going, not a failure to get a fix, and the pin still attaches.
+  const [areaWarning, setAreaWarning] = useState<string | null>(null);
   // Whether geolocation exists can only be answered in a browser, and
   // answering it during render would have the server draw nothing and the
   // client draw a box — a hydration mismatch. So both start with nothing and
@@ -53,6 +57,13 @@ export function LocationShare({
       setError(failed ?? "Couldn't get your location.");
       return;
     }
+
+    // Checked against the delivery area, and only ever as a warning. The
+    // boundary is drawn from four landmarks rather than surveyed, and a fix
+    // indoors can be hundreds of metres out, so refusing an order on the
+    // strength of those two together would turn away real customers.
+    const check = checkArea(found);
+    setAreaWarning(!check.inside && !check.uncertain ? outsideAreaMessage(check) : null);
     onChange(found);
   };
 
@@ -80,7 +91,10 @@ export function LocationShare({
           <button
             type="button"
             aria-label="Remove location"
-            onClick={() => onChange(null)}
+            onClick={() => {
+              setAreaWarning(null);
+              onChange(null);
+            }}
             className="flex size-8 shrink-0 items-center justify-center rounded-full text-accent transition-colors hover:bg-secondary"
           >
             <X className="size-4" />
@@ -93,6 +107,7 @@ export function LocationShare({
             Sends a map pin with your order so the rider can navigate straight to you. Optional —
             the address above is what we go by.
           </p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{AREA_SUMMARY}</p>
           <button
             type="button"
             onClick={() => void share()}
@@ -108,6 +123,16 @@ export function LocationShare({
       {error && (
         <p role="alert" className="mt-3 text-xs font-medium text-destructive">
           {error}
+        </p>
+      )}
+
+      {areaWarning && (
+        <p
+          role="status"
+          className="mt-3 flex gap-2 rounded-xl bg-amber-500/10 p-2.5 text-xs font-medium text-amber-900"
+        >
+          <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
+          <span>{areaWarning}</span>
         </p>
       )}
     </div>

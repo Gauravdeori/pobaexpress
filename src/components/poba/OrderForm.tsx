@@ -18,20 +18,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { whatsappLink } from "@/lib/contact";
-import {
-  deliveryFee,
-  getMenu,
-  getMenuSections,
-  itemLabel,
-  rupees,
-  type MenuItem,
-} from "@/lib/menu";
+import { getMenu, getMenuSections, itemLabel, rupees, type MenuItem } from "@/lib/menu";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { accountLabel, useAccount, saveProfile } from "@/lib/account";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { recordOrder, type OrderLine } from "@/lib/orders";
 import { uploadPrescription } from "@/lib/uploads";
 import { mapsLink, type Coords } from "@/lib/location";
+import { useDeliveryQuote } from "@/lib/use-delivery";
 import { LocationShare } from "@/components/app/LocationShare";
 import { Reveal, SectionHeading } from "./Reveal";
 
@@ -153,7 +147,12 @@ export function OrderForm() {
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
   const sections = getMenuSections(category);
-  const fee = deliveryFee(category);
+  // The same quote the app uses, so a wet night costs the same whether the
+  // order is placed here or in the app. `deliveryFee` alone was the base
+  // rate, which meant this form undercharged for every ride it is meant to
+  // cover.
+  const quote = useDeliveryQuote(category);
+  const fee = quote.fee;
 
   const picked = (menu ?? []).filter((item) => cart[item.id] > 0);
   const subtotal = picked.reduce((sum, item) => sum + item.price * cart[item.id], 0);
@@ -278,7 +277,9 @@ export function OrderForm() {
         lines.push(
           "",
           `*Subtotal:* ${rupees(subtotal)}`,
-          `*Delivery:* ${rupees(fee)}`,
+          quote.surcharge > 0
+            ? `*Delivery:* ${rupees(fee)} (${quote.reason})`
+            : `*Delivery:* ${rupees(fee)}`,
           `*Total:* ${rupees(total)}`,
         );
       }
@@ -286,7 +287,14 @@ export function OrderForm() {
       if (items.trim()) {
         lines.push("", `*${picked.length ? "Also needed" : "Order details"}:* ${items.trim()}`);
       }
-      if (!picked.length) lines.push("", `*Delivery:* ${rupees(fee)} flat`);
+      if (!picked.length) {
+        lines.push(
+          "",
+          quote.surcharge > 0
+            ? `*Delivery:* ${rupees(fee)} (${quote.reason})`
+            : `*Delivery:* ${rupees(fee)} flat`,
+        );
+      }
       if (notes.trim()) lines.push("", `*Extra notes:* ${notes.trim()}`);
       if (prescriptionLine) lines.push("", prescriptionLine);
       return lines.join("\n");
@@ -426,7 +434,16 @@ export function OrderForm() {
             {/* The fee differs per category, so state it wherever you are. */}
             <p className="mt-3 text-xs text-muted-foreground">
               Delivery for {active.label.toLowerCase()}:{" "}
-              <span className="font-semibold text-accent">{rupees(fee)}</span> flat, per order.
+              <span className="font-semibold text-accent">{rupees(fee)}</span> per order.
+              {quote.surcharge > 0 && (
+                <>
+                  {" "}
+                  <span className="font-medium">
+                    Includes {rupees(quote.surcharge)} for tonight&apos;s conditions —{" "}
+                    {quote.reason.toLowerCase()}.
+                  </span>
+                </>
+              )}
             </p>
 
             {/* Menu — only the categories with a fixed price list get one */}

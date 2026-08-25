@@ -26,16 +26,22 @@ import chocolateCakeImg from "@/assets/chocolate-cake.jpg";
 import cakeCategoryImg from "@/assets/cake_category.jpg";
 import medicineCategoryImg from "@/assets/medicine_category.jpg";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
+import { AREA_EDGES, AREA_SUMMARY } from "@/lib/delivery-area";
 import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 
+/**
+ * Everywhere inside the delivery area, with the four edges named exactly as
+ * `AREA_EDGES` names them — a picker offering "Rotkey Area" while the boundary
+ * is drawn at "Rotkey Playground" invites an order from just outside it.
+ */
 const JONAI_LOCATIONS = [
   "Jonai Main Market",
-  "Ruskin Gate",
-  "Jonai P.H.C Road",
+  AREA_EDGES.north,
+  AREA_EDGES.south,
+  AREA_EDGES.east,
+  AREA_EDGES.west,
   "College Road",
   "Station Road",
-  "Torajan Side",
-  "Rotkey Area",
 ];
 
 const SEARCH_PLACEHOLDERS = [
@@ -477,6 +483,11 @@ export function ZomatoTopBanner() {
                   <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
                     Select Delivery Zone in Jonai
                   </div>
+                  {/* The boundary, stated where the zone is chosen: the list
+                      below is the whole of it, not a sample of a wider area. */}
+                  <p className="px-3 pb-1.5 text-[10px] font-medium leading-relaxed text-muted-foreground">
+                    {AREA_SUMMARY}
+                  </p>
                   <div className="mt-1 max-h-48 overflow-y-auto space-y-0.5">
                     {JONAI_LOCATIONS.map((loc) => (
                       <button

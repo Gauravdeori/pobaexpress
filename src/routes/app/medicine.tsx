@@ -6,7 +6,8 @@ import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { deliveryFee, rupees } from "@/lib/menu";
+import { rupees } from "@/lib/menu";
+import { useDeliveryQuote } from "@/lib/use-delivery";
 import { saveMedicineRequest } from "@/lib/medicine-request";
 import { isUploadConfigured, uploadPrescription } from "@/lib/uploads";
 
@@ -33,7 +34,10 @@ function MedicineScreen() {
   const [preview, setPreview] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fee = deliveryFee("medicine");
+  // Quoted through the same conditions as every other screen: this line was
+  // the base rate, so it read ₹30 to someone about to be charged ₹50 on a
+  // wet night.
+  const quote = useDeliveryQuote("medicine");
 
   // Object URLs leak until revoked, so tie each one to the file it previews.
   useEffect(() => {
@@ -94,7 +98,11 @@ function MedicineScreen() {
         />
         <p className="mt-3 text-xs text-muted-foreground">
           Prices depend on the brand in stock, so we confirm the total on WhatsApp before the rider
-          collects. Delivery is {rupees(fee)} flat.
+          collects. Delivery is {rupees(quote.fee)}
+          {quote.surcharge > 0
+            ? `, including ${rupees(quote.surcharge)} for ${quote.reason.toLowerCase()}`
+            : " flat"}
+          .
         </p>
       </div>
 

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
-import { deliveryFee, type MenuItem } from "./menu";
+import { type MenuItem } from "./menu";
 
 export type CartCategory = "food" | "cake" | "medicine";
 
@@ -28,12 +28,18 @@ const EMPTY: CartState = { category: "food", source: null, lines: [] };
 // prices that no longer exist on any menu, and nothing on screen could edit it.
 const STORAGE_KEY = "poba.cart.v2";
 
+/**
+ * Deliberately no `fee` or `total`.
+ *
+ * They used to be here, computed from the base rate, and every screen ignored
+ * them in favour of `useDeliveryQuote` — which adds the weather and night
+ * surcharge. Leaving an un-surcharged total on the context was a quote waiting
+ * to be shown to someone by mistake.
+ */
 type CartContextValue = {
   cart: CartState;
   count: number;
   subtotal: number;
-  fee: number;
-  total: number;
   /** True when adding from `source` would discard what is already in the cart. */
   conflicts: (category: CartCategory, source: string | null) => boolean;
   add: (item: MenuItem, category: CartCategory, source: string | null) => void;
@@ -121,13 +127,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CartContextValue>(() => {
     const count = cart.lines.reduce((sum, line) => sum + line.quantity, 0);
     const subtotal = cart.lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
-    const fee = cart.lines.length > 0 ? deliveryFee(cart.category) : 0;
     return {
       cart,
       count,
       subtotal,
-      fee,
-      total: subtotal + fee,
       conflicts,
       add,
       setQuantity,
