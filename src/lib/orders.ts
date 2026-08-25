@@ -1,7 +1,7 @@
 import {
   addDoc,
   collection,
-  getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   where,
@@ -87,37 +87,66 @@ export type OrderRecord = OrderDraft & {
   etaAt: number | null;
 };
 
+/** Sorted here rather than with `orderBy` — see `watchOrders`. */
+function newestFirst(a: OrderRecord, b: OrderRecord): number {
+  return (b.placedAt?.getTime() ?? 0) - (a.placedAt?.getTime() ?? 0);
+}
+
+/** One shape for a stored order, so the fetch and the live read cannot drift. */
+function toRecord(id: string, raw: unknown): OrderRecord {
+  const data = raw as OrderDraft & {
+    status?: string;
+    createdAt?: Timestamp;
+    etaAt?: number;
+  };
+  return {
+    ...data,
+    id,
+    status: data.status ?? "new",
+    placedAt: data.createdAt?.toDate() ?? null,
+    etaAt: typeof data.etaAt === "number" ? data.etaAt : null,
+  };
+}
+
 /**
- * Every order this customer has placed, newest first.
+ * Every order this customer has placed, newest first, kept live.
+ *
+ * An order changes while the customer is looking at it — accepted, then
+ * prepared, then an arrival time, then out for delivery — and all of that
+ * happens on someone else's screen. Fetching once on mount meant the status
+ * they were watching was only ever as fresh as the moment they opened the tab,
+ * and the estimated arrival could sit there being quietly wrong.
  *
  * Sorted here rather than with `orderBy`, because pairing that with the
  * `where` needs a composite index built in the console — one more setup step,
  * for a list that is a handful of rows per person.
  *
- * Throws rather than swallowing: an empty list and a failed read look identical
- * on screen, and "no orders yet" is a lie to tell someone who has ordered.
+ * Reports errors rather than swallowing them: an empty list and a failed read
+ * look identical on screen, and "no orders yet" is a lie to tell someone who
+ * has ordered.
+ *
+ * Returns its unsubscribe, so the caller tears it down on sign-out.
  */
-export async function listOrders(uid: string): Promise<OrderRecord[]> {
-  if (!db) return [];
+export function watchOrders(
+  uid: string,
+  onChange: (orders: OrderRecord[]) => void,
+  onError: (error: Error) => void,
+): () => void {
+  if (!db) {
+    onChange([]);
+    return () => {};
+  }
 
-  const snapshot = await getDocs(query(collection(db, "orders"), where("userId", "==", uid)));
-
-  return snapshot.docs
-    .map((entry) => {
-      const data = entry.data() as OrderDraft & {
-        status?: string;
-        createdAt?: Timestamp;
-        etaAt?: number;
-      };
-      return {
-        ...data,
-        id: entry.id,
-        status: data.status ?? "new",
-        placedAt: data.createdAt?.toDate() ?? null,
-        etaAt: typeof data.etaAt === "number" ? data.etaAt : null,
-      };
-    })
-    .sort((a, b) => (b.placedAt?.getTime() ?? 0) - (a.placedAt?.getTime() ?? 0));
+  return onSnapshot(
+    query(collection(db, "orders"), where("userId", "==", uid)),
+    (snapshot) => {
+      onChange(snapshot.docs.map((entry) => toRecord(entry.id, entry.data())).sort(newestFirst));
+    },
+    (cause) => {
+      console.error("Could not watch orders", cause);
+      onError(cause);
+    },
+  );
 }
 
 export async function recordOrder(draft: OrderDraft, uid: string | null): Promise<void> {

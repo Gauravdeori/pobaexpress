@@ -6,7 +6,7 @@ import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "@/lib/account";
 import { rupees } from "@/lib/menu";
-import { listOrders, type OrderRecord } from "@/lib/orders";
+import { watchOrders, type OrderRecord } from "@/lib/orders";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/orders")({
@@ -191,27 +191,41 @@ function OrderSkeletons() {
   );
 }
 
+/** How often the "arriving in" line is redrawn. A minute is its resolution. */
+const ETA_TICK_MS = 30_000;
+
 function OrdersScreen() {
   const { user, loading: authLoading } = useAccount();
   const [orders, setOrders] = useState<OrderRecord[] | null>(null);
   const [failed, setFailed] = useState(false);
+  // Bumped on a timer purely to redraw. The subscription below pushes changes
+  // the counter makes, but "arriving in about 25 min" is arithmetic against
+  // the clock — without this it would still read 25 minutes half an hour
+  // later, which is the exact thing a live screen is supposed to stop.
+  const [, setTick] = useState(0);
 
+  const counting =
+    orders?.some(
+      (order) =>
+        order.etaAt !== null && order.status !== "delivered" && order.status !== "cancelled",
+    ) ?? false;
+
+  useEffect(() => {
+    if (!counting) return;
+    const timer = setInterval(() => setTick((n) => n + 1), ETA_TICK_MS);
+    return () => clearInterval(timer);
+  }, [counting]);
+
+  // Live rather than fetched once: the status on this screen is moved from
+  // the counter's screen, so a customer watching "Being prepared" turn into
+  // "On the way" should not have to reload to see it happen.
   useEffect(() => {
     if (!user) {
       setOrders(null);
       return;
     }
-    let cancelled = false;
     setFailed(false);
-    listOrders(user.uid)
-      .then((found) => !cancelled && setOrders(found))
-      .catch((error) => {
-        console.error("Could not load orders", error);
-        if (!cancelled) setFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
+    return watchOrders(user.uid, setOrders, () => setFailed(true));
   }, [user]);
 
   return (
