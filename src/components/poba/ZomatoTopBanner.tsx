@@ -141,7 +141,7 @@ const HERO_SLIDES = [
     heroSecondary: momosImg,
     heroBadge: "HOT & FRESH",
     offerPill: "FLAT ₹5 DELIVERY",
-    features: ["No App Download Required", "Instant WhatsApp Order", "Live Doorstep Tracking"],
+    features: ["Free Poba Express App", "Instant WhatsApp Order", "Live Doorstep Tracking"],
   },
   {
     id: "prarthona-deal",
@@ -666,7 +666,7 @@ export function ZomatoTopBanner() {
             </div>
             <div className="min-w-0">
               <div className="text-xs font-extrabold text-foreground">WhatsApp Ordering</div>
-              <div className="text-[10px] font-semibold text-muted-foreground">No app download</div>
+              <div className="text-[10px] font-semibold text-muted-foreground">Or use the app</div>
             </div>
           </div>
         </div>

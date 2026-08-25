@@ -51,7 +51,7 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
+        "fixed inset-x-0 top-[var(--install-bar)] z-50 transition-all duration-300",
         scrolled
           ? "bg-background/95 backdrop-blur-xl shadow-sm border-b border-border/40"
           : "bg-transparent",

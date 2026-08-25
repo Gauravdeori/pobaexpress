@@ -70,6 +70,12 @@
   --gradient-hero: linear-gradient(180deg, var(--background) 0%, oklch(0.96 0.01 120) 100%);
   --gradient-accent: linear-gradient(135deg, var(--accent), oklch(0.34 0.1 155));
   --gradient-green: linear-gradient(135deg, var(--primary-deep), var(--primary));
+
+  /* Height of the "install the app" strip at the very top of the landing page.
+     Zero until InstallBanner decides it has something to offer, so the fixed
+     navbar and the page below it only move down when the strip is really
+     there. */
+  --install-bar: 0px;
 }
 
 @layer base {

@@ -7,9 +7,10 @@
  * served from cache and refreshed in the background.
  */
 
-// v3 rewrites how navigations are cached — see the fetch handler. Installed
-// clients holding a v2 shell have a cache keyed the wrong way, so it goes.
-const VERSION = "v3";
+// v4 follows the landing page coming back. A client that cached "/" while it
+// was nothing but a redirect into /app would keep serving that redirect as its
+// offline copy, so the whole cache goes.
+const VERSION = "v4";
 const SHELL_CACHE = `poba-shell-${VERSION}`;
 const ASSET_CACHE = `poba-assets-${VERSION}`;
 

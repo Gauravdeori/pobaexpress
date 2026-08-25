@@ -1,8 +1,8 @@
 # Poba Express — Landing Page
 
 Marketing site for **Poba Express**, a local delivery service in Jonai, Assam.
-Food, cake and medicine delivery, ordered straight through WhatsApp — no app,
-no signup.
+Food, cake and medicine delivery, ordered in the installable Poba Express app
+or straight through WhatsApp.
 
 ## Stack
 

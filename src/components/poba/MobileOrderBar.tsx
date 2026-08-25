@@ -68,7 +68,7 @@ export function MobileOrderBar() {
           </a>
           <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
             {launched
-              ? "Food from ₹39 · delivery from ₹5 · no app needed"
+              ? "Food from ₹39 · delivery from ₹5 · order in the app or on WhatsApp"
               : `Ordering opens ${LAUNCH_DATE_LABEL} · food from ₹39`}
           </p>
         </motion.div>

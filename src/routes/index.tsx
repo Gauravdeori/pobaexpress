@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { InstallBanner } from "@/components/poba/InstallBanner";
 import { Navbar } from "@/components/poba/Navbar";
 import { Hero } from "@/components/poba/Hero";
 import { LaunchCountdown } from "@/components/poba/LaunchCountdown";
@@ -15,7 +16,7 @@ import { PartnerSheet } from "@/components/poba/PartnerSheet";
 
 const title = "Poba Express — Jonai's Own Delivery Service";
 const description =
-  "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — flat ₹20 delivery, no app, no signup.";
+  "Food, cake and medicine delivery in Jonai, Assam. Install the free Poba Express app or order on WhatsApp.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,6 +54,10 @@ function Index() {
 
   return (
     <div className="min-h-screen">
+      <InstallBanner />
+      {/* The strip is fixed, so this is the space it takes. Zero-height until
+          the browser actually offers installation. */}
+      <div aria-hidden style={{ height: "var(--install-bar)" }} />
       <Navbar />
       <main>
         <Hero />

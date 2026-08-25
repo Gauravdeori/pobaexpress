@@ -16,7 +16,7 @@ import { UpdateBanner } from "../components/app/UpdateBanner";
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
 const siteDescription =
-  "Food, cake and medicine delivery in Jonai, Assam. Order on WhatsApp — flat delivery from ₹5, no app, no signup.";
+  "Food, cake and medicine delivery in Jonai, Assam. Install the free Poba Express app or order on WhatsApp — delivery from ₹5.";
 
 function NotFoundComponent() {
   return (
@@ -62,7 +62,10 @@ async function resetApp() {
   } catch {
     // Reload regardless: a partial teardown still beats the wedged state.
   }
-  window.location.replace("/app");
+  // Back to whichever page they were wedged on, not to /app: someone reading
+  // the website is not asking to be moved into the ordering app, and that
+  // hop was one of the ways a browser visit ended up there.
+  window.location.replace(window.location.pathname + window.location.search);
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
