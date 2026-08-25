@@ -207,6 +207,200 @@ const HERO_SLIDES = [
   },
 ];
 
+/** Thematic Background SVG Illustrations for Hero Slides */
+function SlideBackgroundIllustrations({ slideId }: { slideId: string }) {
+  if (slideId === "poba-deal") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+        {/* Ambient radial glow */}
+        <div className="absolute -left-20 -bottom-20 size-80 rounded-full bg-emerald-400/15 blur-3xl" />
+        <div className="absolute right-10 -top-20 size-96 rounded-full bg-amber-400/15 blur-3xl" />
+
+        {/* Concentric speed radar rings */}
+        <svg
+          className="absolute -right-24 -top-24 size-[500px] stroke-white/10 opacity-70"
+          viewBox="0 0 400 400"
+          fill="none"
+        >
+          <circle cx="200" cy="200" r="80" strokeWidth="1.5" strokeDasharray="4 6" />
+          <circle cx="200" cy="200" r="130" strokeWidth="1.5" strokeDasharray="6 8" />
+          <circle cx="200" cy="200" r="180" strokeWidth="1.5" />
+          <circle cx="200" cy="200" r="230" strokeWidth="1.5" strokeDasharray="8 10" />
+        </svg>
+
+        {/* Delivery Scooter & Speed Lines Illustration */}
+        <svg
+          className="absolute left-1/3 bottom-2 h-36 w-72 text-white/[0.12]"
+          viewBox="0 0 200 100"
+          fill="currentColor"
+        >
+          <path
+            d="M20 75 Q40 75 50 65 Q60 55 70 55 L90 55 L100 40 L115 40 L120 50 L140 50 Q150 50 155 60 L165 75 Z"
+            opacity="0.6"
+          />
+          <circle cx="45" cy="80" r="14" fill="none" stroke="currentColor" strokeWidth="5" />
+          <circle cx="150" cy="80" r="14" fill="none" stroke="currentColor" strokeWidth="5" />
+          <path
+            d="M0 65 L40 65 M5 75 L30 75 M10 85 L35 85"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+
+        {/* Floating Biryani Pot & Herb Silhouettes */}
+        <svg
+          className="absolute left-10 top-14 size-20 text-amber-300/[0.18]"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3.5-4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+        </svg>
+
+        <svg
+          className="absolute left-1/2 top-4 size-10 text-white/[0.2] animate-pulse"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 2l2.4 7.2h7.6l-6.1 4.5 2.3 7.3-6.2-4.6-6.2 4.6 2.3-7.3-6.1-4.5h7.6z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (slideId === "prarthona-deal") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+        <div className="absolute -right-20 -bottom-20 size-80 rounded-full bg-amber-500/20 blur-3xl" />
+        <div className="absolute left-10 -top-20 size-96 rounded-full bg-orange-600/20 blur-3xl" />
+
+        {/* Wok Flame & Sizzle Steam Wave Illustration */}
+        <svg
+          className="absolute -right-6 bottom-0 h-72 w-96 text-orange-400/[0.12]"
+          viewBox="0 0 200 200"
+          fill="currentColor"
+        >
+          <path d="M100 20 C80 60 40 80 40 120 C40 160 80 190 100 190 C120 190 160 160 160 120 C160 80 120 60 100 20 Z" />
+          <path
+            d="M100 60 C90 85 70 100 70 125 C70 150 90 170 100 170 C110 170 130 150 130 125 C130 100 110 85 100 60 Z"
+            fill="#f59e0b"
+            opacity="0.4"
+          />
+        </svg>
+
+        {/* Floating Dumpling / Momo Steam Curves */}
+        <svg
+          className="absolute left-1/4 top-8 h-56 w-56 text-amber-200/[0.15]"
+          viewBox="0 0 100 100"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+        >
+          <path d="M20 80 Q30 50 20 20" />
+          <path d="M40 85 Q55 50 40 15" />
+          <path d="M60 80 Q70 50 60 20" />
+        </svg>
+
+        {/* Decorative Grid Pattern */}
+        <svg
+          className="absolute left-6 bottom-6 size-32 text-white/[0.08]"
+          viewBox="0 0 100 100"
+          fill="none"
+          stroke="currentColor"
+        >
+          <line x1="0" y1="20" x2="100" y2="20" strokeDasharray="4 4" />
+          <line x1="0" y1="50" x2="100" y2="50" strokeDasharray="4 4" />
+          <line x1="0" y1="80" x2="100" y2="80" strokeDasharray="4 4" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (slideId === "dcakery-deal") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+        <div className="absolute -left-10 -top-10 size-80 rounded-full bg-rose-500/20 blur-3xl" />
+        <div className="absolute right-10 bottom-0 size-96 rounded-full bg-pink-400/20 blur-3xl" />
+
+        {/* Birthday Party Confetti & Streamers Illustration */}
+        <svg
+          className="absolute inset-0 size-full text-rose-300/[0.15]"
+          viewBox="0 0 400 200"
+          fill="currentColor"
+        >
+          <circle cx="40" cy="30" r="5" />
+          <circle cx="120" cy="70" r="4" />
+          <circle cx="280" cy="40" r="6" />
+          <circle cx="340" cy="90" r="4" />
+          <circle cx="200" cy="20" r="5" />
+          <rect x="70" y="45" width="10" height="10" rx="3" transform="rotate(25 70 45)" />
+          <rect x="250" y="80" width="12" height="8" rx="3" transform="rotate(-35 250 80)" />
+          <rect x="160" y="110" width="10" height="10" rx="3" transform="rotate(45 160 110)" />
+          <path
+            d="M30 120 Q50 140 70 120 T110 120"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeDasharray="4 4"
+          />
+          <path
+            d="M220 30 Q240 50 260 30 T300 30"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeDasharray="4 4"
+          />
+        </svg>
+
+        {/* Celebration Sparkles */}
+        <svg
+          className="absolute right-1/3 top-6 size-14 text-rose-200/[0.25] animate-pulse"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+        </svg>
+      </div>
+    );
+  }
+
+  // Medicine deal
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+      <div className="absolute -right-10 -top-10 size-80 rounded-full bg-cyan-500/20 blur-3xl" />
+      <div className="absolute left-10 bottom-0 size-96 rounded-full bg-teal-400/20 blur-3xl" />
+
+      {/* Heartbeat / ECG Wave Line */}
+      <svg
+        className="absolute inset-x-0 bottom-6 h-24 w-full text-cyan-300/[0.18]"
+        viewBox="0 0 500 100"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        preserveAspectRatio="none"
+      >
+        <path d="M0 50 L120 50 L135 20 L150 80 L165 30 L180 65 L195 50 L320 50 L335 15 L350 85 L365 35 L380 60 L395 50 L500 50" />
+      </svg>
+
+      {/* Hexagonal Molecular Mesh */}
+      <svg
+        className="absolute left-6 top-6 size-56 text-cyan-200/[0.12]"
+        viewBox="0 0 100 100"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <polygon points="30,10 50,20 50,40 30,50 10,40 10,20" />
+        <polygon points="70,10 90,20 90,40 70,50 50,40 50,20" />
+        <polygon points="50,40 70,50 70,70 50,80 30,70 30,50" />
+      </svg>
+    </div>
+  );
+}
+
 export function ZomatoTopBanner() {
   const launched = useLaunched();
   const [selectedLocation, setSelectedLocation] = useState(JONAI_LOCATIONS[0]);
@@ -369,9 +563,8 @@ export function ZomatoTopBanner() {
           <div
             className={`bg-gradient-to-br ${activeSlide.gradient} p-6 sm:p-8 lg:p-10 text-white min-h-[340px] flex flex-col justify-between relative transition-all duration-500`}
           >
-            {/* Background Decorative Mesh Glow */}
-            <div className="pointer-events-none absolute -right-20 -top-20 size-[450px] rounded-full bg-white/10 blur-3xl" />
-            <div className="pointer-events-none absolute bottom-0 right-1/4 size-72 rounded-full bg-black/20 blur-2xl" />
+            {/* Thematic Background SVG Illustrations */}
+            <SlideBackgroundIllustrations slideId={activeSlide.id} />
 
             {/* Top Bar on Banner */}
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
