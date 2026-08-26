@@ -138,6 +138,9 @@ const HERO_SLIDES = [
     cta: "Download the App to Order",
     ctaLink: "/app",
     external: false,
+    // Replaced by "LIVE NOW" the moment the shop opens — see `slideCode`.
+    // A banner still advertising an opening date is the clearest possible
+    // signal that a site has not been touched since before it launched.
     code: `OPENING ${LAUNCH_DATE_LABEL}`,
     gradient: "from-[#082817] via-[#0f4427] to-[#1a6b3e]",
     accentColor: "#10b981",
@@ -585,9 +588,22 @@ export function ZomatoTopBanner() {
                 <activeSlide.tagIcon className="size-3.5" />
                 {activeSlide.badge}
               </span>
-              <span className="rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold tracking-wide text-white backdrop-blur-md border border-white/20 shadow-sm">
-                {activeSlide.code}
-              </span>
+              {/* Any slide counting down to a date says LIVE NOW instead once
+                  we are open; the slides whose code is a shop's own label
+                  ("ARTISAN BAKERY") are left alone. */}
+              {launched && activeSlide.code.startsWith("OPENING") ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-black tracking-wide text-white shadow-sm">
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-75" />
+                    <span className="relative inline-flex size-2 rounded-full bg-white" />
+                  </span>
+                  LIVE NOW
+                </span>
+              ) : (
+                <span className="rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold tracking-wide text-white backdrop-blur-md border border-white/20 shadow-sm">
+                  {activeSlide.code}
+                </span>
+              )}
             </div>
 
             {/* Main Content Grid: Left Text & Right Image Showcase */}
