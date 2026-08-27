@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { PartyPopper, Rocket } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useTimeUntilLaunch } from "@/lib/launch";
+import { useAnnouncement, useTimeUntilLaunch } from "@/lib/launch";
 
 const UNITS = [
   { key: "days", label: "Days" },
@@ -31,6 +31,11 @@ export function LaunchCountdown() {
   // Follows the admin panel, so opening early there also stops this counting.
   // Named apart from the per-unit `label` below, which the map shadows.
   const { remaining, label: launchLabel } = useTimeUntilLaunch();
+  // Announced but not yet open is a real state and the one we are in on launch
+  // day: the service exists, the menu is priced, the kitchens take orders in
+  // the morning. "Launching soon" would undersell that to everyone who came
+  // because they heard we launched.
+  const { announced, today } = useAnnouncement();
 
   const launched = remaining?.done ?? false;
   // Counted down, not yet opened. Distinct from "launching soon", because the
@@ -48,14 +53,31 @@ export function LaunchCountdown() {
 
       <div className="relative mx-auto max-w-4xl px-5 text-center lg:px-8">
         <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground backdrop-blur-sm">
-          {launched ? <PartyPopper className="size-4" /> : <Rocket className="size-4" />}
-          {launched ? "We're live" : waiting ? "Opening any moment" : "Launching soon"}
+          {launched || announced ? (
+            <PartyPopper className="size-4" />
+          ) : (
+            <Rocket className="size-4" />
+          )}
+          {launched
+            ? "We're live"
+            : waiting
+              ? "Opening any moment"
+              : announced
+                ? today
+                  ? "Officially launched today"
+                  : "Officially launched"
+                : "Launching soon"}
         </span>
 
         <h2 className="mt-5 text-3xl font-bold text-primary-foreground sm:text-4xl lg:text-5xl">
           {launched ? (
             <>
               Poba Express is <span className="text-accent-light">live now</span>
+            </>
+          ) : announced && !waiting ? (
+            <>
+              Poba Express is{" "}
+              <span className="text-accent-light">officially launched{today ? " today" : ""}</span>
             </>
           ) : (
             <>
@@ -69,7 +91,9 @@ export function LaunchCountdown() {
             ? "Food, cake and medicine delivered across Jonai. Download the Poba Express app now to order."
             : waiting
               ? "The day is here. We're doing the last checks and opening ordering shortly — install the app now so you're ready the moment we do."
-              : "We're getting our riders and partner kitchens ready. Browse the menu and prices now."}
+              : announced
+                ? `Jonai's own delivery service is here. Ordering begins ${launchLabel} — browse the kitchens, bakeries and prices now, and install the app so you're ready.`
+                : "We're getting our riders and partner kitchens ready. Browse the menu and prices now."}
         </p>
 
         {!launched && (

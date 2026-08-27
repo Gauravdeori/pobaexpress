@@ -1,5 +1,5 @@
 /**
- * The day the countdown points at.
+ * The moment the countdown points at — 7 AM on the first delivery morning.
  *
  * Fixed to IST (+05:30) rather than the visitor's timezone, so everyone counts
  * down to the same moment.
@@ -8,14 +8,45 @@
  * Opening is `openNow`, set from the admin panel by someone who can see that
  * the kitchens are lit and a rider is awake. See `timeUntil`.
  *
- * These two are the only place the date is written down; the countdown, the
- * order form, the sticky bar and the checkout all read them, so they can never
- * disagree about the day.
+ * These two are the only place the opening time is written down; the countdown,
+ * the order form, the sticky bar and the checkout all read them, so they can
+ * never disagree about it.
  */
-export const LAUNCH_AT = new Date("2026-08-27T00:00:00+05:30");
+export const LAUNCH_AT = new Date("2026-08-28T07:00:00+05:30");
 
-/** Shown alongside the countdown. Must name the same day as `LAUNCH_AT`. */
-export const LAUNCH_DATE_LABEL = "27 August 2026";
+/** Shown alongside the countdown. Must name the same moment as `LAUNCH_AT`. */
+export const LAUNCH_DATE_LABEL = "28 August, 7 AM";
+
+/**
+ * The day Poba Express itself went public — the site, the app, the partner
+ * list and the prices.
+ *
+ * Deliberately a different date from `LAUNCH_AT`, because these are two real
+ * and separate events: the service was announced on the 27th, and the kitchens
+ * start taking orders at 7 AM the next morning. Folding them into one date
+ * would force a choice between claiming we deliver a day early and saying
+ * nothing about the launch at all.
+ */
+export const ANNOUNCED_AT = new Date("2026-08-27T00:00:00+05:30");
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** True once the service has been announced publicly. */
+export function isAnnounced(now: number = Date.now()): boolean {
+  return now >= ANNOUNCED_AT.getTime();
+}
+
+/**
+ * True only during the calendar day of the announcement, in IST.
+ *
+ * Guards the word "today", which is the one part of the launch copy that stops
+ * being true at midnight — and a page still saying "launched today" a week
+ * later is exactly the stale-site signal the rest of this file avoids.
+ */
+export function isAnnouncementDay(now: number = Date.now()): boolean {
+  const start = ANNOUNCED_AT.getTime();
+  return now >= start && now < start + DAY_MS;
+}
 
 /**
  * Opens ordering now, whatever the date says. TEMPORARY — for testing the

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type FormEvent, type ReactNode } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
   MapPin,
@@ -18,7 +19,6 @@ import {
 } from "lucide-react";
 
 import biryaniImg from "@/assets/biryani.png";
-import burgerImg from "@/assets/burger.png";
 import momosImg from "@/assets/momos.png";
 import chowmeinImg from "@/assets/chowmein.png";
 import pizzaImg from "@/assets/pizza.jpg";
@@ -52,7 +52,36 @@ const SEARCH_PLACEHOLDERS = [
   "Search for 'Chowmein & Fried Rice'...",
 ];
 
-type CategoryItem = {
+/**
+ * Where a tile, chip or search lands.
+ *
+ * Every one of these used to be an `#order` anchor. That worked only on the
+ * landing page, where the order form supplies the id — on the app home screen,
+ * which renders this same banner, there is nothing for the hash to scroll to
+ * and each of them was a tap that did nothing.
+ */
+type Destination = {
+  to: "food" | "cake" | "medicine";
+  /** The dish to pre-fill the kitchen search with. Only read for "food". */
+  query?: string;
+};
+
+/**
+ * The chips under the search box.
+ *
+ * Each query is spelled to match something a partner actually sells — the
+ * kitchen search understands "biryani" for Biriyani Corner's "Biriyani", so a
+ * chip can be labelled the way customers say it and still find the dish.
+ */
+const TRENDING: (Destination & { label: string })[] = [
+  { label: "Chicken Biryani", to: "food", query: "biryani" },
+  { label: "Steamed Momos", to: "food", query: "momo" },
+  { label: "Black Forest Cake", to: "cake" },
+  { label: "Dispy Pizza", to: "food", query: "pizza" },
+  { label: "Paracetamol", to: "medicine" },
+];
+
+type CategoryItem = Destination & {
   id: string;
   name: string;
   tag: string;
@@ -60,7 +89,6 @@ type CategoryItem = {
   fallbackEmoji: string;
   color: string;
   borderColor: string;
-  href: string;
 };
 
 const CATEGORIES: CategoryItem[] = [
@@ -72,7 +100,8 @@ const CATEGORIES: CategoryItem[] = [
     fallbackEmoji: "🍗",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
-    href: "#order",
+    to: "food",
+    query: "biryani",
   },
   {
     id: "momos",
@@ -82,7 +111,8 @@ const CATEGORIES: CategoryItem[] = [
     fallbackEmoji: "🥟",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
-    href: "#order",
+    to: "food",
+    query: "momo",
   },
   {
     id: "cakes",
@@ -92,17 +122,21 @@ const CATEGORIES: CategoryItem[] = [
     fallbackEmoji: "🎂",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
-    href: "/app/cake",
+    to: "cake",
   },
   {
-    id: "burgers",
-    name: "Burgers",
+    // Was "Burgers", which no partner in Jonai sells — the tile showed a photo
+    // of food that could not be ordered, and now that it opens a real list it
+    // would open an empty one. Pizza is on Dispy Bakery's menu today.
+    id: "pizza",
+    name: "Pizza",
     tag: "Fast Food Fav",
-    image: burgerImg,
-    fallbackEmoji: "🍔",
+    image: pizzaImg,
+    fallbackEmoji: "🍕",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
-    href: "#order",
+    to: "food",
+    query: "pizza",
   },
   {
     id: "chowmein",
@@ -112,7 +146,8 @@ const CATEGORIES: CategoryItem[] = [
     fallbackEmoji: "🍜",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
-    href: "#order",
+    to: "food",
+    query: "chowmein",
   },
   {
     id: "medicine",
@@ -122,7 +157,7 @@ const CATEGORIES: CategoryItem[] = [
     fallbackEmoji: "💊",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
-    href: "/app/medicine",
+    to: "medicine",
   },
 ];
 
@@ -410,8 +445,82 @@ function SlideBackgroundIllustrations({ slideId }: { slideId: string }) {
   );
 }
 
+/**
+ * A link to whichever screen actually sells the thing named on it.
+ *
+ * The destination is branched here rather than kept as one `to` string,
+ * because the router types each route's search separately and a union would
+ * lose that — it is what lets `search={{ q }}` be checked against what
+ * `/app/food` really accepts. Same shape as `ShopCard` on the landing page.
+ */
+function ShopLink({
+  dest,
+  className,
+  children,
+}: {
+  dest: Destination;
+  className: string;
+  children: ReactNode;
+}) {
+  if (dest.to === "cake") {
+    return (
+      <Link to="/app/cake" className={className}>
+        {children}
+      </Link>
+    );
+  }
+
+  if (dest.to === "medicine") {
+    return (
+      <Link to="/app/medicine" className={className}>
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <Link to="/app/food" search={{ q: dest.query }} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+/** One circle under "What's on your mind?". */
+function CategoryTile({ cat }: { cat: CategoryItem }) {
+  return (
+    <ShopLink
+      dest={cat}
+      className="group flex flex-col items-center gap-2.5 shrink-0 transition-transform active:scale-95"
+    >
+      <div
+        className={`relative flex size-20 sm:size-24 items-center justify-center rounded-full bg-gradient-to-br ${cat.color} border-2 ${cat.borderColor} p-2 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-accent`}
+      >
+        {cat.image ? (
+          <img
+            src={cat.image}
+            alt={cat.name}
+            className="size-full rounded-full object-cover transition-transform group-hover:scale-110"
+          />
+        ) : (
+          <span className="text-3xl sm:text-4xl drop-shadow-md">{cat.fallbackEmoji}</span>
+        )}
+
+        {/* Offer Tag Badge */}
+        <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-accent-light bg-accent px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm">
+          {cat.tag}
+        </span>
+      </div>
+
+      <span className="text-xs font-extrabold text-foreground group-hover:text-accent transition-colors">
+        {cat.name}
+      </span>
+    </ShopLink>
+  );
+}
+
 export function ZomatoTopBanner() {
   const launched = useLaunched();
+  const navigate = useNavigate();
   const [selectedLocation, setSelectedLocation] = useState(JONAI_LOCATIONS[0]);
   const [locationOpen, setLocationOpen] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -445,6 +554,18 @@ export function ZomatoTopBanner() {
   }, []);
 
   const activeSlide = HERO_SLIDES[currentSlide];
+
+  /**
+   * Hands the typed dish to the kitchen list.
+   *
+   * A form rather than a click handler, so Enter searches — which is what
+   * everyone does, and what the old `#order` link could not do at all.
+   */
+  const submitSearch = (event: FormEvent) => {
+    event.preventDefault();
+    const q = searchQuery.trim();
+    void navigate({ to: "/app/food", search: { q: q || undefined } });
+  };
 
   return (
     <div className="w-full space-y-6 pt-4 pb-8">
@@ -518,23 +639,24 @@ export function ZomatoTopBanner() {
 
           {/* Interactive Search Bar */}
           <div className="relative flex-1">
-            <div className="relative flex items-center">
+            <form onSubmit={submitSearch} role="search" className="relative flex items-center">
               <Search className="absolute left-3.5 size-4 text-accent pointer-events-none" />
               <input
-                type="text"
+                type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={SEARCH_PLACEHOLDERS[placeholderIndex]}
+                aria-label="Search restaurants or dishes"
                 className="w-full rounded-xl border border-border/80 bg-background/80 py-2.5 pl-10 pr-24 text-xs font-medium text-foreground transition-all focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
-              <a
-                href="#order"
+              <button
+                type="submit"
                 className="absolute right-1.5 flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-[11px] font-bold text-white shadow-sm transition-all hover:bg-primary active:scale-95"
               >
                 <span>Search</span>
                 <ArrowRight className="size-3" />
-              </a>
-            </div>
+              </button>
+            </form>
           </div>
 
           {/* Quick Offer Tag */}
@@ -549,20 +671,14 @@ export function ZomatoTopBanner() {
           <span className="shrink-0 font-bold uppercase tracking-wider text-muted-foreground text-[10px]">
             Trending:
           </span>
-          {[
-            "Chicken Biryani",
-            "Steamed Momos",
-            "Black Forest Cake",
-            "Dispy Pizza",
-            "Paracetamol",
-          ].map((tag) => (
-            <a
-              key={tag}
-              href="#order"
+          {TRENDING.map((tag) => (
+            <ShopLink
+              key={tag.label}
+              dest={tag}
               className="shrink-0 rounded-full border border-border/60 bg-card/80 px-3 py-1 font-semibold text-foreground/80 transition-all hover:border-accent hover:bg-accent/10 hover:text-primary"
             >
-              {tag}
-            </a>
+              {tag.label}
+            </ShopLink>
           ))}
         </div>
       </div>
@@ -792,46 +908,19 @@ export function ZomatoTopBanner() {
             </p>
           </div>
 
-          <a
-            href="#order"
+          <Link
+            to="/app/food"
             className="flex items-center gap-1 text-xs font-extrabold text-accent hover:text-primary transition-colors"
           >
             <span>See all menu</span>
             <ChevronRight className="size-4" />
-          </a>
+          </Link>
         </div>
 
         {/* Circular Category Avatars Container */}
         <div className="-mx-4 flex items-center gap-4 overflow-x-auto px-4 pb-4 pt-1 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {CATEGORIES.map((cat) => (
-            <a
-              key={cat.id}
-              href={cat.href}
-              className="group flex flex-col items-center gap-2.5 shrink-0 transition-transform active:scale-95"
-            >
-              <div
-                className={`relative flex size-20 sm:size-24 items-center justify-center rounded-full bg-gradient-to-br ${cat.color} border-2 ${cat.borderColor} p-2 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-accent`}
-              >
-                {cat.image ? (
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="size-full rounded-full object-cover transition-transform group-hover:scale-110"
-                  />
-                ) : (
-                  <span className="text-3xl sm:text-4xl drop-shadow-md">{cat.fallbackEmoji}</span>
-                )}
-
-                {/* Offer Tag Badge */}
-                <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-accent-light bg-accent px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm">
-                  {cat.tag}
-                </span>
-              </div>
-
-              <span className="text-xs font-extrabold text-foreground group-hover:text-accent transition-colors">
-                {cat.name}
-              </span>
-            </a>
+            <CategoryTile key={cat.id} cat={cat} />
           ))}
         </div>
       </div>

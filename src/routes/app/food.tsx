@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Search, X } from "lucide-react";
 
 import { RestaurantCard } from "@/components/app/Shared";
@@ -7,6 +7,10 @@ import { priceFrom, restaurantsIn, type Restaurant } from "@/lib/restaurants";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/food")({
+  // Only present when something is actually being searched, so an ordinary
+  // link into the list stays at /app/food rather than trailing an empty ?q=.
+  validateSearch: (search: Record<string, unknown>): { q?: string } =>
+    typeof search.q === "string" && search.q.trim() ? { q: search.q } : {},
   component: FoodScreen,
 });
 
@@ -31,21 +35,58 @@ const SORTS = {
 
 type SortKey = keyof typeof SORTS;
 
+/**
+ * Dishes Jonai spells more than one way.
+ *
+ * Biriyani Corner writes "Biriyani" and "Chowmin" on its board; the category
+ * tiles on the home screen — and most customers typing — write "Biryani" and
+ * "Chowmein". A plain substring match sends both to "Nothing matches that"
+ * while the dish is sitting on the menu, so each group is tried in full.
+ */
+const SPELLINGS: string[][] = [
+  ["biryani", "biriyani"],
+  ["chowmein", "chowmin", "chow mein", "chow"],
+  ["momo", "momos"],
+  ["maggi", "maggie"],
+];
+
+/** Every spelling worth trying for what was typed. */
+function variants(needle: string): string[] {
+  const group = SPELLINGS.find((forms) => forms.includes(needle));
+  return group ?? [needle];
+}
+
 /** Matches the shop, what it cooks, or anything on its menu. */
 function matches(restaurant: Restaurant, query: string): boolean {
   const needle = query.trim().toLowerCase();
   if (!needle) return true;
-  if (restaurant.name.toLowerCase().includes(needle)) return true;
-  if (restaurant.cuisine.toLowerCase().includes(needle)) return true;
-  // Searching dishes is the point: nobody looks for "Prarthona", they look
-  // for momos and expect to be told who makes them.
-  return restaurant.items.some((item) => item.name.toLowerCase().includes(needle));
+
+  const haystack = [
+    restaurant.name,
+    restaurant.cuisine,
+    // Searching dishes is the point: nobody looks for "Prarthona", they look
+    // for momos and expect to be told who makes them.
+    ...restaurant.items.map((item) => item.name),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return variants(needle).some((form) => haystack.includes(form));
 }
 
 function FoodScreen() {
   const all = restaurantsIn("food");
-  const [query, setQuery] = useState("");
+  // The category tiles on the home screen link in with a dish already typed,
+  // so "Biryani" opens the kitchens that cook it rather than an empty list.
+  const { q } = Route.useSearch();
+  const [query, setQuery] = useState(q ?? "");
   const [sort, setSort] = useState<SortKey>("default");
+
+  // Following a second such link, or going back to one, has to move the box —
+  // which the `useState` initialiser alone would not do.
+  useEffect(() => {
+    setQuery(q ?? "");
+  }, [q]);
 
   const shown = useMemo(() => {
     const found = all.filter((r) => matches(r, query));

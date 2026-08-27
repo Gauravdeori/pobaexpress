@@ -930,7 +930,7 @@ function LaunchControl() {
             <Input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="27 August 2026"
+              placeholder="28 August, 7 AM"
               className="mt-1.5 h-12 rounded-2xl"
             />
           </label>

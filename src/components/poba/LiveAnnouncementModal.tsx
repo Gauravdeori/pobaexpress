@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
   PartyPopper,
@@ -11,7 +12,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLaunched } from "@/lib/launch";
+import { LAUNCH_DATE_LABEL, useAnnouncement, useLaunched } from "@/lib/launch";
 import biryaniImg from "@/assets/biryani.png";
 import momosImg from "@/assets/momos.png";
 import cakeCategoryImg from "@/assets/cake_category.jpg";
@@ -20,16 +21,22 @@ import medicineCategoryImg from "@/assets/medicine_category.jpg";
 export function LiveAnnouncementModal() {
   const [open, setOpen] = useState(false);
   const launched = useLaunched();
+  // The launch and the first delivery are a night apart, so this announces
+  // whichever has just happened. Two keys rather than one, so someone who saw
+  // the launch notice in the morning is still told when ordering actually
+  // opens — that is the more useful of the two messages.
+  const { announced, today } = useAnnouncement();
 
   useEffect(() => {
-    // Check if launched and hasn't been shown in this session yet
-    const shown = sessionStorage.getItem("poba_live_modal_shown");
+    const key = launched ? "poba_live_modal_shown" : "poba_launch_modal_shown";
+    const shown = sessionStorage.getItem(key);
     const isLiveHash = window.location.hash === "#live";
+    const worthShowing = launched || announced;
 
-    if (isLiveHash || (launched && !shown)) {
+    if (isLiveHash || (worthShowing && !shown)) {
       setOpen(true);
-      if (launched && !shown) {
-        sessionStorage.setItem("poba_live_modal_shown", "true");
+      if (worthShowing && !shown) {
+        sessionStorage.setItem(key, "true");
       }
     }
 
@@ -50,7 +57,7 @@ export function LiveAnnouncementModal() {
       window.removeEventListener("hashchange", handleHashChange);
       window.removeEventListener("poba:trigger_live_modal", handleCustomTrigger);
     };
-  }, [launched]);
+  }, [launched, announced]);
 
   const handleClose = () => {
     setOpen(false);
@@ -126,7 +133,7 @@ export function LiveAnnouncementModal() {
             <div className="relative z-10 flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-widest text-emerald-300 backdrop-blur-md shadow-sm">
                 <PartyPopper className="size-4 animate-bounce text-emerald-300" />
-                OFFICIAL LAUNCH
+                {launched ? "WE'RE LIVE" : "OFFICIAL LAUNCH"}
               </span>
             </div>
 
@@ -161,12 +168,32 @@ export function LiveAnnouncementModal() {
             {/* Modal Heading */}
             <div className="relative z-10 mt-4">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-                Poba Express is <span className="text-emerald-400">Live Now</span> in Jonai! 🎉
+                {launched ? (
+                  <>
+                    Poba Express is <span className="text-emerald-400">Live Now</span> in Jonai! 🎉
+                  </>
+                ) : (
+                  <>
+                    Poba Express is <span className="text-emerald-400">Officially Launched</span>
+                    {today ? " Today" : ""} in Jonai! 🎉
+                  </>
+                )}
               </h2>
               <p className="mt-2.5 text-sm sm:text-base text-white/85 leading-relaxed font-medium">
-                Jonai&apos;s very own doorstep delivery service is now open! Order hot biryani,
-                sizzling momos, fresh birthday cakes, and urgent medicines delivered to your door in
-                15–25 minutes.
+                {launched ? (
+                  <>
+                    Jonai&apos;s very own doorstep delivery service is now open! Order hot biryani,
+                    sizzling momos, fresh birthday cakes, and urgent medicines delivered to your
+                    door in 15–25 minutes.
+                  </>
+                ) : (
+                  <>
+                    Jonai&apos;s very own doorstep delivery service is here. Ordering begins{" "}
+                    <span className="font-bold text-emerald-300">{LAUNCH_DATE_LABEL}</span> — have a
+                    look at the kitchens, bakeries and prices now, and install the app so you can
+                    order the moment we open.
+                  </>
+                )}
               </p>
             </div>
 
@@ -207,23 +234,23 @@ export function LiveAnnouncementModal() {
 
             {/* CTAs */}
             <div className="relative z-10 mt-7 flex flex-col sm:flex-row items-center gap-3">
-              <a
-                href="#order"
+              <Link
+                to="/app/food"
                 onClick={handleClose}
                 className="inline-flex h-12 w-full sm:w-auto flex-1 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 text-sm font-bold text-emerald-950 shadow-lg transition-all hover:bg-emerald-400 active:scale-95"
               >
-                <span>Order Now</span>
+                <span>{launched ? "Order Now" : "Browse the Menu"}</span>
                 <ArrowRight className="size-4" />
-              </a>
+              </Link>
 
-              <a
-                href="/app"
+              <Link
+                to="/app"
                 onClick={handleClose}
                 className="inline-flex h-12 w-full sm:w-auto flex-1 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 text-sm font-bold text-white shadow-sm backdrop-blur-md transition-all hover:bg-white/20 active:scale-95"
               >
                 <Sparkles className="size-4 text-emerald-300" />
                 <span>Open Poba App</span>
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>

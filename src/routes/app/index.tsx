@@ -25,8 +25,8 @@ import {
 import { useAccount } from "@/lib/account";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { RESTAURANTS, priceFrom, restaurantsIn } from "@/lib/restaurants";
-import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
 import { whatsappLink } from "@/lib/contact";
+import { LiveBanner } from "@/components/poba/LiveBanner";
 import { ZomatoTopBanner } from "@/components/poba/ZomatoTopBanner";
 import { RestaurantTile } from "@/components/app/Shared";
 
@@ -85,11 +85,17 @@ const promises = [
 ] as const;
 
 function AppHome() {
-  const launched = useLaunched();
   const { profile } = useAccount();
 
   return (
     <div className="font-sans pb-6">
+      {/* Whether we are open, said on the screen people actually order from.
+          Until now this only appeared on the marketing page, so anyone who
+          installed the app and opened it first found out at checkout. */}
+      <div className="pt-4">
+        <LiveBanner />
+      </div>
+
       {/* Premium Zomato/Swiggy Layout top section */}
       <ZomatoTopBanner />
 

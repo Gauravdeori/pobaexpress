@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 
-import { DEFAULT_LAUNCH, timeUntil, type Remaining } from "./launch-config";
+import {
+  DEFAULT_LAUNCH,
+  isAnnounced,
+  isAnnouncementDay,
+  timeUntil,
+  type Remaining,
+} from "./launch-config";
 import { useLaunchSettings } from "./settings";
 
 export {
+  ANNOUNCED_AT,
   DEFAULT_LAUNCH,
+  isAnnounced,
+  isAnnouncementDay,
   LAUNCH_AT,
   LAUNCH_DATE_LABEL,
   timeUntil,
@@ -53,6 +62,32 @@ export function useLaunched(): boolean {
   }, [settings]);
 
   return launched;
+}
+
+/**
+ * Whether Poba Express has been announced, and whether that happened today.
+ *
+ * Both are read off the clock, so both are seeded from the first render and
+ * corrected in an effect — the same shape as `useLaunched`, and for the same
+ * reason: the server and the client must agree about the first paint even when
+ * it is rendered either side of IST midnight.
+ */
+export function useAnnouncement(): { announced: boolean; today: boolean } {
+  const [state, setState] = useState(() => ({
+    announced: isAnnounced(),
+    today: isAnnouncementDay(),
+  }));
+
+  useEffect(() => {
+    const check = () => setState({ announced: isAnnounced(), today: isAnnouncementDay() });
+    check();
+    // Once a minute is enough: the only thing that changes here is the word
+    // "today", and it changes at midnight.
+    const timer = setInterval(check, 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return state;
 }
 
 /** Kept for callers that only want the date the code was built with. */
