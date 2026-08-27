@@ -16,6 +16,7 @@ import {
   MessageCircle,
   Percent,
   CheckCircle2,
+  Clock,
 } from "lucide-react";
 
 import biryaniImg from "@/assets/biryani.png";
@@ -27,7 +28,12 @@ import cakeCategoryImg from "@/assets/cake_category.jpg";
 import medicineCategoryImg from "@/assets/medicine_category.jpg";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { AREA_EDGES, AREA_SUMMARY } from "@/lib/delivery-area";
-import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import {
+  DELIVERY_HOURS_LABEL,
+  LAUNCH_DATE_LABEL,
+  useLaunched,
+  useServiceHours,
+} from "@/lib/launch";
 
 /**
  * Everywhere inside the delivery area, with the four edges named exactly as
@@ -485,6 +491,43 @@ function ShopLink({
   );
 }
 
+/**
+ * "Open now till 11 PM", or "Closed — opens 10 AM".
+ *
+ * The window is printed either way. A shut shop that does not say when it
+ * opens sends people to look somewhere else; one that does gets them back in
+ * the morning.
+ */
+function DeliveryHoursChip() {
+  const { open, nextChangeLabel } = useServiceHours();
+
+  return (
+    <div
+      className={`flex shrink-0 items-center gap-2.5 rounded-xl border px-3.5 py-2 ${
+        open
+          ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+          : "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+      }`}
+    >
+      <Clock className="size-4 shrink-0" />
+      <div className="min-w-0 leading-tight">
+        <div className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider">
+          <span className="relative flex size-1.5 shrink-0">
+            {open && (
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-current opacity-70" />
+            )}
+            <span className="relative inline-flex size-1.5 rounded-full bg-current" />
+          </span>
+          {open ? `Open now · till ${nextChangeLabel}` : `Closed · opens ${nextChangeLabel}`}
+        </div>
+        <div className="truncate text-xs font-bold text-foreground">
+          Delivery {DELIVERY_HOURS_LABEL}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** One circle under "What's on your mind?". */
 function CategoryTile({ cat }: { cat: CategoryItem }) {
   return (
@@ -659,8 +702,15 @@ export function ZomatoTopBanner() {
             </form>
           </div>
 
+          {/* Delivery hours. Sits beside the location and the search because
+              it answers the same question they do — can I get food, here,
+              now — and it is shown at every width, unlike the offer tag: most
+              people open this on a phone, and "are you open" is not a
+              desktop-only question. */}
+          <DeliveryHoursChip />
+
           {/* Quick Offer Tag */}
-          <div className="hidden shrink-0 lg:flex items-center gap-2 rounded-xl bg-accent/10 px-3.5 py-2 text-accent border border-accent/20">
+          <div className="hidden shrink-0 xl:flex items-center gap-2 rounded-xl bg-accent/10 px-3.5 py-2 text-accent border border-accent/20">
             <Sparkles className="size-4 text-accent animate-pulse" />
             <span className="text-xs font-extrabold">Delivery from ₹{MIN_DELIVERY_FEE}</span>
           </div>

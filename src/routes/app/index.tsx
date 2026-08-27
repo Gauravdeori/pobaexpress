@@ -25,7 +25,6 @@ import {
 import { useAccount } from "@/lib/account";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { RESTAURANTS, priceFrom, restaurantsIn } from "@/lib/restaurants";
-import { whatsappLink } from "@/lib/contact";
 import { LiveBanner } from "@/components/poba/LiveBanner";
 import { ZomatoTopBanner } from "@/components/poba/ZomatoTopBanner";
 import { RestaurantTile } from "@/components/app/Shared";

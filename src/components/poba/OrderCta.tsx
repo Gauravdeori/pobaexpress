@@ -6,6 +6,7 @@ import { ArrowRight, Bike, Check, Download, Smartphone } from "lucide-react";
 import { useInstallPrompt } from "@/lib/install";
 import { useLaunched } from "@/lib/launch";
 import { LAUNCH_DATE_LABEL } from "@/lib/launch-config";
+import { DELIVERY_HOURS_LABEL } from "@/lib/launch";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { InstallHelpDialog } from "./InstallHelpDialog";
 import { Reveal, SectionHeading } from "./Reveal";
@@ -108,12 +109,12 @@ export function OrderCta() {
                   </Link>
                 </div>
 
-                {!launched && (
-                  <p className="mt-5 flex items-center justify-center gap-2 text-sm font-semibold text-primary-foreground/70 md:justify-start">
-                    <Bike className="size-4" />
-                    Deliveries begin {LAUNCH_DATE_LABEL} — install now and be ready.
-                  </p>
-                )}
+                <p className="mt-5 flex items-center justify-center gap-2 text-sm font-semibold text-primary-foreground/70 md:justify-start">
+                  <Bike className="size-4" />
+                  {launched
+                    ? `Delivering ${DELIVERY_HOURS_LABEL}, every day.`
+                    : `Deliveries begin ${LAUNCH_DATE_LABEL} — install now and be ready.`}
+                </p>
               </div>
             </div>
           </motion.div>

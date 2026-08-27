@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { saveProfile, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/contact";
-import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import { DELIVERY_HOURS_LABEL, useOrderStatus } from "@/lib/launch";
 import { mapsLink, type Coords } from "@/lib/location";
 import { rupees } from "@/lib/menu";
 import { useDeliveryQuote } from "@/lib/use-delivery";
@@ -105,7 +105,7 @@ function CheckoutScreen() {
   const { kind } = Route.useSearch();
   const { cart, subtotal, clear } = useCart();
   const { user, profile, loading: authLoading } = useAccount();
-  const launched = useLaunched();
+  const { canOrder, launched, reason } = useOrderStatus();
 
   const medicine = kind === "medicine";
   const [medicineRequest, setMedicineRequest] = useState<MedicineRequest>({
@@ -200,7 +200,7 @@ function CheckoutScreen() {
 
   const placeOrder = async () => {
     // Re-checked here rather than trusting the button being hidden.
-    if (!launched || !user) return;
+    if (!canOrder || !user) return;
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError("Name, phone and address are all needed so the rider can find you.");
       return;
@@ -556,15 +556,15 @@ function CheckoutScreen() {
         <Button
           variant="accent"
           className="mt-5 h-12 w-full rounded-2xl"
-          disabled={sending || !launched}
+          disabled={sending || !canOrder}
           onClick={placeOrder}
         >
           {sending ? (
             <>
               <Loader2 className="size-4 animate-spin" /> Placing…
             </>
-          ) : !launched ? (
-            `Ordering opens ${LAUNCH_DATE_LABEL}`
+          ) : !canOrder ? (
+            reason
           ) : (
             <>
               <Check className="size-4" /> Place order
@@ -575,7 +575,12 @@ function CheckoutScreen() {
       <p className="mt-3 text-center text-xs text-muted-foreground">
         {needsSignIn
           ? "An account is needed to place an order. Your cart is kept."
-          : "Sending the order opens WhatsApp so we can confirm it with you."}
+          : launched && !canOrder
+            ? // Said here as well as on the button, because this is the last
+              // screen before an order and "closed" without an hour is the
+              // kind of dead end people read as a broken checkout.
+              `We deliver ${DELIVERY_HOURS_LABEL} every day. Your cart is kept until we open.`
+            : "Sending the order opens WhatsApp so we can confirm it with you."}
       </p>
     </div>
   );

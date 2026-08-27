@@ -1,4 +1,4 @@
-import { Facebook, Instagram, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
+import { Clock, Facebook, Instagram, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "@tanstack/react-router";
 import { LOGO_SRC, logoRef, onLogoError } from "@/lib/assets";
@@ -12,6 +12,7 @@ import {
   WHATSAPP_DISPLAY,
   whatsappLink,
 } from "@/lib/contact";
+import { DELIVERY_HOURS_LABEL } from "@/lib/launch";
 
 const quickLinks = [
   { label: "Home", href: "#home" },
@@ -115,6 +116,18 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/75">
             <li className="flex items-center gap-2">
               <MapPin className="size-4 shrink-0 text-accent-light" /> {ADDRESS}
+            </li>
+            {/* The hours belong beside the address and the phone number: they
+                are the same kind of fact, and this is where people look for
+                them once the page has stopped selling. */}
+            <li className="flex items-start gap-2">
+              <Clock className="mt-0.5 size-4 shrink-0 text-accent-light" />
+              <span>
+                {DELIVERY_HOURS_LABEL}
+                <span className="block text-xs text-primary-foreground/55">
+                  Delivery hours, every day
+                </span>
+              </span>
             </li>
             <li>
               <a

@@ -21,7 +21,7 @@ import { whatsappLink } from "@/lib/contact";
 import { getMenu, getMenuSections, itemLabel, rupees, type MenuItem } from "@/lib/menu";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { accountLabel, useAccount, saveProfile } from "@/lib/account";
-import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import { DELIVERY_HOURS_LABEL, useOrderStatus } from "@/lib/launch";
 import { recordOrder, type OrderLine } from "@/lib/orders";
 import { uploadPrescription } from "@/lib/uploads";
 import { mapsLink, type Coords } from "@/lib/location";
@@ -142,7 +142,7 @@ export function OrderForm() {
   const [sending, setSending] = useState(false);
 
   const { user, profile } = useAccount();
-  const launched = useLaunched();
+  const { canOrder, launched, label: launchLabel, reason } = useOrderStatus();
 
   const active = categories.find((c) => c.id === category)!;
   const menu = getMenu(category);
@@ -221,10 +221,15 @@ export function OrderForm() {
   const handleOrder = async (event: FormEvent) => {
     event.preventDefault();
 
-    // The button is disabled before launch; this guards the Enter key and any
-    // other route to submit.
-    if (!launched) {
-      setError(`Ordering opens on ${LAUNCH_DATE_LABEL}. Browse the menu in the meantime.`);
+    // The button is disabled whenever the counter is shut — before launch and
+    // outside the day's hours alike. This guards the Enter key and any other
+    // route to submit.
+    if (!canOrder) {
+      setError(
+        launched
+          ? `${reason}. We deliver ${DELIVERY_HOURS_LABEL} every day.`
+          : `${reason}. Browse the menu in the meantime.`,
+      );
       return;
     }
 
@@ -689,12 +694,12 @@ export function OrderForm() {
                 variant="accent"
                 size="xl"
                 type="submit"
-                disabled={sending || !launched || !user}
+                disabled={sending || !canOrder || !user}
                 className="w-full sm:w-auto"
               >
-                {launched ? <Send className="size-4" /> : <Clock className="size-4" />}
-                {!launched
-                  ? `Ordering opens ${LAUNCH_DATE_LABEL}`
+                {canOrder ? <Send className="size-4" /> : <Clock className="size-4" />}
+                {!canOrder
+                  ? reason
                   : !user
                     ? "Sign in to Order"
                     : sending
@@ -702,11 +707,16 @@ export function OrderForm() {
                       : "Place My Order"}
               </Button>
               <p className="text-xs text-muted-foreground">
-                {launched ? (
+                {canOrder ? (
                   "We open WhatsApp with your order ready to send, then confirm it within minutes — the same way the app does."
+                ) : launched ? (
+                  <>
+                    We deliver {DELIVERY_HOURS_LABEL} every day. Have a look at the menu and prices
+                    — your cart is kept for the morning.
+                  </>
                 ) : (
                   <>
-                    We start delivering on {LAUNCH_DATE_LABEL}. Have a look at the menu and prices —
+                    We start delivering on {launchLabel}. Have a look at the menu and prices —
                     ordering opens as soon as the kitchens are ready that day.
                   </>
                 )}

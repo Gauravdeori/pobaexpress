@@ -1,5 +1,9 @@
 /**
- * The moment the countdown points at — 7 AM on the first delivery morning.
+ * The moment the countdown points at — the first order Poba Express ever takes.
+ *
+ * Set to the hour the counter opens rather than the stroke of midnight, so the
+ * countdown ends when someone can actually order rather than nine hours early.
+ * See `service-hours`, which keeps that hour every day after this one.
  *
  * Fixed to IST (+05:30) rather than the visitor's timezone, so everyone counts
  * down to the same moment.
@@ -12,10 +16,10 @@
  * the order form, the sticky bar and the checkout all read them, so they can
  * never disagree about it.
  */
-export const LAUNCH_AT = new Date("2026-08-28T07:00:00+05:30");
+export const LAUNCH_AT = new Date("2026-08-28T10:00:00+05:30");
 
 /** Shown alongside the countdown. Must name the same moment as `LAUNCH_AT`. */
-export const LAUNCH_DATE_LABEL = "28 August, 7 AM";
+export const LAUNCH_DATE_LABEL = "28 August, 10 AM";
 
 /**
  * The day Poba Express itself went public — the site, the app, the partner

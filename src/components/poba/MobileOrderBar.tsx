@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag } from "lucide-react";
 
-import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
+import { DELIVERY_HOURS_LABEL, useOrderStatus } from "@/lib/launch";
 
 /**
  * Phone-only sticky call to action. The order form sits two thirds down a very
@@ -12,7 +12,7 @@ import { LAUNCH_DATE_LABEL, useLaunched } from "@/lib/launch";
  */
 export function MobileOrderBar() {
   const [visible, setVisible] = useState(false);
-  const launched = useLaunched();
+  const { canOrder, launched, reason } = useOrderStatus();
 
   useEffect(() => {
     const order = document.getElementById("order");
@@ -64,12 +64,14 @@ export function MobileOrderBar() {
             className="flex h-14 items-center justify-center gap-2.5 rounded-full bg-gradient-accent text-base font-semibold text-accent-foreground shadow-lift"
           >
             <ShoppingBag className="size-5" />
-            {launched ? "Order Now" : "See the menu & prices"}
+            {canOrder ? "Order Now" : "See the menu & prices"}
           </a>
           <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
-            {launched
+            {canOrder
               ? "Food from ₹39 · delivery from ₹5 · order in a few taps"
-              : `Ordering opens ${LAUNCH_DATE_LABEL} · food from ₹39`}
+              : launched
+                ? `${reason} · delivery ${DELIVERY_HOURS_LABEL}`
+                : `${reason} · food from ₹39`}
           </p>
         </motion.div>
       )}

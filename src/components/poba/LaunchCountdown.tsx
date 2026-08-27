@@ -3,7 +3,12 @@ import { motion } from "motion/react";
 import { PartyPopper, Rocket } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useAnnouncement, useTimeUntilLaunch } from "@/lib/launch";
+import {
+  DELIVERY_HOURS_LABEL,
+  useAnnouncement,
+  useServiceHours,
+  useTimeUntilLaunch,
+} from "@/lib/launch";
 
 const UNITS = [
   { key: "days", label: "Days" },
@@ -36,6 +41,7 @@ export function LaunchCountdown() {
   // the morning. "Launching soon" would undersell that to everyone who came
   // because they heard we launched.
   const { announced, today } = useAnnouncement();
+  const { open: withinHours, nextChangeLabel } = useServiceHours();
 
   const launched = remaining?.done ?? false;
   // Counted down, not yet opened. Distinct from "launching soon", because the
@@ -88,7 +94,12 @@ export function LaunchCountdown() {
 
         <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           {launched
-            ? "Food, cake and medicine delivered across Jonai. Download the Poba Express app now to order."
+            ? // Once we are live the useful fact is not that we exist, it is
+              // whether the counter is staffed at the moment someone is
+              // reading — so this says which, and always names the window.
+              withinHours
+              ? `Food, cake and medicine delivered across Jonai, ${DELIVERY_HOURS_LABEL}. Download the Poba Express app now to order.`
+              : `Closed right now — we open at ${nextChangeLabel}. We deliver food, cake and medicine across Jonai, ${DELIVERY_HOURS_LABEL}.`
             : waiting
               ? "The day is here. We're doing the last checks and opening ordering shortly — install the app now so you're ready the moment we do."
               : announced
@@ -126,7 +137,7 @@ export function LaunchCountdown() {
           className="mt-9 flex flex-wrap justify-center items-center gap-3"
         >
           <Button variant="onGreen" size="xl" asChild>
-            <a href="#order">{launched ? "Order Now" : "See the menu & prices"}</a>
+            <a href="#order">{launched && withinHours ? "Order Now" : "See the menu & prices"}</a>
           </Button>
 
           <Button variant="ghostOnGreen" size="xl" asChild>
