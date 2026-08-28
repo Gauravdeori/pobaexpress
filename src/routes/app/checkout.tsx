@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Banknote, Check, Loader2, LogIn, Paperclip } from "lucide-react";
 
 import { LocationShare } from "@/components/app/LocationShare";
+import { blocksOrder, checkArea, outsideAreaMessage } from "@/lib/delivery-area";
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,6 +122,9 @@ function CheckoutScreen() {
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [coords, setCoords] = useState<Coords | null>(null);
+  // Derived from the pin rather than stored beside it, so the two cannot
+  // disagree. Same predicate the landing page's form uses.
+  const outsideArea = blocksOrder(coords);
   const [codeInput, setCodeInput] = useState("");
   const [offer, setOffer] = useState<Offer | null>(null);
   const [codeBusy, setCodeBusy] = useState(false);
@@ -201,6 +205,10 @@ function CheckoutScreen() {
   const placeOrder = async () => {
     // Re-checked here rather than trusting the button being hidden.
     if (!canOrder || !user) return;
+    if (outsideArea && coords) {
+      setError(outsideAreaMessage(checkArea(coords)));
+      return;
+    }
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError("Name, phone and address are all needed so the rider can find you.");
       return;
@@ -556,7 +564,7 @@ function CheckoutScreen() {
         <Button
           variant="accent"
           className="mt-5 h-12 w-full rounded-2xl"
-          disabled={sending || !canOrder}
+          disabled={sending || !canOrder || outsideArea}
           onClick={placeOrder}
         >
           {sending ? (
@@ -565,6 +573,8 @@ function CheckoutScreen() {
             </>
           ) : !canOrder ? (
             reason
+          ) : outsideArea ? (
+            "Outside our delivery area"
           ) : (
             <>
               <Check className="size-4" /> Place order
@@ -575,12 +585,14 @@ function CheckoutScreen() {
       <p className="mt-3 text-center text-xs text-muted-foreground">
         {needsSignIn
           ? "An account is needed to place an order. Your cart is kept."
-          : launched && !canOrder
-            ? // Said here as well as on the button, because this is the last
-              // screen before an order and "closed" without an hour is the
-              // kind of dead end people read as a broken checkout.
-              `We deliver ${DELIVERY_HOURS_LABEL} every day. Your cart is kept until we open.`
-            : "Sending the order opens WhatsApp so we can confirm it with you."}
+          : outsideArea && coords
+            ? outsideAreaMessage(checkArea(coords))
+            : launched && !canOrder
+              ? // Said here as well as on the button, because this is the last
+                // screen before an order and "closed" without an hour is the
+                // kind of dead end people read as a broken checkout.
+                `We deliver ${DELIVERY_HOURS_LABEL} every day. Your cart is kept until we open.`
+              : "Sending the order opens WhatsApp so we can confirm it with you."}
       </p>
     </div>
   );

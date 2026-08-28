@@ -33,8 +33,10 @@ export function LocationShare({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Kept apart from `error`: a pin outside the area is a note about where the
-  // order is going, not a failure to get a fix, and the pin still attaches.
+  // Kept apart from `error`: a pin outside the area is a fact about where the
+  // order is going, not a failure to get a fix. The pin still attaches — the
+  // order paths read it themselves and stop there, so removing the pin is
+  // never a way to get around the boundary.
   const [areaWarning, setAreaWarning] = useState<string | null>(null);
   // Whether geolocation exists can only be answered in a browser, and
   // answering it during render would have the server draw nothing and the
@@ -58,10 +60,10 @@ export function LocationShare({
       return;
     }
 
-    // Checked against the delivery area, and only ever as a warning. The
-    // boundary is drawn from four landmarks rather than surveyed, and a fix
-    // indoors can be hundreds of metres out, so refusing an order on the
-    // strength of those two together would turn away real customers.
+    // Said the moment the pin lands, rather than left for the button to reveal
+    // at the end: someone outside the area should learn it before they pick
+    // out a meal, not after. A fix too vague to judge says nothing either way
+    // and is left alone — see `blocksOrder`.
     const check = checkArea(found);
     setAreaWarning(!check.inside && !check.uncertain ? outsideAreaMessage(check) : null);
     onChange(found);

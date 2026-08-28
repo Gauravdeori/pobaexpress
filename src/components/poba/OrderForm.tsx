@@ -27,6 +27,7 @@ import { uploadPrescription } from "@/lib/uploads";
 import { mapsLink, type Coords } from "@/lib/location";
 import { useDeliveryQuote } from "@/lib/use-delivery";
 import { LocationShare } from "@/components/app/LocationShare";
+import { blocksOrder, checkArea, outsideAreaMessage } from "@/lib/delivery-area";
 import { Reveal, SectionHeading } from "./Reveal";
 
 /** Anything bigger than this is likely a mistake and won't share cleanly. */
@@ -135,6 +136,9 @@ export function OrderForm() {
   const [items, setItems] = useState("");
   const [notes, setNotes] = useState("");
   const [coords, setCoords] = useState<Coords | null>(null);
+  // Derived rather than stored: the pin is the only input, so a second copy of
+  // the verdict in state could only ever go stale against it.
+  const outsideArea = blocksOrder(coords);
   const [prescription, setPrescription] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -237,6 +241,12 @@ export function OrderForm() {
       setError(
         "You must be signed in to place an order. Please use the Sign in button at the top.",
       );
+      return;
+    }
+
+    // The button is disabled for this too; this is the Enter key's guard.
+    if (outsideArea && coords) {
+      setError(outsideAreaMessage(checkArea(coords)));
       return;
     }
 
@@ -694,17 +704,23 @@ export function OrderForm() {
                 variant="accent"
                 size="xl"
                 type="submit"
-                disabled={sending || !canOrder || !user}
+                disabled={sending || !canOrder || !user || outsideArea}
                 className="w-full sm:w-auto"
               >
-                {canOrder ? <Send className="size-4" /> : <Clock className="size-4" />}
+                {canOrder && !outsideArea ? (
+                  <Send className="size-4" />
+                ) : (
+                  <Clock className="size-4" />
+                )}
                 {!canOrder
                   ? reason
-                  : !user
-                    ? "Sign in to Order"
-                    : sending
-                      ? "Uploading photo…"
-                      : "Place My Order"}
+                  : outsideArea
+                    ? "Outside our delivery area"
+                    : !user
+                      ? "Sign in to Order"
+                      : sending
+                        ? "Uploading photo…"
+                        : "Place My Order"}
               </Button>
               <p className="text-xs text-muted-foreground">
                 {canOrder ? (
