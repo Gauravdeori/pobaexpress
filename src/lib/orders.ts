@@ -85,6 +85,15 @@ export type OrderRecord = OrderDraft & {
    * its type without a Timestamp import.
    */
   etaAt: number | null;
+  /**
+   * Why the order was turned down, in the counter's own words, or null.
+   *
+   * Stored on the order rather than only sent over WhatsApp, because the
+   * customer's Orders tab is where they go to find out what happened — and a
+   * bare "Cancelled" there is the kind of dead end that turns into a phone
+   * call. Only ever set alongside a cancelled status.
+   */
+  cancelReason: string | null;
 };
 
 /** Sorted here rather than with `orderBy` — see `watchOrders`. */
@@ -92,12 +101,19 @@ function newestFirst(a: OrderRecord, b: OrderRecord): number {
   return (b.placedAt?.getTime() ?? 0) - (a.placedAt?.getTime() ?? 0);
 }
 
-/** One shape for a stored order, so the fetch and the live read cannot drift. */
-function toRecord(id: string, raw: unknown): OrderRecord {
+/**
+ * One shape for a stored order, so the fetch and the live read cannot drift.
+ *
+ * Exported because the admin console reads the same collection and had grown
+ * its own copy of this — which is how `cancelReason` came to be missing from
+ * the counter's view of an order it had just written.
+ */
+export function toRecord(id: string, raw: unknown): OrderRecord {
   const data = raw as OrderDraft & {
     status?: string;
     createdAt?: Timestamp;
     etaAt?: number;
+    cancelReason?: unknown;
   };
   return {
     ...data,
@@ -105,6 +121,7 @@ function toRecord(id: string, raw: unknown): OrderRecord {
     status: data.status ?? "new",
     placedAt: data.createdAt?.toDate() ?? null,
     etaAt: typeof data.etaAt === "number" ? data.etaAt : null,
+    cancelReason: typeof data.cancelReason === "string" ? data.cancelReason : null,
   };
 }
 
@@ -160,6 +177,7 @@ export async function recordOrder(draft: OrderDraft, uid: string | null): Promis
       // change to an existing field instead of adding one the rule would have
       // to allow separately.
       etaAt: null,
+      cancelReason: null,
       createdAt: serverTimestamp(),
     });
   } catch (error) {

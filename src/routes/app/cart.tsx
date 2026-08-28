@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LogIn, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { LogIn, Minus, PackageX, Plus, ShoppingBag, Trash2 } from "lucide-react";
 
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "@/lib/account";
+import { useSoldOut } from "@/lib/availability";
 import { useCart } from "@/lib/cart";
 import { rupees } from "@/lib/menu";
 import { useDeliveryQuote } from "@/lib/use-delivery";
@@ -20,6 +21,11 @@ function CartScreen() {
   const total = subtotal + quote.fee + quote.platformFee;
   const { user, loading: authLoading } = useAccount();
   const needsSignIn = !authLoading && !user;
+  // A cart can be filled at seven and paid for at eight, and the kitchen can
+  // run out in between. Checked here rather than only at checkout so the news
+  // arrives on the screen where the line can be removed.
+  const soldOut = useSoldOut();
+  const goneLines = cart.lines.filter((line) => soldOut.has(line.id));
 
   if (cart.lines.length === 0) {
     return (
@@ -54,6 +60,12 @@ function CartScreen() {
                 {line.variant ? `${line.variant} · ` : ""}
                 {rupees(line.price)}
               </p>
+              {soldOut.has(line.id) && (
+                <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-bold text-destructive">
+                  <PackageX className="size-3" />
+                  Sold out — remove to continue
+                </p>
+              )}
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <button
@@ -69,9 +81,10 @@ function CartScreen() {
               </span>
               <button
                 type="button"
+                disabled={soldOut.has(line.id)}
                 onClick={() => setQuantity(line.id, line.quantity + 1)}
                 aria-label={`Add one more ${line.name}`}
-                className="flex size-9 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground"
+                className="flex size-9 items-center justify-center rounded-full bg-gradient-accent text-accent-foreground disabled:opacity-40"
               >
                 <Plus className="size-4" />
               </button>
@@ -102,9 +115,35 @@ function CartScreen() {
         </div>
       </div>
 
+      {goneLines.length > 0 && (
+        <div className="mt-4 rounded-2xl border border-destructive/30 bg-destructive/5 p-4">
+          <p className="flex items-center gap-2 text-sm font-bold text-destructive">
+            <PackageX className="size-4 shrink-0" />
+            {goneLines.length === 1 ? "One item has sold out" : "Some items have sold out"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {goneLines.map((line) => line.name).join(", ")} — the kitchen has run out. Remove{" "}
+            {goneLines.length === 1 ? "it" : "them"} and the rest of your order is fine.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              for (const line of goneLines) setQuantity(line.id, 0);
+            }}
+            className="mt-3 h-10 w-full rounded-xl bg-destructive text-xs font-bold text-destructive-foreground transition-opacity hover:opacity-90"
+          >
+            Remove {goneLines.length === 1 ? "it" : `all ${goneLines.length}`}
+          </button>
+        </div>
+      )}
+
       {/* Sent to sign-in first rather than into a form they cannot submit.
           The cart is in storage, so it is still here afterwards. */}
-      {needsSignIn ? (
+      {goneLines.length > 0 ? (
+        <Button variant="accent" className="mt-4 h-12 w-full rounded-2xl" disabled>
+          Remove sold-out items to continue
+        </Button>
+      ) : needsSignIn ? (
         <Button variant="accent" className="mt-4 h-12 w-full rounded-2xl" asChild>
           <Link to="/app/account">
             <LogIn className="size-4" /> Sign in to order

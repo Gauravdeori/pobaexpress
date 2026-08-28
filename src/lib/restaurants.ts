@@ -106,6 +106,25 @@ export function getRestaurant(slug: string): Restaurant | undefined {
   return RESTAURANTS.find((r) => r.slug === slug);
 }
 
+/**
+ * Every dish Poba Express sells, grouped by who cooks it.
+ *
+ * Built from the same lists the menu screens read, so the counter's sold-out
+ * switches cover exactly what a customer can put in a cart — a hand-kept
+ * second list here would go stale the first time a partner added a dish, and
+ * the item it missed would be the one nobody could turn off.
+ *
+ * Cake is appended rather than filtered in, because Dcakery is deliberately
+ * not in `RESTAURANTS` (it has its own screen) and would otherwise be the one
+ * kitchen whose menu the counter could not touch.
+ */
+export function allMenuSections(): { name: string; items: MenuItem[] }[] {
+  return [
+    ...RESTAURANTS.map((restaurant) => ({ name: restaurant.name, items: restaurant.items })),
+    { name: CAKE_SOURCE, items: CAKE_ITEMS },
+  ];
+}
+
 /** Cheapest item on the menu, for the "from ₹x" line on a card. */
 export function priceFrom(restaurant: Restaurant): number {
   return restaurant.items.reduce((low, item) => Math.min(low, item.price), Infinity);

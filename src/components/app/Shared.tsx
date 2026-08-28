@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, Star, UtensilsCrossed } from "lucide-react";
 
+import { useSoldOut } from "@/lib/availability";
 import { itemLabel, rupees, type MenuItem } from "@/lib/menu";
 import { priceFrom, type Restaurant } from "@/lib/restaurants";
 import { cn } from "@/lib/utils";
@@ -197,13 +198,30 @@ function AddControl({
   onAdd,
   onSetQuantity,
   className,
+  soldOut,
 }: {
   item: MenuItem;
   quantity: number;
   onAdd: () => void;
   onSetQuantity: (quantity: number) => void;
   className?: string;
+  soldOut?: boolean;
 }) {
+  // Checked before the quantity, so a dish that runs out while it is already
+  // in someone's basket stops offering them a fourth one.
+  if (soldOut) {
+    return (
+      <span
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-xl border border-border bg-secondary px-4 py-2 text-[13px] font-extrabold uppercase text-muted-foreground",
+          className,
+        )}
+      >
+        Sold out
+      </span>
+    );
+  }
+
   if (quantity > 0) {
     return (
       <div
@@ -266,18 +284,29 @@ export function DishCard({
   quantityOf,
   onAdd,
   onSetQuantity,
+  soldOut,
 }: {
   sizes: MenuItem[];
   quantityOf: (id: string) => number;
   onAdd: (item: MenuItem) => void;
   onSetQuantity: (id: string, quantity: number) => void;
+  soldOut: ReadonlySet<string>;
 }) {
   const [first] = sizes;
   const inCart = sizes.some((size) => quantityOf(size.id) > 0);
   const single = sizes.length === 1;
+  // A dish with three sizes and one of them gone is still on the menu; one
+  // with every size gone is not. Dimming the whole card in the first case
+  // would hide the two people can still order.
+  const allGone = sizes.every((size) => soldOut.has(size.id));
 
   return (
-    <li className="relative flex flex-col justify-between py-6 border-b border-border/40 last:border-0">
+    <li
+      className={cn(
+        "relative flex flex-col justify-between py-6 border-b border-border/40 last:border-0",
+        allGone && "opacity-55",
+      )}
+    >
       <div className="flex items-start justify-between gap-4">
         {/* LEFT SIDE: Details */}
         <div className="flex-1 min-w-0 pr-2">
@@ -297,6 +326,12 @@ export function DishCard({
           </div>
 
           <h3 className="text-[17px] font-bold text-foreground leading-tight mb-1">{first.name}</h3>
+
+          {allGone && (
+            <p className="mb-1.5 inline-block rounded-full bg-secondary px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-muted-foreground">
+              Sold out today
+            </p>
+          )}
 
           {single ? (
             <p className="text-[15px] font-semibold text-foreground mb-2">{rupees(first.price)}</p>
@@ -331,8 +366,13 @@ export function DishCard({
                 quantity={quantityOf(first.id)}
                 onAdd={() => onAdd(first)}
                 onSetQuantity={(next) => onSetQuantity(first.id, next)}
+                soldOut={soldOut.has(first.id)}
                 className="w-full h-10 shadow-[0_3px_8px_rgba(0,0,0,0.12)]"
               />
+            ) : allGone ? (
+              <span className="w-full h-10 bg-secondary border border-border text-muted-foreground text-[13px] font-extrabold uppercase rounded-xl flex items-center justify-center">
+                Sold out
+              </span>
             ) : (
               <button className="w-full h-10 shadow-[0_3px_8px_rgba(0,0,0,0.12)] bg-white/95 backdrop-blur border border-green-600 text-green-700 text-[15px] font-extrabold uppercase rounded-xl flex items-center justify-center hover:bg-green-50 active:scale-95 transition-all">
                 ADD
@@ -352,7 +392,12 @@ export function DishCard({
               className="flex items-center justify-between gap-3 border-b border-border/50 px-3 py-3 last:border-b-0"
             >
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[15px] font-semibold text-foreground">
+                <div
+                  className={cn(
+                    "truncate text-[15px] font-semibold",
+                    soldOut.has(size.id) ? "text-muted-foreground line-through" : "text-foreground",
+                  )}
+                >
                   {size.variant}
                 </div>
                 <div className="mt-0.5 text-[14px] font-bold text-foreground">
@@ -364,6 +409,7 @@ export function DishCard({
                 quantity={quantityOf(size.id)}
                 onAdd={() => onAdd(size)}
                 onSetQuantity={(next) => onSetQuantity(size.id, next)}
+                soldOut={soldOut.has(size.id)}
                 className="w-[100px] h-[36px]"
               />
             </li>
@@ -392,6 +438,10 @@ export function MenuList({
   onAdd: (item: MenuItem) => void;
   onSetQuantity: (id: string, quantity: number) => void;
 }) {
+  // Read here rather than passed in, so every screen that renders a menu gets
+  // the same answer without each of them having to remember to ask.
+  const soldOut = useSoldOut();
+
   const groups: MenuItem[][] = [];
   for (const item of items) {
     const last = groups[groups.length - 1];
@@ -408,6 +458,7 @@ export function MenuList({
           quantityOf={quantityOf}
           onAdd={onAdd}
           onSetQuantity={onSetQuantity}
+          soldOut={soldOut}
         />
       ))}
     </ul>

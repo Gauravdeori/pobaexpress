@@ -92,6 +92,15 @@ function OrderCard({ order }: { order: OrderRecord }) {
         <StatusPill status={order.status} />
       </div>
 
+      {/* Why, when the answer is no. A bare "Cancelled" is the thing that turns
+          into a phone call to the shop, and the shop has already written the
+          reason down — it just never reached the person it was about. */}
+      {order.status === "cancelled" && order.cancelReason && (
+        <p className="mt-3 rounded-xl bg-secondary px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+          {order.cancelReason}
+        </p>
+      )}
+
       {eta && (
         <p className="mt-3 flex items-center gap-2 rounded-xl bg-accent/10 px-3 py-2 text-xs font-bold text-accent">
           {order.status === "on-the-way" ? (

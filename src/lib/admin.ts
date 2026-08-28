@@ -18,7 +18,7 @@ import type { User } from "firebase/auth";
 
 import { db } from "./firebase";
 import { EMPTY_TERMS, normaliseCode, type OfferTerms } from "./promo-rules";
-import type { OrderDraft, OrderRecord } from "./orders";
+import { toRecord, type OrderRecord } from "./orders";
 
 /**
  * Who counts as an admin.
@@ -102,6 +102,27 @@ export const NEXT_STEP: Partial<Record<OrderStatus, { to: OrderStatus; label: st
 export const ETA_PRESETS = [15, 20, 30, 45, 60] as const;
 
 /**
+ * Why an order gets turned down, in the words the customer will read.
+ *
+ * Written as whole sentences rather than tags, because they are shown to the
+ * customer as-is. Turning someone down is the one message the shop sends that
+ * is never good news, and "OUT_OF_STOCK" on their orders screen would make it
+ * worse; these apologise, and the first one says when to come back.
+ *
+ * The list is a shortcut, not a limit — the counter can always type its own.
+ */
+export const CANCEL_REASONS = [
+  "Sorry — one of the items you ordered has run out. Please try again tomorrow.",
+  "Sorry — the kitchen is too busy to take this one right now.",
+  "Sorry — we've closed for the day. We're back at 10 AM.",
+  "Sorry — that address is outside the area we deliver to.",
+  "Sorry — we couldn't reach you on the phone to confirm this order.",
+] as const;
+
+/** As long as the rule in firestore.rules will accept. */
+export const CANCEL_REASON_MAX = 200;
+
+/**
  * Every order, newest first, kept live.
  *
  * A live subscription rather than a fetch: this is the screen someone leaves
@@ -123,22 +144,10 @@ export function useAllOrders(enabled: boolean) {
     const unsubscribe = onSnapshot(
       query(collection(db, "orders"), orderBy("createdAt", "desc")),
       (snapshot) => {
-        setOrders(
-          snapshot.docs.map((entry) => {
-            const data = entry.data() as OrderDraft & {
-              status?: string;
-              createdAt?: Timestamp;
-              etaAt?: number;
-            };
-            return {
-              ...data,
-              id: entry.id,
-              status: data.status ?? "new",
-              placedAt: data.createdAt?.toDate() ?? null,
-              etaAt: typeof data.etaAt === "number" ? data.etaAt : null,
-            };
-          }),
-        );
+        // Shared with the customer's own history rather than mapped again
+        // here: two copies of this is how the console came to be reading an
+        // order without the reason it had just written to it.
+        setOrders(snapshot.docs.map((entry) => toRecord(entry.id, entry.data())));
         setError(null);
         setLoading(false);
       },
@@ -191,10 +200,38 @@ export async function setOrderProgress(
   // Delivered and cancelled orders are done moving, so any estimate on them is
   // stale by definition.
   if (status === "delivered" || status === "cancelled") patch.etaAt = null;
+  // An order moved back out of cancelled must not keep the apology: "Being
+  // prepared" under "we've run out of that" is the screen contradicting
+  // itself. Rejections go through `rejectOrder`, which sets it.
+  if (status !== "cancelled") patch.cancelReason = null;
   else if (minutesFromNow !== undefined) {
     patch.etaAt = minutesFromNow === null ? null : Date.now() + minutesFromNow * 60_000;
   }
   await updateDoc(doc(db, "orders", orderId), patch);
+}
+
+/**
+ * Turn an order down, and say why.
+ *
+ * One write, because they are one decision. A rejection that recorded the
+ * status but lost the reason would leave the customer with a bare "Cancelled"
+ * — which is the thing this exists to stop — and there is no second screen
+ * anywhere that would let someone go back and fill it in.
+ *
+ * Trimmed and capped to what the rule accepts, so an over-long reason is
+ * shortened here rather than bounced by Firestore as a permission error, which
+ * is what it would look like from the counter.
+ */
+export async function rejectOrder(orderId: string, reason: string) {
+  if (!db) return;
+  const text = reason.trim().slice(0, CANCEL_REASON_MAX);
+  await updateDoc(doc(db, "orders", orderId), {
+    status: "cancelled",
+    // A cancelled order is done moving, so any estimate on it is stale.
+    etaAt: null,
+    cancelReason: text || null,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 /** Delete one order. Irreversible, and it takes the customer's copy with it. */

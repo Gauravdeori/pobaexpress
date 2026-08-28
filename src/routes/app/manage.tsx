@@ -10,8 +10,10 @@ import {
   Phone,
   Rocket,
   Timer,
+  PackageX,
   Trash2,
   TriangleAlert,
+  Undo2,
   X,
 } from "lucide-react";
 
@@ -19,10 +21,13 @@ import { ScreenHeading } from "@/components/app/Shared";
 import { LiveAnnouncementModal } from "@/components/poba/LiveAnnouncementModal";
 import { useAccount } from "@/lib/account";
 import {
+  CANCEL_REASONS,
+  CANCEL_REASON_MAX,
   ETA_PRESETS,
   NEXT_STEP,
   ORDER_STATUSES,
   deleteOrders,
+  rejectOrder,
   setOrderProgress,
   useAllOrders,
   useIsAdmin,
@@ -31,6 +36,8 @@ import {
 import { useTimeUntilLaunch } from "@/lib/launch";
 import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
 import { rupees } from "@/lib/menu";
+import { setItemSoldOut, useSoldOut } from "@/lib/availability";
+import { allMenuSections } from "@/lib/restaurants";
 import type { OrderRecord } from "@/lib/orders";
 import { cn } from "@/lib/utils";
 
@@ -96,18 +103,96 @@ function placedLabel(date: Date | null): string {
   });
 }
 
+/**
+ * "No, and here is why."
+ *
+ * Turning an order down is a two-tap action rather than one, on purpose: the
+ * reject button opens this instead of firing, so a thumb on a busy phone
+ * cannot cancel someone's dinner by brushing past it. The reasons are one tap
+ * each, because the moment you need this is the moment you are least able to
+ * type.
+ */
+function RejectPanel({
+  busy,
+  onCancel,
+  onReject,
+}: {
+  busy: boolean;
+  onCancel: () => void;
+  onReject: (reason: string) => void;
+}) {
+  const [custom, setCustom] = useState("");
+
+  return (
+    <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/5 p-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-destructive">
+        Why are you turning this down?
+      </p>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        The customer sees this on their orders screen, word for word.
+      </p>
+
+      <div className="mt-2.5 grid gap-1.5">
+        {CANCEL_REASONS.map((reason) => (
+          <button
+            key={reason}
+            type="button"
+            disabled={busy}
+            onClick={() => onReject(reason)}
+            className="rounded-xl border border-border bg-card px-3 py-2.5 text-left text-xs font-medium text-primary transition-colors hover:border-destructive hover:text-destructive disabled:opacity-50"
+          >
+            {reason}
+          </button>
+        ))}
+      </div>
+
+      <label className="mt-2.5 block">
+        <span className="sr-only">Another reason</span>
+        <input
+          value={custom}
+          onChange={(event) => setCustom(event.target.value)}
+          maxLength={CANCEL_REASON_MAX}
+          placeholder="Or type your own reason…"
+          className="h-11 w-full rounded-xl border border-border bg-card px-3 text-xs text-primary outline-none focus:border-destructive"
+        />
+      </label>
+
+      <div className="mt-2.5 flex gap-2">
+        <button
+          type="button"
+          disabled={busy || !custom.trim()}
+          onClick={() => onReject(custom)}
+          className="h-11 flex-1 rounded-xl bg-destructive text-xs font-bold text-destructive-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+        >
+          {busy ? <Loader2 className="mx-auto size-4 animate-spin" /> : "Reject with this reason"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="h-11 rounded-xl border border-border px-4 text-xs font-semibold text-muted-foreground"
+        >
+          Keep it
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function OrderCard({
   order,
   busy,
   onChange,
+  onReject,
 }: {
   order: OrderRecord;
   busy: boolean;
   onChange: (id: string, status: OrderStatus, eta?: number | null) => void;
+  onReject: (id: string, reason: string) => void;
 }) {
   const next = NEXT_STEP[order.status as OrderStatus];
   const settled = order.status === "delivered" || order.status === "cancelled";
   const [more, setMore] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
 
   return (
     <li className="rounded-2xl border border-border bg-card p-4 shadow-sm">
@@ -198,21 +283,75 @@ function OrderCard({
         </a>
       )}
 
-      {next && (
+      {/* Accept and reject, the same size and side by side. Rejecting used to
+          be three taps down under "Move to another state", among five other
+          states of equal weight — which is not where you put the answer to
+          half the orders that come in. */}
+      {(next || !settled) && !rejecting && (
+        <div className="mt-3 flex gap-2">
+          {next && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onChange(order.id, next.to)}
+              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-bold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {busy ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : next.to === "on-the-way" ? (
+                <Bike className="size-4" />
+              ) : (
+                <Check className="size-4" />
+              )}
+              {next.label}
+            </button>
+          )}
+          {!settled && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setRejecting(true)}
+              className={cn(
+                "flex h-12 items-center justify-center gap-2 rounded-2xl border border-destructive/40 text-sm font-bold text-destructive transition-colors hover:bg-destructive/5 disabled:opacity-50",
+                next ? "px-5" : "flex-1",
+              )}
+            >
+              <X className="size-4" />
+              Reject
+            </button>
+          )}
+        </div>
+      )}
+
+      {rejecting && (
+        <RejectPanel
+          busy={busy}
+          onCancel={() => setRejecting(false)}
+          onReject={(reason) => {
+            setRejecting(false);
+            onReject(order.id, reason);
+          }}
+        />
+      )}
+
+      {/* Why it was turned down, kept on the card: the counter needs to be able
+          to answer "what did you tell them?" when the customer rings back. */}
+      {order.status === "cancelled" && order.cancelReason && (
+        <p className="mt-3 rounded-xl bg-destructive/5 p-2.5 text-xs text-muted-foreground">
+          <span className="font-semibold text-destructive">Told the customer:</span>{" "}
+          {order.cancelReason}
+        </p>
+      )}
+
+      {order.status === "cancelled" && (
         <button
           type="button"
           disabled={busy}
-          onClick={() => onChange(order.id, next.to)}
-          className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-bold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+          onClick={() => onChange(order.id, "confirmed")}
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground underline disabled:opacity-50"
         >
-          {busy ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : next.to === "on-the-way" ? (
-            <Bike className="size-4" />
-          ) : (
-            <Check className="size-4" />
-          )}
-          {next.label}
+          <Undo2 className="size-3" />
+          Undo — accept it after all
         </button>
       )}
 
@@ -260,25 +399,21 @@ function OrderCard({
 
       {more && (
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {ORDER_STATUSES.filter((status) => status !== order.status && status !== next?.to).map(
-            (status) => (
-              <button
-                key={status}
-                type="button"
-                disabled={busy}
-                onClick={() => onChange(order.id, status)}
-                className={cn(
-                  "min-h-9 rounded-full border border-border px-3 text-xs font-semibold transition-colors disabled:opacity-50",
-                  status === "cancelled"
-                    ? "text-muted-foreground hover:border-destructive hover:text-destructive"
-                    : "text-muted-foreground hover:border-accent hover:text-accent",
-                )}
-              >
-                {status === "cancelled" && <X className="mr-1 inline size-3" />}
-                {STATUS_LABELS[status] ?? status}
-              </button>
-            ),
-          )}
+          {/* Cancelled is missing on purpose: it has its own button now, and
+              reaching it from here would skip the reason. */}
+          {ORDER_STATUSES.filter(
+            (status) => status !== order.status && status !== next?.to && status !== "cancelled",
+          ).map((status) => (
+            <button
+              key={status}
+              type="button"
+              disabled={busy}
+              onClick={() => onChange(order.id, status)}
+              className="min-h-9 rounded-full border border-border px-3 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+            >
+              {STATUS_LABELS[status] ?? status}
+            </button>
+          ))}
         </div>
       )}
     </li>
@@ -489,6 +624,130 @@ function ClearOrders({ total, finished }: { total: number; finished: number }) {
   );
 }
 
+/**
+ * What is off the menu today.
+ *
+ * The counterpart to rejecting an order: turning a dish off here is what stops
+ * you having to turn the same order down twice. A sold-out dish disappears
+ * from the menu screens and cannot be added to a cart, so the next customer
+ * never gets as far as ordering it.
+ *
+ * Collapsed by default. This is a list of every dish in Jonai and the screen
+ * it lives on is one someone opens to deal with orders — it should be findable
+ * without being in the way.
+ */
+function MenuAvailability() {
+  const soldOut = useSoldOut();
+  const sections = allMenuSections();
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const toggle = async (id: string, next: boolean) => {
+    setBusy(id);
+    setError(null);
+    try {
+      await setItemSoldOut(id, next);
+    } catch (cause) {
+      console.error("Could not change availability", cause);
+      setError("Couldn't save that. Check the connection and try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className="mb-4 rounded-2xl border border-border bg-card p-4">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 text-left"
+      >
+        <span className="flex items-center gap-2">
+          <PackageX className="size-4 shrink-0 text-muted-foreground" />
+          <span className="text-sm font-bold text-primary">Sold out today</span>
+        </span>
+        <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+          {soldOut.size > 0 ? `${soldOut.size} off the menu` : "Everything on"}
+        </span>
+      </button>
+
+      {!open && soldOut.size > 0 && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Tap to put them back on when the kitchen has them again.
+        </p>
+      )}
+
+      {open && (
+        <>
+          <p className="mt-2 text-xs text-muted-foreground">
+            A dish switched off here vanishes from the menu and cannot be added to a cart, until you
+            switch it back on.
+          </p>
+
+          {error && (
+            <p role="alert" className="mt-2 text-xs font-medium text-destructive">
+              {error}
+            </p>
+          )}
+
+          <div className="mt-3 space-y-4">
+            {sections.map((section) => (
+              <div key={section.name}>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                  {section.name}
+                </p>
+                <ul className="mt-1.5 divide-y divide-border/60">
+                  {section.items.map((item) => {
+                    const off = soldOut.has(item.id);
+                    return (
+                      <li key={item.id} className="flex items-center justify-between gap-3 py-2">
+                        <span className="min-w-0">
+                          <span
+                            className={cn(
+                              "block truncate text-xs font-semibold",
+                              off ? "text-muted-foreground line-through" : "text-primary",
+                            )}
+                          >
+                            {item.name}
+                            {item.variant ? ` · ${item.variant}` : ""}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {rupees(item.price)}
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          disabled={busy === item.id}
+                          onClick={() => void toggle(item.id, !off)}
+                          className={cn(
+                            "min-h-9 shrink-0 rounded-full border px-3 text-xs font-bold transition-colors disabled:opacity-50",
+                            off
+                              ? "border-accent bg-accent/10 text-accent"
+                              : "border-border text-muted-foreground hover:border-destructive hover:text-destructive",
+                          )}
+                        >
+                          {busy === item.id ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : off ? (
+                            "Back on"
+                          ) : (
+                            "Sold out"
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function ManageScreen() {
   const { user, loading: authLoading } = useAccount();
   const { isAdmin, checking, denied } = useIsAdmin(user);
@@ -505,6 +764,17 @@ function ManageScreen() {
       await setOrderProgress(id, status, eta);
     } catch (cause) {
       console.error("Could not update the order", cause);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const reject = async (id: string, reason: string) => {
+    setBusy(id);
+    try {
+      await rejectOrder(id, reason);
+    } catch (cause) {
+      console.error("Could not reject the order", cause);
     } finally {
       setBusy(null);
     }
@@ -560,6 +830,8 @@ function ManageScreen() {
 
       <GoLivePanel />
 
+      <MenuAvailability />
+
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-primary">
           {newCount > 0 ? (
@@ -606,7 +878,13 @@ function ManageScreen() {
       ) : (
         <ul className="space-y-3">
           {shown.map((order) => (
-            <OrderCard key={order.id} order={order} busy={busy === order.id} onChange={change} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              busy={busy === order.id}
+              onChange={change}
+              onReject={reject}
+            />
           ))}
         </ul>
       )}

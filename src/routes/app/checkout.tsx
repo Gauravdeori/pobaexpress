@@ -4,6 +4,7 @@ import { Banknote, Check, Loader2, LogIn, Paperclip } from "lucide-react";
 
 import { LocationShare } from "@/components/app/LocationShare";
 import { blocksOrder, checkArea, outsideAreaMessage } from "@/lib/delivery-area";
+import { useSoldOut } from "@/lib/availability";
 import { ScreenHeading } from "@/components/app/Shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -125,6 +126,11 @@ function CheckoutScreen() {
   // Derived from the pin rather than stored beside it, so the two cannot
   // disagree. Same predicate the landing page's form uses.
   const outsideArea = blocksOrder(coords);
+  // Re-checked on the last screen as well as in the cart: the kitchen can run
+  // out while someone is typing their address, and this is the point of no
+  // return.
+  const soldOut = useSoldOut();
+  const goneLines = cart.lines.filter((line) => soldOut.has(line.id));
   const [codeInput, setCodeInput] = useState("");
   const [offer, setOffer] = useState<Offer | null>(null);
   const [codeBusy, setCodeBusy] = useState(false);
@@ -207,6 +213,14 @@ function CheckoutScreen() {
     if (!canOrder || !user) return;
     if (outsideArea && coords) {
       setError(outsideAreaMessage(checkArea(coords)));
+      return;
+    }
+    if (goneLines.length > 0) {
+      setError(
+        `${goneLines.map((line) => line.name).join(", ")} just sold out. Remove ${
+          goneLines.length === 1 ? "it" : "them"
+        } from your cart and the rest of the order is fine.`,
+      );
       return;
     }
     if (!name.trim() || !phone.trim() || !address.trim()) {
@@ -564,7 +578,7 @@ function CheckoutScreen() {
         <Button
           variant="accent"
           className="mt-5 h-12 w-full rounded-2xl"
-          disabled={sending || !canOrder || outsideArea}
+          disabled={sending || !canOrder || outsideArea || goneLines.length > 0}
           onClick={placeOrder}
         >
           {sending ? (
@@ -575,6 +589,8 @@ function CheckoutScreen() {
             reason
           ) : outsideArea ? (
             "Outside our delivery area"
+          ) : goneLines.length > 0 ? (
+            "Sold out — check your cart"
           ) : (
             <>
               <Check className="size-4" /> Place order
@@ -585,14 +601,16 @@ function CheckoutScreen() {
       <p className="mt-3 text-center text-xs text-muted-foreground">
         {needsSignIn
           ? "An account is needed to place an order. Your cart is kept."
-          : outsideArea && coords
-            ? outsideAreaMessage(checkArea(coords))
-            : launched && !canOrder
-              ? // Said here as well as on the button, because this is the last
-                // screen before an order and "closed" without an hour is the
-                // kind of dead end people read as a broken checkout.
-                `We deliver ${DELIVERY_HOURS_LABEL} every day. Your cart is kept until we open.`
-              : "Sending the order opens WhatsApp so we can confirm it with you."}
+          : goneLines.length > 0
+            ? `${goneLines.map((line) => line.name).join(", ")} sold out while you were ordering. Open your cart to remove ${goneLines.length === 1 ? "it" : "them"}.`
+            : outsideArea && coords
+              ? outsideAreaMessage(checkArea(coords))
+              : launched && !canOrder
+                ? // Said here as well as on the button, because this is the last
+                  // screen before an order and "closed" without an hour is the
+                  // kind of dead end people read as a broken checkout.
+                  `We deliver ${DELIVERY_HOURS_LABEL} every day. Your cart is kept until we open.`
+                : "Sending the order opens WhatsApp so we can confirm it with you."}
       </p>
     </div>
   );

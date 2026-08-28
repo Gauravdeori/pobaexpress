@@ -42,23 +42,31 @@ service cloud.firestore {
       allow read: if isAdmin()
                   || (request.auth != null && resource.data.userId == request.auth.uid);
 
-      // An admin moves an order along, gives it an estimated arrival, and does
-      // nothing else to it. Prices, addresses and line items are the
-      // customer's record: not editable from a browser by anyone, so a stolen
-      // admin session cannot rewrite what someone ordered or what they owe.
+      // An admin moves an order along, gives it an estimated arrival, says why
+      // they turned it down, and does nothing else to it. Prices, addresses
+      // and line items are the customer's record: not editable from a browser
+      // by anyone, so a stolen admin session cannot rewrite what someone
+      // ordered or what they owe.
       //
       // etaAt is epoch milliseconds or null. Typed here as well as in the
       // client, because the client is the half an attacker controls: a string
       // in that field would render as a broken countdown on the customer's
       // order screen.
+      //
+      // cancelReason is shown to the customer verbatim, so it is bounded here
+      // as well: a rejection reason is a sentence, and the field is the one
+      // piece of admin-written text that lands on someone else's screen.
       allow update: if isAdmin()
                     && request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['status', 'etaAt', 'updatedAt'])
+                         .hasOnly(['status', 'etaAt', 'cancelReason', 'updatedAt'])
                     && request.resource.data.status in
                          ['new', 'confirmed', 'preparing', 'on-the-way',
                           'delivered', 'cancelled']
                     && (request.resource.data.etaAt == null
-                        || request.resource.data.etaAt is number);
+                        || request.resource.data.etaAt is number)
+                    && (request.resource.data.cancelReason == null
+                        || (request.resource.data.cancelReason is string
+                            && request.resource.data.cancelReason.size() <= 200));
 
       // Only an admin, and never the customer whose order it is: a customer
       // who could delete their own row could erase the record of a bill they
