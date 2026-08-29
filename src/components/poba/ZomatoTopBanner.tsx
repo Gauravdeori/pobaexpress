@@ -81,6 +81,7 @@ type Destination = {
  */
 const TRENDING: (Destination & { label: string })[] = [
   { label: "Chicken Biryani", to: "food", query: "biryani" },
+  { label: "Local Thalis", to: "food", query: "thali" },
   { label: "Steamed Momos", to: "food", query: "momo" },
   { label: "Black Forest Cake", to: "cake" },
   { label: "Dispy Pizza", to: "food", query: "pizza" },
@@ -101,13 +102,23 @@ const CATEGORIES: CategoryItem[] = [
   {
     id: "biryani",
     name: "Biryani",
-    tag: "From ₹59",
+    tag: "From ₹129",
     image: biryaniImg,
     fallbackEmoji: "🍗",
     color: "from-accent/15 to-accent/5",
     borderColor: "border-accent/25",
     to: "food",
     query: "biryani",
+  },
+  {
+    id: "thalis",
+    name: "Local Thalis",
+    tag: "Assamese & Ethnic",
+    fallbackEmoji: "🍱",
+    color: "from-accent/15 to-accent/5",
+    borderColor: "border-accent/25",
+    to: "food",
+    query: "thali",
   },
   {
     id: "momos",
@@ -131,9 +142,6 @@ const CATEGORIES: CategoryItem[] = [
     to: "cake",
   },
   {
-    // Was "Burgers", which no partner in Jonai sells — the tile showed a photo
-    // of food that could not be ordered, and now that it opens a real list it
-    // would open an empty one. Pizza is on Dispy Bakery's menu today.
     id: "pizza",
     name: "Pizza",
     tag: "Fast Food Fav",

@@ -103,6 +103,7 @@ function AppHome() {
         <div className="flex items-center gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             { label: "⚡ Fast Delivery (15-25 min)", to: "/app/food" },
+            { label: "🍱 Traditional & Local Thalis", to: "/app/food?q=thali" },
             { label: "⭐ Top Rated Kitchens", to: "/app/food" },
             { label: "🎂 Fresh Birthday Cakes", to: "/app/cake" },
             { label: "🍕 Handcrafted Pizzas", to: "/app/r/dispy-bakery" },
@@ -135,7 +136,7 @@ function AppHome() {
             to="/app/food"
             className="flex items-center gap-1 text-xs font-extrabold text-accent hover:underline"
           >
-            <span>See all (4)</span>
+            <span>See all ({RESTAURANTS.length})</span>
             <ChevronRight className="size-3.5" />
           </Link>
         </div>

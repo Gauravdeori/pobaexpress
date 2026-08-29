@@ -6,9 +6,11 @@ import biriyaniCornerImg from "@/assets/biriyani_corner_cover.jpg";
 
 import {
   BIRIYANI_CORNER_MENU,
-  DAJU_BAHADUR_MENU,
   DCAKERY_MENU,
   DISPY_BAKERY_MENU,
+  GURUNG_FAST_FOOD_MENU,
+  MONTU_FAST_FOOD_MENU,
+  MS_MAA_HOTEL_MENU,
   PRARTHONA_MENU,
   type MenuItem,
 } from "./menu";
@@ -53,19 +55,19 @@ export const RESTAURANTS: Restaurant[] = [
     slug: "prarthona",
     name: "Prarthona Restaurant",
     category: "food",
-    cuisine: "Fried rice · Chowmein · Rolls · Momo",
+    cuisine: "Fried rice · Chowmein · Rolls · Momo · Starters",
     image: friedRiceImg,
     eta: [15, 25],
     items: PRARTHONA_MENU,
   },
   {
-    slug: "daju-bahadur",
-    name: "Daju Bahadur",
+    slug: "gurung-fast-food",
+    name: "Gurung Fast Food",
     category: "food",
-    cuisine: "Nepali fast food · Momo · Chowmein",
+    cuisine: "Nepali fast food · Momo · Chowmein · Lollipop",
     image: momosImg,
     eta: [15, 25],
-    items: DAJU_BAHADUR_MENU,
+    items: GURUNG_FAST_FOOD_MENU,
   },
   {
     slug: "biriyani-corner",
@@ -86,6 +88,22 @@ export const RESTAURANTS: Restaurant[] = [
     hours: "Daily 1 PM – 6 PM",
     items: DISPY_BAKERY_MENU,
   },
+  {
+    slug: "ms-maa-hotel",
+    name: "M.S Maa Hotel",
+    category: "food",
+    cuisine: "Assamese local thali · Pork · Handi mutton & chicken",
+    eta: [15, 25],
+    items: MS_MAA_HOTEL_MENU,
+  },
+  {
+    slug: "montu-fast-food",
+    name: "Montu Fast Food",
+    category: "food",
+    cuisine: "Ethnic cuisine · Local thali · Tibetan momo & thukpa",
+    eta: [15, 25],
+    items: MONTU_FAST_FOOD_MENU,
+  },
 ];
 
 /**
@@ -103,7 +121,9 @@ export function restaurantsIn(category: Restaurant["category"]): Restaurant[] {
 }
 
 export function getRestaurant(slug: string): Restaurant | undefined {
-  return RESTAURANTS.find((r) => r.slug === slug);
+  return RESTAURANTS.find(
+    (r) => r.slug === slug || (slug === "daju-bahadur" && r.slug === "gurung-fast-food"),
+  );
 }
 
 /**

@@ -48,6 +48,8 @@ const SPELLINGS: string[][] = [
   ["chowmein", "chowmin", "chow mein", "chow"],
   ["momo", "momos"],
   ["maggi", "maggie"],
+  ["thali", "thalis", "local thali", "traditional"],
+  ["gahori", "pork"],
 ];
 
 /** Every spelling worth trying for what was typed. */
