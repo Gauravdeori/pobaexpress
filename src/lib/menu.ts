@@ -80,6 +80,8 @@ import bcAndaMagazImg from "@/assets/bc_anda_magaz.jpg";
 import bcSpaRollImg from "@/assets/bc_spa_roll.jpg";
 import bcChowminImg from "@/assets/bc_chowmin.jpg";
 import bcMaggieImg from "@/assets/bc_maggie.jpg";
+import msMaaHotelCoverImg from "@/assets/ms_maa_hotel_cover.jpg";
+import thukpaImg from "@/assets/thukpa.jpg";
 
 /**
  * Item ids are prefixed per kitchen because two partners sell the same dish at
@@ -526,10 +528,10 @@ export const DCAKERY_MENU: MenuItem[] = [
 
 export const MS_MAA_HOTEL_MENU: MenuItem[] = [
   // RICE
-  { id: "mm-veg-thali", name: "Veg Thali", price: 99 },
-  { id: "mm-pork-thali", name: "Pork Thali", price: 149 },
-  { id: "mm-chicken-thali", name: "Chicken Thali", price: 179 },
-  { id: "mm-fish-thali", name: "Fish Thali", price: 179 },
+  { id: "mm-veg-thali", name: "Veg Thali", price: 99, image: msMaaHotelCoverImg },
+  { id: "mm-pork-thali", name: "Pork Thali", price: 149, image: msMaaHotelCoverImg },
+  { id: "mm-chicken-thali", name: "Chicken Thali", price: 179, image: msMaaHotelCoverImg },
+  { id: "mm-fish-thali", name: "Fish Thali", price: 179, image: msMaaHotelCoverImg },
 
   // ROTI / NUN
   { id: "mm-roti-thali", name: "Roti Thali", price: 79 },
@@ -591,9 +593,9 @@ export const MONTU_FAST_FOOD_MENU: MenuItem[] = [
   { id: "mf-patties-egg", name: "Patties Egg", price: 54 },
 
   // LOCAL THALI
-  { id: "mf-pork-thali", name: "Pork Thali", price: 239 },
-  { id: "mf-broiler-thali", name: "Broiler Thali", price: 189 },
-  { id: "mf-local-thali", name: "Local Thali", price: 339 },
+  { id: "mf-pork-thali", name: "Pork Thali", price: 239, image: msMaaHotelCoverImg },
+  { id: "mf-broiler-thali", name: "Broiler Thali", price: 189, image: msMaaHotelCoverImg },
+  { id: "mf-local-thali", name: "Local Thali", price: 339, image: msMaaHotelCoverImg },
 
   // TIBETAN (PORK)
   {
@@ -615,12 +617,14 @@ export const MONTU_FAST_FOOD_MENU: MenuItem[] = [
     name: "Tibetan Pork Thukpa",
     variant: "Half plate",
     price: 124,
+    image: thukpaImg,
   },
   {
     id: "mf-tibetan-pork-thukpa-full",
     name: "Tibetan Pork Thukpa",
     variant: "Full plate",
     price: 214,
+    image: thukpaImg,
   },
   {
     id: "mf-tibetan-pork-chow-half",
@@ -694,8 +698,20 @@ export const MONTU_FAST_FOOD_MENU: MenuItem[] = [
     price: 194,
     image: friedRiceImg,
   },
-  { id: "mf-chicken-thukpa-half", name: "Chicken Thukpa", variant: "Half plate", price: 104 },
-  { id: "mf-chicken-thukpa-full", name: "Chicken Thukpa", variant: "Full plate", price: 174 },
+  {
+    id: "mf-chicken-thukpa-half",
+    name: "Chicken Thukpa",
+    variant: "Half plate",
+    price: 104,
+    image: thukpaImg,
+  },
+  {
+    id: "mf-chicken-thukpa-full",
+    name: "Chicken Thukpa",
+    variant: "Full plate",
+    price: 174,
+    image: thukpaImg,
+  },
   {
     id: "mf-chilly-chicken-half",
     name: "Chilly Chicken",
@@ -712,8 +728,20 @@ export const MONTU_FAST_FOOD_MENU: MenuItem[] = [
   },
 
   // TIBETAN (MIXED / VEG STYLE)
-  { id: "mf-tibetan-thukpa-half", name: "Tibetan Thukpa", variant: "Half plate", price: 114 },
-  { id: "mf-tibetan-thukpa-full", name: "Tibetan Thukpa", variant: "Full plate", price: 194 },
+  {
+    id: "mf-tibetan-thukpa-half",
+    name: "Tibetan Thukpa",
+    variant: "Half plate",
+    price: 114,
+    image: thukpaImg,
+  },
+  {
+    id: "mf-tibetan-thukpa-full",
+    name: "Tibetan Thukpa",
+    variant: "Full plate",
+    price: 194,
+    image: thukpaImg,
+  },
   {
     id: "mf-tibetan-chow-mein-half",
     name: "Tibetan Chow Mein",

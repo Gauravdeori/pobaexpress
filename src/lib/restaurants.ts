@@ -3,6 +3,8 @@ import friedRiceImg from "@/assets/fried_rice.png";
 import momosImg from "@/assets/momos.png";
 import dispyBakeryImg from "@/assets/dispy_bakery.jpg";
 import biriyaniCornerImg from "@/assets/biriyani_corner_cover.jpg";
+import msMaaHotelImg from "@/assets/ms_maa_hotel_cover.jpg";
+import montuFastFoodImg from "@/assets/montu_fast_food_cover.jpg";
 
 import {
   BIRIYANI_CORNER_MENU,
@@ -92,7 +94,8 @@ export const RESTAURANTS: Restaurant[] = [
     slug: "ms-maa-hotel",
     name: "M.S Maa Hotel",
     category: "food",
-    cuisine: "Assamese local thali · Pork · Handi mutton & chicken",
+    cuisine: "Authentic Assamese local thali · Pork · Handi mutton & chicken",
+    image: msMaaHotelImg,
     eta: [15, 25],
     items: MS_MAA_HOTEL_MENU,
   },
@@ -101,6 +104,7 @@ export const RESTAURANTS: Restaurant[] = [
     name: "Montu Fast Food",
     category: "food",
     cuisine: "Ethnic cuisine · Local thali · Tibetan momo & thukpa",
+    image: montuFastFoodImg,
     eta: [15, 25],
     items: MONTU_FAST_FOOD_MENU,
   },
