@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Clock, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Clock, Store, UtensilsCrossed } from "lucide-react";
 
 import { MenuList, Rating } from "@/components/app/Shared";
 import { useCart } from "@/lib/cart";
@@ -7,6 +7,7 @@ import { rupees } from "@/lib/menu";
 import { useDeliveryQuote } from "@/lib/use-delivery";
 import { getRestaurant, priceFrom } from "@/lib/restaurants";
 import { CartBar } from "@/components/app/CartBar";
+import { useClosedRestaurants } from "@/lib/availability";
 
 export const Route = createFileRoute("/app/r/$slug")({
   loader: ({ params }) => {
@@ -21,6 +22,8 @@ function RestaurantScreen() {
   const restaurant = Route.useLoaderData();
   const { cart, add, setQuantity } = useCart();
   const quote = useDeliveryQuote(restaurant.category);
+  const closedRestaurants = useClosedRestaurants();
+  const isClosed = closedRestaurants.has(restaurant.slug);
 
   const quantityOf = (id: string) => cart.lines.find((line) => line.id === id)?.quantity ?? 0;
   const mine = cart.source === restaurant.name;
@@ -48,12 +51,7 @@ function RestaurantScreen() {
       </div>
 
       <div className="mx-auto max-w-3xl px-4">
-        {/* Lifted over the photo so the two read as one object.
-
-            `relative` is load-bearing, not decoration: the photo above is
-            positioned, and a positioned element paints over a static sibling
-            however the markup is ordered. Without it the image covered the top
-            of this card and ate the shop's name. */}
+        {/* Lifted over the photo so the two read as one object. */}
         <div className="relative z-10 -mt-8 rounded-2xl border border-border bg-card p-4 shadow-soft">
           <div className="flex items-center gap-2">
             <h1 className="min-w-0 truncate text-xl font-bold text-primary">{restaurant.name}</h1>
@@ -61,31 +59,37 @@ function RestaurantScreen() {
           </div>
           <p className="mt-1 truncate text-sm text-muted-foreground">{restaurant.cuisine}</p>
 
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-primary">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
-              <Clock className="size-3.5 text-muted-foreground" />
-              {restaurant.eta[0]}–{restaurant.eta[1]} min
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
-              {rupees(quote.fee)} delivery
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
-              from {rupees(priceFrom(restaurant))}
-            </span>
-            {/* Only the partners that keep short hours carry this, and it is
-                the one chip worth the accent — ordering at 9 PM from a shop
-                that shuts at 6 is the mistake worth preventing. */}
-            {quote.reason && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-accent">
-                {quote.reason}
+          {isClosed ? (
+            <div className="mt-3 flex items-center gap-2 rounded-xl bg-destructive/15 p-3 border border-destructive/30 text-destructive text-xs font-bold">
+              <Store className="size-4 shrink-0" />
+              <span>
+                This restaurant is currently closed today and not accepting online orders.
               </span>
-            )}
-            {restaurant.hours && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-accent-foreground">
-                {restaurant.hours}
+            </div>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
+                <Clock className="size-3.5 text-muted-foreground" />
+                {restaurant.eta[0]}–{restaurant.eta[1]} min
               </span>
-            )}
-          </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
+                {rupees(quote.fee)} delivery
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
+                from {rupees(priceFrom(restaurant))}
+              </span>
+              {quote.reason && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-accent">
+                  {quote.reason}
+                </span>
+              )}
+              {restaurant.hours && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-accent-foreground">
+                  {restaurant.hours}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="mb-3 mt-7 flex items-baseline justify-between gap-3">
@@ -96,9 +100,9 @@ function RestaurantScreen() {
         </div>
         <MenuList
           items={restaurant.items}
-          quantityOf={(id) => (mine ? quantityOf(id) : 0)}
-          onAdd={(item) => add(item, restaurant.category, restaurant.name)}
-          onSetQuantity={setQuantity}
+          quantityOf={(id) => (mine && !isClosed ? quantityOf(id) : 0)}
+          onAdd={(item) => !isClosed && add(item, restaurant.category, restaurant.name)}
+          onSetQuantity={(id, qty) => !isClosed && setQuantity(id, qty)}
         />
       </div>
 

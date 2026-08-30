@@ -16,6 +16,9 @@ import {
   Eye,
   Rocket,
   ShoppingBag,
+  Store,
+  Power,
+  UtensilsCrossed,
   Trash2,
   X,
 } from "lucide-react";
@@ -27,6 +30,8 @@ import { useAccount, accountLabel } from "@/lib/account";
 import { rupees } from "@/lib/menu";
 import { timeUntil } from "@/lib/launch";
 import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
+import { setRestaurantClosed, useClosedRestaurants } from "@/lib/availability";
+import { RESTAURANTS } from "@/lib/restaurants";
 import { LiveAnnouncementModal } from "@/components/poba/LiveAnnouncementModal";
 import {
   ETA_PRESETS,
@@ -126,7 +131,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Admin() {
   const { user, loading: authLoading } = useAccount();
   const { isAdmin, checking, denied } = useIsAdmin(user);
-  const [tab, setTab] = useState<"orders" | "offers" | "launch">("orders");
+  const [tab, setTab] = useState<"orders" | "offers" | "restaurants" | "launch">("orders");
   const [copied, setCopied] = useState(false);
 
   if (authLoading || checking) {
@@ -191,9 +196,6 @@ function Admin() {
               <li>Save, then reload this page.</li>
             </ol>
 
-            {/* Copyable, because this is the whole point of the screen and a
-                28-character id cannot be selected out of a paragraph on a
-                phone, which is the device the shop is run from. */}
             <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Your account id
             </p>
@@ -235,6 +237,7 @@ function Admin() {
         {(
           [
             ["orders", "Orders", ClipboardList],
+            ["restaurants", "Restaurants (On/Off)", Store],
             ["offers", "Offers", Tag],
             ["launch", "Launch", Rocket],
           ] as const
@@ -257,7 +260,15 @@ function Admin() {
       </div>
 
       <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-        {tab === "orders" ? <Orders /> : tab === "offers" ? <Offers /> : <LaunchControl />}
+        {tab === "orders" ? (
+          <Orders />
+        ) : tab === "restaurants" ? (
+          <RestaurantStatusControl />
+        ) : tab === "offers" ? (
+          <Offers />
+        ) : (
+          <LaunchControl />
+        )}
       </div>
       <LiveAnnouncementModal />
     </Shell>
@@ -958,6 +969,127 @@ function LaunchControl() {
       >
         {saving ? "Saving…" : saved ? "Saved" : "Save Settings"}
       </Button>
+    </div>
+  );
+}
+
+function RestaurantStatusControl() {
+  const closedRestaurants = useClosedRestaurants();
+  const [busySlug, setBusySlug] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const toggleStatus = async (slug: string, isClosed: boolean) => {
+    setBusySlug(slug);
+    setError(null);
+    try {
+      await setRestaurantClosed(slug, !isClosed);
+    } catch (cause) {
+      console.error("Could not change restaurant status", cause);
+      setError("Failed to update status. Please try again.");
+    } finally {
+      setBusySlug(null);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-2xl bg-accent/15 text-accent">
+            <Store className="size-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-primary">Restaurant Availability Controls</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Turn individual partner kitchens ON or OFF in real-time across the app and website.
+            </p>
+          </div>
+        </div>
+
+        {error && <p className="mt-3 text-xs font-semibold text-destructive">{error}</p>}
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {RESTAURANTS.map((restaurant) => {
+            const isClosed = closedRestaurants.has(restaurant.slug);
+            const isBusy = busySlug === restaurant.slug;
+
+            return (
+              <div
+                key={restaurant.slug}
+                className={cn(
+                  "relative flex flex-col justify-between rounded-2xl border p-5 transition-all",
+                  isClosed
+                    ? "border-destructive/30 bg-destructive/5"
+                    : "border-emerald-500/30 bg-emerald-950/5",
+                )}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {restaurant.image ? (
+                        <img
+                          src={restaurant.image}
+                          alt={restaurant.name}
+                          className="size-12 shrink-0 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+                          <UtensilsCrossed className="size-5" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <h3 className="truncate text-base font-bold text-foreground">
+                          {restaurant.name}
+                        </h3>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {restaurant.cuisine}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide",
+                        isClosed
+                          ? "bg-destructive/15 text-destructive border border-destructive/30"
+                          : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30",
+                      )}
+                    >
+                      {isClosed ? "CLOSED" : "OPEN"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex items-center justify-between border-t border-border/40 pt-4">
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {isClosed ? "Customers see: Closed Today" : "Receiving online orders"}
+                  </span>
+
+                  <Button
+                    type="button"
+                    variant={isClosed ? "accent" : "outline"}
+                    disabled={isBusy}
+                    onClick={() => void toggleStatus(restaurant.slug, isClosed)}
+                    className={cn(
+                      "h-10 rounded-xl px-4 text-xs font-bold transition-all gap-1.5",
+                      isClosed
+                        ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                        : "border-destructive/40 text-destructive hover:bg-destructive/10",
+                    )}
+                  >
+                    {isBusy ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Power className="size-3.5" />
+                    )}
+                    <span>{isClosed ? "Turn ON (Open)" : "Turn OFF (Close)"}</span>
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

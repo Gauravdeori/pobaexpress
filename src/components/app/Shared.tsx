@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, Star, UtensilsCrossed } from "lucide-react";
 
-import { useSoldOut } from "@/lib/availability";
+import { useClosedRestaurants, useSoldOut } from "@/lib/availability";
 import { itemLabel, rupees, type MenuItem } from "@/lib/menu";
 import { priceFrom, type Restaurant } from "@/lib/restaurants";
 import { cn } from "@/lib/utils";
@@ -62,11 +62,17 @@ export function RestaurantThumb({ image, className }: { image?: string; classNam
 }
 
 export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
+  const closedRestaurants = useClosedRestaurants();
+  const isClosed = closedRestaurants.has(restaurant.slug);
+
   return (
     <Link
       to="/app/r/$slug"
       params={{ slug: restaurant.slug }}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/80 bg-card shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] active:scale-[0.99]"
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-3xl border bg-card shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] active:scale-[0.99]",
+        isClosed ? "border-destructive/40 opacity-85" : "border-border/80 hover:border-accent/40",
+      )}
     >
       {/* Cover Image Container */}
       <div className="relative aspect-[16/8] sm:aspect-[21/9] w-full overflow-hidden bg-muted">
@@ -75,7 +81,10 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
             src={restaurant.image}
             alt={restaurant.name}
             aria-hidden
-            className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className={cn(
+              "size-full object-cover transition-transform duration-700 group-hover:scale-105",
+              isClosed && "grayscale-[40%]",
+            )}
           />
         ) : (
           <span className="flex size-full items-center justify-center bg-accent/10 text-accent">
@@ -88,10 +97,16 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-          <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-[11px] font-extrabold tracking-wide text-amber-300 backdrop-blur-md border border-amber-400/20 shadow-md">
-            <span>🔥</span>
-            <span>ITEMS FROM {rupees(priceFrom(restaurant))}</span>
-          </span>
+          {isClosed ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-destructive px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-md">
+              CLOSED TODAY
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-[11px] font-extrabold tracking-wide text-amber-300 backdrop-blur-md border border-amber-400/20 shadow-md">
+              <span>🔥</span>
+              <span>ITEMS FROM {rupees(priceFrom(restaurant))}</span>
+            </span>
+          )}
 
           {restaurant.hours && (
             <span className="rounded-full bg-emerald-950/80 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 backdrop-blur-md border border-emerald-400/30">
@@ -121,28 +136,50 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
       {/* Bottom Info Strip */}
       <div className="flex items-center justify-between bg-card/60 p-3.5 text-xs font-semibold text-muted-foreground backdrop-blur-md">
         <div className="flex items-center gap-2 text-foreground/80">
-          <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
-            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            {restaurant.eta[0]}–{restaurant.eta[1]} MINS
-          </span>
-          <span className="text-muted-foreground/40">•</span>
-          <span>From {rupees(priceFrom(restaurant))}</span>
-          <span className="text-muted-foreground/40">•</span>
-          <span className="text-accent font-bold">Safe & Hygienic</span>
+          {isClosed ? (
+            <span className="flex items-center gap-1.5 text-destructive font-extrabold">
+              <span className="size-2 rounded-full bg-destructive" />
+              Not Accepting Orders Today
+            </span>
+          ) : (
+            <>
+              <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                {restaurant.eta[0]}–{restaurant.eta[1]} MINS
+              </span>
+              <span className="text-muted-foreground/40">•</span>
+              <span>From {rupees(priceFrom(restaurant))}</span>
+              <span className="text-muted-foreground/40">•</span>
+              <span className="text-accent font-bold">Safe & Hygienic</span>
+            </>
+          )}
         </div>
 
-        <span className="font-extrabold text-accent group-hover:underline">View Menu →</span>
+        <span
+          className={cn(
+            "font-extrabold",
+            isClosed ? "text-muted-foreground" : "text-accent group-hover:underline",
+          )}
+        >
+          {isClosed ? "View Menu →" : "View Menu →"}
+        </span>
       </div>
     </Link>
   );
 }
 
 export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
+  const closedRestaurants = useClosedRestaurants();
+  const isClosed = closedRestaurants.has(restaurant.slug);
+
   return (
     <Link
       to="/app/r/$slug"
       params={{ slug: restaurant.slug }}
-      className="group relative flex w-48 sm:w-56 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg active:scale-[0.98]"
+      className={cn(
+        "group relative flex w-48 sm:w-56 shrink-0 flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]",
+        isClosed ? "border-destructive/40 opacity-80" : "border-border/80 hover:border-accent/50",
+      )}
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         {restaurant.image ? (
@@ -150,7 +187,10 @@ export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
             src={restaurant.image}
             alt={restaurant.name}
             aria-hidden
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className={cn(
+              "size-full object-cover transition-transform duration-500 group-hover:scale-105",
+              isClosed && "grayscale-[40%]",
+            )}
           />
         ) : (
           <span className="flex size-full items-center justify-center text-accent">
@@ -162,9 +202,15 @@ export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
 
         {/* Promo Ribbon on Image */}
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-          <span className="truncate rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-black tracking-wide text-white backdrop-blur-md">
-            FROM {rupees(priceFrom(restaurant))}
-          </span>
+          {isClosed ? (
+            <span className="truncate rounded-md bg-destructive px-2 py-0.5 text-[10px] font-black uppercase text-white shadow-sm">
+              CLOSED TODAY
+            </span>
+          ) : (
+            <span className="truncate rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-black tracking-wide text-white backdrop-blur-md">
+              FROM {rupees(priceFrom(restaurant))}
+            </span>
+          )}
           <span className="flex items-center gap-0.5 rounded-md bg-emerald-600 px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow-sm">
             <Star className="size-2.5 fill-white" />
             {restaurant.rating?.toFixed(1) || "4.3"}
@@ -180,10 +226,14 @@ export function RestaurantTile({ restaurant }: { restaurant: Restaurant }) {
           {restaurant.cuisine}
         </p>
         <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-muted-foreground border-t border-border/40 pt-2">
-          <span className="text-emerald-600 font-bold flex items-center gap-1">
-            <span className="size-1.5 rounded-full bg-emerald-500" />
-            {restaurant.eta[0]}–{restaurant.eta[1]} min
-          </span>
+          {isClosed ? (
+            <span className="text-destructive font-bold">Closed Today</span>
+          ) : (
+            <span className="text-emerald-600 font-bold flex items-center gap-1">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              {restaurant.eta[0]}–{restaurant.eta[1]} min
+            </span>
+          )}
           <span className="text-foreground/80 font-bold">Doorstep</span>
         </div>
       </div>

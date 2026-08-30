@@ -8,7 +8,9 @@ import {
   Lock,
   MapPin,
   Phone,
+  Power,
   Rocket,
+  Store,
   Timer,
   PackageX,
   Trash2,
@@ -36,8 +38,13 @@ import {
 import { useTimeUntilLaunch } from "@/lib/launch";
 import { saveLaunchSettings, useLaunchSettings } from "@/lib/settings";
 import { rupees } from "@/lib/menu";
-import { setItemSoldOut, useSoldOut } from "@/lib/availability";
-import { allMenuSections } from "@/lib/restaurants";
+import {
+  setItemSoldOut,
+  setRestaurantClosed,
+  useClosedRestaurants,
+  useSoldOut,
+} from "@/lib/availability";
+import { allMenuSections, RESTAURANTS } from "@/lib/restaurants";
 import type { OrderRecord } from "@/lib/orders";
 import { cn } from "@/lib/utils";
 
@@ -625,6 +632,94 @@ function ClearOrders({ total, finished }: { total: number; finished: number }) {
 }
 
 /**
+ * Turn an entire restaurant / kitchen ON or OFF.
+ */
+function RestaurantTogglePanel() {
+  const closedRestaurants = useClosedRestaurants();
+  const [open, setOpen] = useState(false);
+  const [busySlug, setBusySlug] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const toggleStatus = async (slug: string, isClosed: boolean) => {
+    setBusySlug(slug);
+    setError(null);
+    try {
+      await setRestaurantClosed(slug, !isClosed);
+    } catch (cause) {
+      console.error("Could not change restaurant status", cause);
+      setError("Failed to update status.");
+    } finally {
+      setBusySlug(null);
+    }
+  };
+
+  return (
+    <div className="mb-4 rounded-2xl border border-border bg-card p-4">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 text-left"
+      >
+        <span className="flex items-center gap-2">
+          <Store className="size-4 shrink-0 text-muted-foreground" />
+          <span className="text-sm font-bold text-primary">Restaurant Status (On / Off)</span>
+        </span>
+        <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+          {closedRestaurants.size > 0
+            ? `${closedRestaurants.size} shop${closedRestaurants.size === 1 ? "" : "s"} closed`
+            : "All shops open"}
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-3 space-y-2 border-t border-border/50 pt-3">
+          <p className="text-xs text-muted-foreground mb-3">
+            Toggle an individual restaurant OFF to pause orders and show &quot;Closed Today&quot; to
+            customers.
+          </p>
+          {error && <p className="text-xs font-medium text-destructive mb-2">{error}</p>}
+          {RESTAURANTS.map((restaurant) => {
+            const isClosed = closedRestaurants.has(restaurant.slug);
+            const isBusy = busySlug === restaurant.slug;
+
+            return (
+              <div
+                key={restaurant.slug}
+                className="flex items-center justify-between gap-3 py-2 border-b border-border/40 last:border-b-0"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-bold text-foreground">{restaurant.name}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{restaurant.cuisine}</p>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isBusy}
+                  onClick={() => void toggleStatus(restaurant.slug, isClosed)}
+                  className={cn(
+                    "shrink-0 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1",
+                    isClosed
+                      ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25"
+                      : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25",
+                  )}
+                >
+                  {isBusy ? (
+                    <Loader2 className="size-3 animate-spin" />
+                  ) : (
+                    <Power className="size-3" />
+                  )}
+                  <span>{isClosed ? "OFF (Tap to Open)" : "ON (Tap to Close)"}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
  * What is off the menu today.
  *
  * The counterpart to rejecting an order: turning a dish off here is what stops
@@ -829,6 +924,8 @@ function ManageScreen() {
       <ScreenHeading title="Orders" />
 
       <GoLivePanel />
+
+      <RestaurantTogglePanel />
 
       <MenuAvailability />
 
