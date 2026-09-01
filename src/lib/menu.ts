@@ -304,6 +304,22 @@ export const PRARTHONA_MENU: MenuItem[] = [
   },
   { id: "pr-fry-momo-half", name: "Fry Momo", variant: "Half plate", price: 123, image: momosImg },
   { id: "pr-fry-momo-full", name: "Fry Momo", variant: "Full plate", price: 217, image: momosImg },
+
+  // BIRYANI
+  {
+    id: "pr-biryani-chicken-half",
+    name: "Biryani Chicken",
+    variant: "Half plate",
+    price: 156,
+    image: biryaniImg,
+  },
+  {
+    id: "pr-biryani-chicken-full",
+    name: "Biryani Chicken",
+    variant: "Full plate",
+    price: 276,
+    image: biryaniImg,
+  },
 ];
 
 export const GURUNG_FAST_FOOD_MENU: MenuItem[] = [
@@ -376,6 +392,13 @@ export const GURUNG_FAST_FOOD_MENU: MenuItem[] = [
     variant: "Full plate",
     price: 129,
     image: chilliChickenImg,
+  },
+  {
+    id: "gf-biryani-chicken-full",
+    name: "Biryani Chicken",
+    variant: "Full plate",
+    price: 149,
+    image: biryaniImg,
   },
 ];
 

@@ -1009,7 +1009,7 @@ function RestaurantStatusControl() {
         {error && <p className="mt-3 text-xs font-semibold text-destructive">{error}</p>}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {RESTAURANTS.map((restaurant) => {
+          {[...RESTAURANTS, { slug: "dcakery", name: "Dcakery", cuisine: "Custom cakes & desserts" } as unknown as typeof RESTAURANTS[0]].map((restaurant) => {
             const isClosed = closedRestaurants.has(restaurant.slug);
             const isBusy = busySlug === restaurant.slug;
 
