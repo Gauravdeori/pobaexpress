@@ -588,6 +588,22 @@ export const MONTU_FAST_FOOD_MENU: MenuItem[] = [
   { id: "mf-burger-chicken", name: "Burger Chicken", price: 184, image: burgerImg },
   { id: "mf-burger-veg", name: "Burger Veg", price: 134, image: burgerImg },
 
+  // READYMADE CAKE
+  {
+    id: "mf-readymade-cake-half",
+    name: "Black forest cake",
+    variant: "Readymade cake, half kg",
+    price: 456,
+    image: chocolateCakeImg,
+  },
+  {
+    id: "mf-readymade-cake-full",
+    name: "Black forest cake",
+    variant: "Readymade cake, 1kg",
+    price: 956,
+    image: chocolateCakeImg,
+  },
+
   // BIRTHDAY CAKE
   {
     id: "mf-birthday-cake-half",
