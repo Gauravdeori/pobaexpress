@@ -19,7 +19,7 @@ export const PHARMACIES: Pharmacy[] = [
     categoryLine1: "Medicines · Wellness",
     categoryLine2: "Health Essentials",
     image: peguDrugsHouseImg,
-    eta: "15–25 min",
+    eta: "15–35 min",
     fulfillment: "Doorstep",
   },
 ];

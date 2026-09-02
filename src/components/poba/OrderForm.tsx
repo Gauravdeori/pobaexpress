@@ -442,7 +442,12 @@ export function OrderForm() {
                         : "border-border bg-background text-muted-foreground hover:border-accent hover:text-primary",
                   )}
                 >
-                  <c.icon className={cn("size-4", c.id === "medicine" && category !== c.id && "text-cyan-400")} />
+                  <c.icon
+                    className={cn(
+                      "size-4",
+                      c.id === "medicine" && category !== c.id && "text-cyan-400",
+                    )}
+                  />
                   {c.label}
                   {c.id === "medicine" && (
                     <span className="ml-1 rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-black uppercase text-cyan-300 border border-cyan-400/40 animate-pulse">

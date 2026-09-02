@@ -7,7 +7,7 @@ const features = [
     icon: Zap,
     title: "Fast Delivery",
     text: "Riders dispatched in minutes across every Jonai neighbourhood.",
-    badge: "15-25 MINS",
+    badge: "15-35 MINS",
     gradient: "from-amber-500/10 via-emerald-500/5 to-card",
     borderColor: "hover:border-amber-500/40",
     iconBg: "bg-amber-500/10 text-amber-400 group-hover:bg-amber-500 group-hover:text-amber-950",

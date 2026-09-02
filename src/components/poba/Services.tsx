@@ -11,7 +11,7 @@ const services = [
   {
     icon: UtensilsCrossed,
     title: "Food Delivery",
-    tag: "15-25 MINS",
+    tag: "15-35 MINS",
     text: "Biryani, chowmein, momos, pizza and more — from ₹39, delivered hot to your door.",
     image: biryaniImg,
     imageAlt: "Delicious Biryani and Food",
@@ -112,7 +112,8 @@ const services = [
     href: "/app/medicine",
     actionLabel: "Order Medicines Now",
     gradient: "from-cyan-950/90 via-teal-900/40 to-card",
-    borderColor: "border-cyan-400/80 shadow-[0_0_35px_rgba(6,182,212,0.35)] ring-2 ring-cyan-400/50",
+    borderColor:
+      "border-cyan-400/80 shadow-[0_0_35px_rgba(6,182,212,0.35)] ring-2 ring-cyan-400/50",
     badgeBg: "bg-cyan-500/30 text-cyan-200 border-cyan-400/60 animate-pulse",
     iconBg: "bg-cyan-500/25 text-cyan-300 group-hover:bg-cyan-500 group-hover:text-cyan-950",
     highlighted: true,
@@ -162,9 +163,7 @@ export function Services() {
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className={`group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border bg-gradient-to-br ${s.gradient} ${
-                  s.highlighted
-                    ? `${s.borderColor}`
-                    : `border-border/80 ${s.borderColor}`
+                  s.highlighted ? `${s.borderColor}` : `border-border/80 ${s.borderColor}`
                 } p-7 shadow-lift backdrop-blur-xl transition-all duration-300`}
               >
                 {/* Top Highlight Ribbon for Medicine */}

@@ -67,7 +67,7 @@ const trustPromises = [
   {
     icon: Zap,
     iconBg: "bg-emerald-500/10 text-emerald-600",
-    label: "15–25 Min Delivery",
+    label: "15–35 Min Delivery",
     detail: "Fast in Jonai",
   },
   {
@@ -296,7 +296,7 @@ function AppHome() {
                   <div className="mt-3 flex items-center justify-between border-t border-border/40 pt-2 text-xs">
                     <span className="flex items-center gap-1 font-extrabold text-emerald-700 dark:text-emerald-400">
                       <span className="inline-block size-1.5 rounded-full bg-emerald-600" />
-                      15–25 min
+                      15–35 min
                     </span>
                     <span className="rounded-md bg-secondary px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
                       Doorstep
@@ -332,7 +332,7 @@ function AppHome() {
       {/* Quick Category Filter Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {[
-          { label: "⚡ Fast Delivery (15–25 min)", to: "/app/food" },
+          { label: "⚡ Fast Delivery (15–35 min)", to: "/app/food" },
           { label: "🍱 Traditional & Local Thali", to: "/app/food?q=thali" },
         ].map((pill) => (
           <Link

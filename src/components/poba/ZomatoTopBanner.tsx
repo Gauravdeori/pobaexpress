@@ -183,7 +183,7 @@ const HERO_SLIDES = [
     title: `Fast Doorstep Delivery in Jonai`,
     highlight: `Zero Commission • Delivery from ₹${MIN_DELIVERY_FEE}`,
     description:
-      "Order hot meals, sizzling momos, fresh birthday cakes, and urgent medicines delivered in 15–25 mins.",
+      "Order hot meals, sizzling momos, fresh birthday cakes, and urgent medicines delivered in 15–35 mins.",
     cta: "Download the App to Order",
     ctaLink: "/app",
     external: false,
@@ -219,7 +219,7 @@ const HERO_SLIDES = [
     heroSecondary: momosImg,
     heroBadge: "TOP RATED",
     offerPill: "FROM ₹58",
-    features: ["⚡ 15–25 Min Delivery", "🥟 Steamed & Fried Momos", "🔥 Cooked Fresh"],
+    features: ["⚡ 15–35 Min Delivery", "🥟 Steamed & Fried Momos", "🔥 Cooked Fresh"],
   },
   {
     id: "dcakery-deal",

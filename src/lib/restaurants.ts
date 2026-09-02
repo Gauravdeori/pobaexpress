@@ -59,7 +59,7 @@ export const RESTAURANTS: Restaurant[] = [
     category: "food",
     cuisine: "Biryani · Fried rice · Chowmein · Rolls · Momo · Starters",
     image: friedRiceImg,
-    eta: [15, 25],
+    eta: [15, 35],
     items: PRARTHONA_MENU,
   },
   {
@@ -68,7 +68,7 @@ export const RESTAURANTS: Restaurant[] = [
     category: "food",
     cuisine: "Biryani · Nepali fast food · Momo · Chowmein · Lollipop",
     image: momosImg,
-    eta: [15, 25],
+    eta: [15, 35],
     items: GURUNG_FAST_FOOD_MENU,
   },
   {
@@ -77,7 +77,7 @@ export const RESTAURANTS: Restaurant[] = [
     category: "food",
     cuisine: "Biriyani · Anda Magaz · Spa Roll · Chowmin · Maggie",
     image: biriyaniCornerImg,
-    eta: [15, 25],
+    eta: [15, 35],
     items: BIRIYANI_CORNER_MENU,
   },
   {
@@ -86,7 +86,7 @@ export const RESTAURANTS: Restaurant[] = [
     category: "food",
     cuisine: "Homemade pizza · Regular, medium, large",
     image: dispyBakeryImg,
-    eta: [15, 25],
+    eta: [15, 35],
     hours: "Daily 1 PM – 6 PM",
     items: DISPY_BAKERY_MENU,
   },
@@ -96,7 +96,7 @@ export const RESTAURANTS: Restaurant[] = [
     category: "food",
     cuisine: "Authentic Assamese local thali · Pork · Handi mutton & chicken",
     image: msMaaHotelImg,
-    eta: [15, 25],
+    eta: [15, 35],
     items: MS_MAA_HOTEL_MENU,
   },
   {
@@ -105,7 +105,7 @@ export const RESTAURANTS: Restaurant[] = [
     category: "food",
     cuisine: "Ethnic cuisine · Local thali · Tibetan momo & thukpa",
     image: montuFastFoodImg,
-    eta: [15, 25],
+    eta: [15, 35],
     items: MONTU_FAST_FOOD_MENU,
   },
 ];

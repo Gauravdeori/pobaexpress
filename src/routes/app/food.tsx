@@ -17,7 +17,7 @@ export const Route = createFileRoute("/app/food")({
 /**
  * Only orderings the data can actually justify.
  *
- * No "fastest" — every kitchen quotes the same 15–25 minutes, so a sort on it
+ * No "fastest" — every kitchen quotes the same 15–35 minutes, so a sort on it
  * would just reshuffle the list and imply a difference that isn't there. No
  * "top rated" either, for want of a single real rating.
  */

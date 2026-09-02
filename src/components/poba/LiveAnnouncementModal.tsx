@@ -184,7 +184,7 @@ export function LiveAnnouncementModal() {
                   <>
                     Jonai&apos;s very own doorstep delivery service is now open! Order hot biryani,
                     sizzling momos, fresh birthday cakes, and urgent medicines delivered to your
-                    door in 15–25 minutes.
+                    door in 15–35 minutes.
                   </>
                 ) : (
                   <>
@@ -204,7 +204,7 @@ export function LiveAnnouncementModal() {
                   <Zap className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs font-bold text-white">15–25 Min Delivery</div>
+                  <div className="text-xs font-bold text-white">15–35 Min Delivery</div>
                   <div className="text-[10px] text-white/70">Superfast in Jonai</div>
                 </div>
               </div>
