@@ -678,7 +678,14 @@ function RestaurantTogglePanel() {
             customers.
           </p>
           {error && <p className="text-xs font-medium text-destructive mb-2">{error}</p>}
-          {[...RESTAURANTS, { slug: "dcakery", name: "Dcakery", cuisine: "Custom cakes & desserts" } as unknown as typeof RESTAURANTS[0]].map((restaurant) => {
+          {[
+            ...RESTAURANTS,
+            {
+              slug: "dcakery",
+              name: "Dcakery",
+              cuisine: "Custom cakes & desserts",
+            } as unknown as (typeof RESTAURANTS)[0],
+          ].map((restaurant) => {
             const isClosed = closedRestaurants.has(restaurant.slug);
             const isBusy = busySlug === restaurant.slug;
 

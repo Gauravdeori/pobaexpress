@@ -29,9 +29,7 @@ function CakeScreen() {
       {isClosed && (
         <div className="mt-3 mb-5 flex items-center gap-2 rounded-xl bg-destructive/15 p-3 border border-destructive/30 text-destructive text-xs font-bold">
           <Store className="size-4 shrink-0" />
-          <span>
-            Dcakery is currently closed today and not accepting online orders.
-          </span>
+          <span>Dcakery is currently closed today and not accepting online orders.</span>
         </div>
       )}
       <MenuList
