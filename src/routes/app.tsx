@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { ClipboardList, Home, Package, ShoppingBag, UserRound } from "lucide-react";
+import { ClipboardList, ChevronDown, Home, Package, ShoppingBag, UserRound } from "lucide-react";
 
 import { useAccount } from "@/lib/account";
 import { useIsAdmin } from "@/lib/admin";
@@ -63,7 +63,7 @@ function AppShell() {
 
 function AppHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-border/40 bg-background/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4">
         <Link to="/app" className="flex items-center gap-2">
           <img
@@ -71,12 +71,16 @@ function AppHeader() {
             src={LOGO_SRC}
             onError={onLogoError}
             alt="Poba Express"
-            className="h-9 w-auto"
+            className="h-9.5 w-auto"
           />
         </Link>
-        <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-          Jonai
-        </span>
+        <button
+          type="button"
+          className="flex items-center gap-1.5 rounded-full border border-border/80 bg-background px-3.5 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-400 shadow-sm transition-all hover:bg-secondary active:scale-95"
+        >
+          <span>Jonai</span>
+          <ChevronDown className="size-3.5 text-emerald-700 dark:text-emerald-400 stroke-[2.5]" />
+        </button>
       </div>
     </header>
   );
