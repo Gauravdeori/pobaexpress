@@ -105,16 +105,17 @@ const services = [
   {
     icon: Pill,
     title: "Medicine Delivery",
-    tag: "VERIFIED RX",
+    tag: "⚡ 24/7 EMERGENCY & RX",
     text: "Fast delivery from trusted local pharmacies. Just upload your prescription.",
     image: medicineCategoryImg,
     imageAlt: "Medicine & Pharmacy Essentials",
     href: "/app/medicine",
-    actionLabel: "Order Medicines",
-    gradient: "from-cyan-950/60 via-teal-900/20 to-card/90",
-    borderColor: "hover:border-cyan-500/50",
-    badgeBg: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-    iconBg: "bg-cyan-500/15 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-cyan-950",
+    actionLabel: "Order Medicines Now",
+    gradient: "from-cyan-950/90 via-teal-900/40 to-card",
+    borderColor: "border-cyan-400/80 shadow-[0_0_35px_rgba(6,182,212,0.35)] ring-2 ring-cyan-400/50",
+    badgeBg: "bg-cyan-500/30 text-cyan-200 border-cyan-400/60 animate-pulse",
+    iconBg: "bg-cyan-500/25 text-cyan-300 group-hover:bg-cyan-500 group-hover:text-cyan-950",
+    highlighted: true,
     Illustration: () => (
       <svg
         className="pointer-events-none absolute -right-6 -bottom-6 size-48 text-cyan-400/10 transition-transform duration-500 group-hover:scale-110 group-hover:text-cyan-400/15"
@@ -160,8 +161,19 @@ export function Services() {
               <motion.article
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className={`group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-border/80 bg-gradient-to-br ${s.gradient} p-7 shadow-lift backdrop-blur-xl transition-all duration-300 ${s.borderColor}`}
+                className={`group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border bg-gradient-to-br ${s.gradient} ${
+                  s.highlighted
+                    ? `${s.borderColor}`
+                    : `border-border/80 ${s.borderColor}`
+                } p-7 shadow-lift backdrop-blur-xl transition-all duration-300`}
               >
+                {/* Top Highlight Ribbon for Medicine */}
+                {s.highlighted && (
+                  <div className="absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-cyan-500 to-teal-400 px-12 py-1 text-[9px] font-black uppercase tracking-widest text-slate-950 shadow-md z-20">
+                    FEATURED
+                  </div>
+                )}
+
                 {/* Custom Background Vector Illustration */}
                 <s.Illustration />
 
@@ -175,14 +187,21 @@ export function Services() {
                   <span
                     className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider ${s.badgeBg} shadow-sm backdrop-blur`}
                   >
-                    <Sparkles className="size-3" />
+                    {s.highlighted ? (
+                      <span className="relative flex size-2 mr-0.5">
+                        <span className="absolute inline-flex size-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                        <span className="relative inline-flex size-2 rounded-full bg-cyan-400" />
+                      </span>
+                    ) : (
+                      <Sparkles className="size-3" />
+                    )}
                     {s.tag}
                   </span>
                 </div>
 
                 {/* Main Card Content */}
                 <div className="mt-6 flex-1">
-                  <h3 className="text-2xl font-bold text-primary transition-colors group-hover:text-accent">
+                  <h3 className="text-2xl font-bold text-primary transition-colors group-hover:text-accent flex items-center gap-2">
                     {s.title}
                   </h3>
                   <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground font-medium">
@@ -199,8 +218,8 @@ export function Services() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
                   <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-background/80 px-2.5 py-1 text-[11px] font-bold text-foreground backdrop-blur">
-                    <ShieldCheck className="size-3.5 text-accent" />
-                    Jonai Verified
+                    <ShieldCheck className="size-3.5 text-cyan-400" />
+                    Verified Local Pharmacy
                   </div>
                 </div>
 
@@ -208,7 +227,9 @@ export function Services() {
                 <div className="mt-6 pt-2">
                   <Link
                     to={s.href}
-                    className="inline-flex items-center gap-2 text-sm font-bold text-accent transition-all group-hover:gap-3"
+                    className={`inline-flex items-center gap-2 text-sm font-bold ${
+                      s.highlighted ? "text-cyan-400 hover:text-cyan-300" : "text-accent"
+                    } transition-all group-hover:gap-3`}
                   >
                     {s.actionLabel}
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />

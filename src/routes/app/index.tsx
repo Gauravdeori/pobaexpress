@@ -108,12 +108,15 @@ function AppHome() {
             { label: "🎂 Fresh Birthday Cakes", to: "/app/cake" },
             { label: "🍕 Handcrafted Pizzas", to: "/app/r/dispy-bakery" },
             { label: "🥟 Steamed & Fried Momos", to: "/app/r/prarthona" },
-            { label: "💊 24/7 Medicines", to: "/app/medicine" },
+            { label: "💊 24/7 Urgent Medicines", to: "/app/medicine", highlighted: true },
           ].map((pill) => (
             <Link
               key={pill.label}
               to={pill.to}
-              className="shrink-0 rounded-full border border-border/80 bg-card px-4 py-2 text-xs font-bold text-foreground/90 shadow-sm backdrop-blur-md transition-all hover:border-accent hover:bg-accent/10 hover:text-accent active:scale-95"
+              className={pill.highlighted
+                ? "shrink-0 rounded-full border border-cyan-400 bg-cyan-500/15 px-4 py-2 text-xs font-extrabold text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.3)] backdrop-blur-md transition-all hover:bg-cyan-500/25 animate-pulse active:scale-95"
+                : "shrink-0 rounded-full border border-border/80 bg-card px-4 py-2 text-xs font-bold text-foreground/90 shadow-sm backdrop-blur-md transition-all hover:border-accent hover:bg-accent/10 hover:text-accent active:scale-95"
+              }
             >
               {pill.label}
             </Link>

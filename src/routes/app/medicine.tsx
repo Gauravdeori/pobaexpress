@@ -81,6 +81,26 @@ function MedicineScreen() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-5">
+      <div className="mb-4 flex items-center justify-between rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/60 via-teal-900/30 to-card p-3.5 shadow-md">
+        <div className="flex items-center gap-3">
+          <span className="relative flex size-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+            <span className="absolute -top-1 -right-1 flex size-3">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+              <span className="relative inline-flex size-3 rounded-full bg-cyan-400" />
+            </span>
+            💊
+          </span>
+          <div>
+            <h4 className="text-xs font-black uppercase tracking-wider text-cyan-300">
+              ⚡ 24/7 Priority Medicine Delivery
+            </h4>
+            <p className="text-[11px] text-muted-foreground font-medium">
+              Verified Jonai Pharmacies • Rapid Prescription Dispatch
+            </p>
+          </div>
+        </div>
+      </div>
+
       <ScreenHeading
         title="Medicine"
         subtitle="List what you need and attach the prescription — we confirm the total on WhatsApp before the rider collects."

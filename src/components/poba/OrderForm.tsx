@@ -437,11 +437,18 @@ export function OrderForm() {
                     "flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-all duration-300",
                     category === c.id
                       ? "border-transparent bg-gradient-accent text-accent-foreground shadow-soft"
-                      : "border-border bg-background text-muted-foreground hover:border-accent hover:text-primary",
+                      : c.id === "medicine"
+                        ? "border-cyan-500/60 bg-cyan-500/10 text-cyan-400 font-bold hover:border-cyan-400 hover:bg-cyan-500/20 shadow-[0_0_12px_rgba(6,182,212,0.25)]"
+                        : "border-border bg-background text-muted-foreground hover:border-accent hover:text-primary",
                   )}
                 >
-                  <c.icon className="size-4" />
+                  <c.icon className={cn("size-4", c.id === "medicine" && category !== c.id && "text-cyan-400")} />
                   {c.label}
+                  {c.id === "medicine" && (
+                    <span className="ml-1 rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-black uppercase text-cyan-300 border border-cyan-400/40 animate-pulse">
+                      ⚡ 24/7 RX
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

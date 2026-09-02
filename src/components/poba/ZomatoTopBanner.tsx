@@ -166,11 +166,11 @@ const CATEGORIES: CategoryItem[] = [
   {
     id: "medicine",
     name: "Medicines",
-    tag: `Delivery from ₹${MIN_DELIVERY_FEE}`,
+    tag: "⚡ 24/7 RX",
     image: medicineCategoryImg,
     fallbackEmoji: "💊",
-    color: "from-accent/15 to-accent/5",
-    borderColor: "border-accent/25",
+    color: "from-cyan-500/30 via-teal-500/15 to-accent/5",
+    borderColor: "border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.45)] ring-2 ring-cyan-400/50",
     to: "medicine",
   },
 ];
@@ -557,12 +557,24 @@ function CategoryTile({ cat }: { cat: CategoryItem }) {
         )}
 
         {/* Offer Tag Badge */}
-        <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-accent-light bg-accent px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm">
+        <span
+          className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm border ${
+            cat.id === "medicine"
+              ? "border-cyan-300 bg-cyan-600 animate-pulse text-white shadow-[0_0_8px_rgba(6,182,212,0.6)]"
+              : "border-accent-light bg-accent"
+          }`}
+        >
           {cat.tag}
         </span>
       </div>
 
-      <span className="text-xs font-extrabold text-foreground group-hover:text-accent transition-colors">
+      <span
+        className={`text-xs font-extrabold transition-colors ${
+          cat.id === "medicine"
+            ? "text-cyan-400 font-black group-hover:text-cyan-300"
+            : "text-foreground group-hover:text-accent"
+        }`}
+      >
         {cat.name}
       </span>
     </ShopLink>
