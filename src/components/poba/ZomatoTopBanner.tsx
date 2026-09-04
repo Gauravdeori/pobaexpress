@@ -177,6 +177,26 @@ const CATEGORIES: CategoryItem[] = [
 
 const HERO_SLIDES = [
   {
+    id: "montu-deal",
+    badge: "MONTU FAST FOOD",
+    badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
+    title: "Special Cake Offer",
+    highlight: "1 kg Cake at ₹800",
+    description: "Sweet way to say Thank You. Same Day Delivery in Jonai.",
+    cta: "Order Now",
+    ctaLink: "/app/r/montu-fast-food",
+    external: false,
+    code: "HAPPY TEACHER'S DAY",
+    gradient: "from-[#0f3622] via-[#155431] to-[#1a7341]",
+    accentColor: "#10b981",
+    tagIcon: Cake,
+    heroImage: chocolateCakeImg,
+    heroSecondary: cakeCategoryImg,
+    heroBadge: "SPECIAL OFFER",
+    offerPill: "FLAT ₹800",
+    features: ["🎂 Fresh Baked", "⚡ Same Day Delivery", "❤️ Thank You"],
+  },
+  {
     id: "poba-deal",
     badge: "POBA EXPRESS EXCLUSIVE",
     badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
@@ -267,6 +287,54 @@ const HERO_SLIDES = [
 
 /** Thematic Background SVG Illustrations for Hero Slides */
 function SlideBackgroundIllustrations({ slideId }: { slideId: string }) {
+  if (slideId === "montu-deal") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+        <div className="absolute -left-10 -top-10 size-80 rounded-full bg-emerald-500/20 blur-3xl" />
+        <div className="absolute right-10 bottom-0 size-96 rounded-full bg-green-400/20 blur-3xl" />
+
+        {/* Celebration Confetti & Sparkles */}
+        <svg
+          className="absolute inset-0 size-full text-emerald-300/[0.15]"
+          viewBox="0 0 400 200"
+          fill="currentColor"
+        >
+          <circle cx="40" cy="30" r="5" />
+          <circle cx="120" cy="70" r="4" />
+          <circle cx="280" cy="40" r="6" />
+          <circle cx="340" cy="90" r="4" />
+          <circle cx="200" cy="20" r="5" />
+          <rect x="70" y="45" width="10" height="10" rx="3" transform="rotate(25 70 45)" />
+          <rect x="250" y="80" width="12" height="8" rx="3" transform="rotate(-35 250 80)" />
+          <rect x="160" y="110" width="10" height="10" rx="3" transform="rotate(45 160 110)" />
+          <path
+            d="M30 120 Q50 140 70 120 T110 120"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeDasharray="4 4"
+          />
+          <path
+            d="M220 30 Q240 50 260 30 T300 30"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeDasharray="4 4"
+          />
+        </svg>
+
+        {/* Floating Heart / Sparkle */}
+        <svg
+          className="absolute right-1/4 top-8 size-12 text-emerald-200/[0.25] animate-pulse"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+      </div>
+    );
+  }
+
   if (slideId === "poba-deal") {
     return (
       <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
@@ -1081,3 +1149,4 @@ export function ZomatoTopBanner() {
     </div>
   );
 }
+
