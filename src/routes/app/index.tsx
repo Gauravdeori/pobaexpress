@@ -9,6 +9,7 @@ import {
   UtensilsCrossed,
   Zap,
   Percent,
+  ArrowRight,
 } from "lucide-react";
 
 import biryaniImg from "@/assets/biryani.png";
@@ -16,6 +17,7 @@ import momosImg from "@/assets/momos.png";
 import cakeCategoryImg from "@/assets/cake_category.jpg";
 import chowmeinImg from "@/assets/chowmein.png";
 import msMaaHotelImg from "@/assets/ms_maa_hotel_cover.jpg";
+import chocolateCakeImg from "@/assets/chocolate-cake.jpg";
 import { PHARMACIES } from "@/lib/pharmacies";
 import { RESTAURANTS, priceFrom } from "@/lib/restaurants";
 import { LiveBanner } from "@/components/poba/LiveBanner";
@@ -47,7 +49,7 @@ const topCategories = [
   {
     name: "Cakes",
     image: cakeCategoryImg,
-    to: "/app/cake",
+    to: "/app/r/montu-fast-food",
   },
   {
     name: "Pegu Drugs House",
@@ -94,6 +96,66 @@ function AppHome() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-4 font-sans pb-10">
       <LiveBanner />
+
+      {/* Promotional Banner (Montu Cake Offer) */}
+      <div className="mb-6 relative overflow-hidden rounded-3xl shadow-sm border border-emerald-500/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f3622] via-[#155431] to-[#1a7341]"></div>
+        {/* Confetti SVG */}
+        <svg className="absolute inset-0 size-full text-emerald-300/[0.15]" viewBox="0 0 400 200" fill="currentColor">
+          <circle cx="40" cy="30" r="5" />
+          <circle cx="120" cy="70" r="4" />
+          <circle cx="280" cy="40" r="6" />
+          <circle cx="340" cy="90" r="4" />
+          <circle cx="200" cy="20" r="5" />
+          <rect x="70" y="45" width="10" height="10" rx="3" transform="rotate(25 70 45)" />
+          <rect x="250" y="80" width="12" height="8" rx="3" transform="rotate(-35 250 80)" />
+          <rect x="160" y="110" width="10" height="10" rx="3" transform="rotate(45 160 110)" />
+        </svg>
+
+        <div className="relative z-10 p-5 flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm backdrop-blur-md border border-white/20">
+                <Cake className="size-3" />
+                HAPPY TEACHER'S DAY
+              </span>
+              <span className="inline-flex items-center rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-200 border border-emerald-400/30">
+                MONTU FAST FOOD
+              </span>
+            </div>
+            
+            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+              Special Cake Offer
+            </h2>
+            <div className="mt-1.5 flex items-center gap-2">
+              <span className="rounded bg-white/20 px-2 py-0.5 text-[11px] font-black text-white border border-white/20">
+                FLAT ₹800
+              </span>
+              <span className="text-sm font-bold text-emerald-50">1 kg Cake</span>
+            </div>
+            <p className="mt-2 text-xs font-medium text-emerald-100/90 max-w-[200px] leading-relaxed">
+              Sweet way to say Thank You. Same Day Delivery in Jonai.
+            </p>
+            <Link
+              to="/app/cake"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[11px] font-bold text-emerald-900 shadow-xl transition-transform active:scale-95"
+            >
+              Order Now <ArrowRight className="size-3" />
+            </Link>
+          </div>
+          
+          <div className="relative size-28 sm:size-32 shrink-0 rounded-full border-[3px] border-white/30 shadow-2xl overflow-hidden bg-white/10 backdrop-blur-sm p-1">
+            <img 
+              src={chocolateCakeImg} 
+              alt="Chocolate Cake" 
+              className="size-full rounded-full object-cover"
+            />
+            <div className="absolute -bottom-2 -right-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-amber-300 backdrop-blur-md border border-amber-400/30 shadow-lg">
+              FRESH
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Top 6 Category Rail (Pixel Perfect to Screenshot) */}
       <div className="mb-6 grid grid-cols-3 sm:grid-cols-6 gap-2.5 sm:gap-3">
@@ -347,3 +409,4 @@ function AppHome() {
     </div>
   );
 }
+
