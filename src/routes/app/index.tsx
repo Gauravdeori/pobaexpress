@@ -137,7 +137,7 @@ function AppHome() {
               Sweet way to say Thank You. Same Day Delivery in Jonai.
             </p>
             <Link
-              to="/app/cake"
+              to="/app/r/montu-fast-food"
               className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[11px] font-bold text-emerald-900 shadow-xl transition-transform active:scale-95"
             >
               Order Now <ArrowRight className="size-3" />
