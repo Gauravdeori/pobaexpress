@@ -250,7 +250,7 @@ const HERO_SLIDES = [
     description:
       "Indulgent Chocolate Truffle, Butterscotch, New York Cheesecakes & freshly baked dessert loaves.",
     cta: "Order Bakery Cakes",
-    ctaLink: "/app/cake",
+    ctaLink: "/app/r/montu-fast-food",
     external: false,
     code: "ARTISAN BAKERY",
     gradient: "from-[#280517] via-[#4a0d2d] to-[#781849]",
