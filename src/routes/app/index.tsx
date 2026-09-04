@@ -129,7 +129,7 @@ function AppHome() {
             </h2>
             <div className="mt-1.5 flex items-center gap-2">
               <span className="rounded bg-white/20 px-2 py-0.5 text-[11px] font-black text-white border border-white/20">
-                FLAT ₹800
+                FROM ₹800
               </span>
               <span className="text-sm font-bold text-emerald-50">1 kg Cake</span>
             </div>

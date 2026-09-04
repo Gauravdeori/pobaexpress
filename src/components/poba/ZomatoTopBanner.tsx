@@ -193,7 +193,7 @@ const HERO_SLIDES = [
     heroImage: chocolateCakeImg,
     heroSecondary: cakeCategoryImg,
     heroBadge: "SPECIAL OFFER",
-    offerPill: "FLAT ₹800",
+    offerPill: "FROM ₹800",
     features: ["🎂 Fresh Baked", "⚡ Same Day Delivery", "❤️ Thank You"],
   },
   {
