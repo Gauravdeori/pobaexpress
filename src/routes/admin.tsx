@@ -231,6 +231,7 @@ function Admin() {
             Signed in as <span className="font-medium text-foreground">{accountLabel(user)}</span>
           </p>
         </div>
+        <MasterToggle />
       </div>
 
       <div className="mt-8 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -272,6 +273,56 @@ function Admin() {
       </div>
       <LiveAnnouncementModal />
     </Shell>
+  );
+}
+
+function MasterToggle() {
+  const settings = useLaunchSettings();
+  const [saving, setSaving] = useState(false);
+
+  const toggle = async () => {
+    setSaving(true);
+    try {
+      const turnOn = settings.openNow !== true;
+      await saveLaunchSettings({
+        ...settings,
+        openNow: turnOn,
+      });
+      if (turnOn) {
+        window.dispatchEvent(new CustomEvent("poba:trigger_live_modal"));
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isLive = settings.openNow === true;
+
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-3 shadow-sm">
+      <div className="text-sm">
+        <p className="font-bold text-primary">Master Switch</p>
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <span className={cn("relative flex size-2 rounded-full", isLive ? "bg-emerald-500" : "bg-destructive")}>
+            {isLive && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />}
+          </span>
+          {isLive ? "Accepting orders" : "Operations paused"}
+        </p>
+      </div>
+      <Button
+        variant={isLive ? "destructive" : "accent"}
+        className={cn(
+          "h-10 rounded-xl px-5 font-bold transition-all shrink-0",
+          isLive ? "bg-destructive/10 text-destructive hover:bg-destructive/20" : "bg-emerald-500 hover:bg-emerald-400 text-emerald-950"
+        )}
+        disabled={saving}
+        onClick={() => void toggle()}
+      >
+        {saving ? <Loader2 className="size-4 animate-spin" /> : (isLive ? "Turn OFF" : "Turn ON")}
+      </Button>
+    </div>
   );
 }
 
