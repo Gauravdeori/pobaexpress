@@ -11,7 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { startAnalytics } from "../lib/firebase";
-import { UpdateBanner } from "../components/app/UpdateBanner";
+import { PwaUpdatePrompt } from "../components/poba/PwaUpdatePrompt";
 
 // Defaults for every route; individual routes override them in their own `head`.
 const siteTitle = "Poba Express — Jonai's Own Delivery Service";
@@ -225,9 +225,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      {/* At the root so it reaches the marketing page and the app alike, and
-          renders nothing at all until there is genuinely a new build waiting. */}
-      <UpdateBanner />
+      {/* PWA Update Prompt Toast Manager */}
+      <PwaUpdatePrompt />
     </QueryClientProvider>
   );
 }

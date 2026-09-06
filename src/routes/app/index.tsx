@@ -117,7 +117,7 @@ function AppHome() {
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm backdrop-blur-md border border-white/20">
                 <Cake className="size-3" />
-                HAPPY TEACHER'S DAY
+                ORDER NOW
               </span>
               <span className="inline-flex items-center rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-200 border border-emerald-400/30">
                 MONTU FAST FOOD
@@ -125,7 +125,7 @@ function AppHome() {
             </div>
             
             <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-              Special Cake Offer
+              Fresh Cakes Delivered
             </h2>
             <div className="mt-1.5 flex items-center gap-2">
               <span className="rounded bg-white/20 px-2 py-0.5 text-[11px] font-black text-white border border-white/20">
@@ -134,10 +134,11 @@ function AppHome() {
               <span className="text-sm font-bold text-emerald-50">1 kg Cake</span>
             </div>
             <p className="mt-2 text-xs font-medium text-emerald-100/90 max-w-[200px] leading-relaxed">
-              Sweet way to say Thank You. Same Day Delivery in Jonai.
+              Order delicious cakes for birthdays and special occasions. Same Day Delivery in Jonai.
             </p>
             <Link
-              to="/app/r/montu-fast-food"
+              to="/app/r/$slug"
+              params={{ slug: "montu-fast-food" }}
               className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[11px] font-bold text-emerald-900 shadow-xl transition-transform active:scale-95"
             >
               Order Now <ArrowRight className="size-3" />
@@ -321,7 +322,8 @@ function AppHome() {
             return (
               <Link
                 key={r.slug}
-                to={`/app/r/${r.slug}`}
+                to="/app/r/$slug"
+                params={{ slug: r.slug }}
                 className="group flex w-64 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-card p-3 shadow-sm transition-all hover:shadow-md hover:border-rose-500/40"
               >
                 <div className="relative h-32 w-full overflow-hidden rounded-xl bg-secondary">
