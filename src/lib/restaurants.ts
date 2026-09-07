@@ -5,6 +5,7 @@ import dispyBakeryImg from "@/assets/dispy_bakery.jpg";
 import biriyaniCornerImg from "@/assets/biriyani_corner_cover.jpg";
 import msMaaHotelImg from "@/assets/ms_maa_hotel_cover.jpg";
 import montuFastFoodImg from "@/assets/montu_fast_food_cover.jpg";
+import urbanCafeImg from "@/assets/urban_cafe_cover.jpg";
 
 import {
   BIRIYANI_CORNER_MENU,
@@ -14,6 +15,7 @@ import {
   MONTU_FAST_FOOD_MENU,
   MS_MAA_HOTEL_MENU,
   PRARTHONA_MENU,
+  URBAN_CAFE_MENU,
   type MenuItem,
 } from "./menu";
 
@@ -107,6 +109,15 @@ export const RESTAURANTS: Restaurant[] = [
     image: montuFastFoodImg,
     eta: [15, 35],
     items: MONTU_FAST_FOOD_MENU,
+  },
+  {
+    slug: "urban-cafe",
+    name: "Urban Cafe",
+    category: "food",
+    cuisine: "Food · Party · Event · Sizzlers · Exotics · Pizza",
+    image: urbanCafeImg,
+    eta: [15, 35],
+    items: URBAN_CAFE_MENU,
   },
 ];
 
