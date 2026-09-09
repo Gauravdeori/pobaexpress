@@ -56,6 +56,15 @@ export type Restaurant = {
  */
 export const RESTAURANTS: Restaurant[] = [
   {
+    slug: "urban-cafe",
+    name: "Urban Cafe",
+    category: "food",
+    cuisine: "Food · Party · Event · Sizzlers · Exotics · Pizza",
+    image: urbanCafeImg,
+    eta: [15, 35],
+    items: URBAN_CAFE_MENU,
+  },
+  {
     slug: "prarthona",
     name: "Prarthona Restaurant",
     category: "food",
@@ -109,15 +118,6 @@ export const RESTAURANTS: Restaurant[] = [
     image: montuFastFoodImg,
     eta: [15, 35],
     items: MONTU_FAST_FOOD_MENU,
-  },
-  {
-    slug: "urban-cafe",
-    name: "Urban Cafe",
-    category: "food",
-    cuisine: "Food · Party · Event · Sizzlers · Exotics · Pizza",
-    image: urbanCafeImg,
-    eta: [15, 35],
-    items: URBAN_CAFE_MENU,
   },
 ];
 

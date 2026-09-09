@@ -26,6 +26,7 @@ import pizzaImg from "@/assets/pizza.jpg";
 import chocolateCakeImg from "@/assets/chocolate-cake.jpg";
 import cakeCategoryImg from "@/assets/cake_category.jpg";
 import medicineCategoryImg from "@/assets/medicine_category.jpg";
+import urbanCafeCoverImg from "@/assets/urban_cafe_cover.jpg";
 import { MIN_DELIVERY_FEE } from "@/lib/menu";
 import { AREA_EDGES, AREA_SUMMARY } from "@/lib/delivery-area";
 import {
@@ -177,12 +178,33 @@ const CATEGORIES: CategoryItem[] = [
 
 const HERO_SLIDES = [
   {
+    id: "urban-cafe-deal",
+    badge: "URBAN CAFE",
+    badgeBg: "bg-orange-500/20 text-orange-300 border-orange-400/30",
+    title: "Sizzlers & Exotics",
+    highlight: "Try our new Lava Glazed Octopus",
+    description: "Experience the best food, party, event, sizzlers, exotics, and pizza in town.",
+    cta: "Order Now",
+    ctaLink: "/app/r/urban-cafe",
+    external: false,
+    code: "NEW ARRIVAL",
+    gradient: "from-[#3a1a08] via-[#5c2a0d] to-[#8a3a12]",
+    accentColor: "#f97316",
+    tagIcon: Sparkles,
+    heroImage: urbanCafeCoverImg,
+    heroSecondary: pizzaImg,
+    heroBadge: "SPECIAL MENU",
+    offerPill: "EXOTICS",
+    features: ["🐙 Lava Glazed Octopus", "🔥 Tex-Mex Sizzlers", "🍕 Special Pizzas"],
+  },
+  {
     id: "montu-deal",
     badge: "MONTU FAST FOOD",
     badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
     title: "Fresh Cakes Delivered",
     highlight: "1 kg Cake starting at ₹800",
-    description: "Order delicious cakes for birthdays and special occasions. Same Day Delivery in Jonai.",
+    description:
+      "Order delicious cakes for birthdays and special occasions. Same Day Delivery in Jonai.",
     cta: "Order Now",
     ctaLink: "/app/r/montu-fast-food",
     external: false,
@@ -287,6 +309,38 @@ const HERO_SLIDES = [
 
 /** Thematic Background SVG Illustrations for Hero Slides */
 function SlideBackgroundIllustrations({ slideId }: { slideId: string }) {
+  if (slideId === "urban-cafe-deal") {
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+        <div className="absolute -left-10 -top-10 size-80 rounded-full bg-orange-500/20 blur-3xl" />
+        <div className="absolute right-10 bottom-0 size-96 rounded-full bg-red-400/20 blur-3xl" />
+
+        {/* Wok Flame & Sizzle Steam Wave Illustration */}
+        <svg
+          className="absolute -right-6 bottom-0 h-72 w-96 text-orange-400/[0.12]"
+          viewBox="0 0 200 200"
+          fill="currentColor"
+        >
+          <path d="M100 20 C80 60 40 80 40 120 C40 160 80 190 100 190 C120 190 160 160 160 120 C160 80 120 60 100 20 Z" />
+          <path
+            d="M100 60 C90 85 70 100 70 125 C70 150 90 170 100 170 C110 170 130 150 130 125 C130 100 110 85 100 60 Z"
+            fill="#f97316"
+            opacity="0.4"
+          />
+        </svg>
+
+        {/* Sparkles */}
+        <svg
+          className="absolute right-1/4 top-8 size-12 text-orange-200/[0.25] animate-pulse"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+        </svg>
+      </div>
+    );
+  }
+
   if (slideId === "montu-deal") {
     return (
       <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
@@ -1149,4 +1203,3 @@ export function ZomatoTopBanner() {
     </div>
   );
 }
-

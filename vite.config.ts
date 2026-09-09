@@ -16,30 +16,30 @@ export default defineConfig({
     nitro(),
     viteReact(),
     VitePWA({
-      registerType: 'prompt',
-      injectRegister: 'auto',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      registerType: "prompt",
+      injectRegister: "auto",
+      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
       manifest: {
-        name: 'Poba Express',
-        short_name: 'Poba',
-        description: 'Fast Doorstep Delivery in Jonai',
-        theme_color: '#10b981',
+        name: "Poba Express",
+        short_name: "Poba",
+        description: "Fast Doorstep Delivery in Jonai",
+        theme_color: "#10b981",
         icons: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
           },
           {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
       },
       workbox: {
-        navigateFallbackDenylist: [/^\/api/]
-      }
+        navigateFallbackDenylist: [/^\/api/],
+      },
     }),
   ],
   resolve: {

@@ -101,7 +101,11 @@ function AppHome() {
       <div className="mb-6 relative overflow-hidden rounded-3xl shadow-sm border border-emerald-500/30">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0f3622] via-[#155431] to-[#1a7341]"></div>
         {/* Confetti SVG */}
-        <svg className="absolute inset-0 size-full text-emerald-300/[0.15]" viewBox="0 0 400 200" fill="currentColor">
+        <svg
+          className="absolute inset-0 size-full text-emerald-300/[0.15]"
+          viewBox="0 0 400 200"
+          fill="currentColor"
+        >
           <circle cx="40" cy="30" r="5" />
           <circle cx="120" cy="70" r="4" />
           <circle cx="280" cy="40" r="6" />
@@ -123,7 +127,7 @@ function AppHome() {
                 MONTU FAST FOOD
               </span>
             </div>
-            
+
             <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
               Fresh Cakes Delivered
             </h2>
@@ -144,11 +148,11 @@ function AppHome() {
               Order Now <ArrowRight className="size-3" />
             </Link>
           </div>
-          
+
           <div className="relative size-28 sm:size-32 shrink-0 rounded-full border-[3px] border-white/30 shadow-2xl overflow-hidden bg-white/10 backdrop-blur-sm p-1">
-            <img 
-              src={chocolateCakeImg} 
-              alt="Chocolate Cake" 
+            <img
+              src={chocolateCakeImg}
+              alt="Chocolate Cake"
               className="size-full rounded-full object-cover"
             />
             <div className="absolute -bottom-2 -right-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-amber-300 backdrop-blur-md border border-amber-400/30 shadow-lg">
@@ -411,4 +415,3 @@ function AppHome() {
     </div>
   );
 }
-

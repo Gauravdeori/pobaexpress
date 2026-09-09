@@ -11,9 +11,12 @@ export function PwaUpdatePrompt() {
     onRegistered(r) {
       // Periodically check for updates every hour in the background
       if (r) {
-        setInterval(() => {
-          r.update().catch(() => {});
-        }, 60 * 60 * 1000);
+        setInterval(
+          () => {
+            r.update().catch(() => {});
+          },
+          60 * 60 * 1000,
+        );
       }
     },
     onRegisterError(error) {
