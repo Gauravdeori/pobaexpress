@@ -884,20 +884,20 @@ export const URBAN_CAFE_MENU: MenuItem[] = [
   {
     id: "uc-butter-chicken-masala-gravy",
     name: "Butter Chicken Masala Gravy",
-    price: 250,
+    price: 260,
     image: urbanCafeCoverImg,
   },
   {
     id: "uc-karahi-chicken-gravy",
     name: "Karahi Chicken Gravy",
-    price: 250,
+    price: 260,
     image: urbanCafeCoverImg,
   },
-  { id: "uc-chicken-do-pyaza", name: "Chicken Do Pyaza", price: 250, image: urbanCafeCoverImg },
+  { id: "uc-chicken-do-pyaza", name: "Chicken Do Pyaza", price: 260, image: urbanCafeCoverImg },
   {
     id: "uc-paneer-butter-masala",
     name: "Paneer Butter Masala",
-    price: 250,
+    price: 260,
     image: urbanCafeCoverImg,
   },
 
